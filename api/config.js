@@ -6,11 +6,15 @@ module.exports = {
 				dbpwd  : process.env.DBPWD || require('./creds.json').dbpwd,
 				dburl  : process.env.DBURL || require('./creds.json').dburl
 			},
-	server : {
+	github : {
 				secret 	: process.env.SECRET || require('./creds.json').secret,
 				cKey	: process.env.CKEY || require('./creds.json').cKey,
 				cSecret	: process.env.CSECRET || require('./creds.json').cSecret,
-			}
+			},
+	cookie : {
+		password: process.env.COOKIESECRET || require('./creds.json').cookieSecret
+	}
+
 };
 
 /* $lab:coverage:on$ */

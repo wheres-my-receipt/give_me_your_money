@@ -24,14 +24,14 @@ server.register([Bell, Cookie], function (err) {
 
     server.auth.strategy('github', 'bell', {
         provider: 'github',
-        password: config.server.secret,
+        password: config.github.password,
         isSecure: false,
-        clientId: config.server.cKey,
-        clientSecret: config.server.cSecret
+        clientId: config.github.clientId,
+        clientSecret: config.github.clientSecret
     });
 
     server.auth.strategy('session', 'cookie', {
-        password: config.server.secret,
+        password: config.cookie.password,
         cookie: 'sid',
         redirectTo: '/login',
         redirectOnTry: false,
