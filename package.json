@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "lab -v -c",
-    "start":"node app.js"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,9 @@
     "lab": "^5.5.0"
   },
   "dependencies": {
+    "bell": "^2.2.0",
     "hapi": "^8.4.0",
+    "hapi-auth-cookie": "^2.0.0",
     "mailgun-js": "^0.6.8"
   }
 }

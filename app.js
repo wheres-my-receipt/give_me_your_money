@@ -1,1 +1,6 @@
-// server init here
+var server = require('./api/server');
+
+
+
+
+
