@@ -65,25 +65,6 @@ module.exports = {
 			return reply( "getMember path");
 		}
 	},
-	updateMember: {
-		auth: {
-        	strategy: 'session',
-        },
-        validate:{
-                payload: joiSchema,
-        },
-		handler: function (request, reply) {
-			return reply( "updateMember path");
-		}
-	},
-	deleteMember: {
-		auth: {
-        	strategy: 'session',
-        },
-		handler: function (request, reply) {
-			return reply( "deleteMember path");
-		}
-	},
 	getAccount: {
 		auth: {
         	strategy: 'session',
@@ -100,7 +81,18 @@ module.exports = {
                 payload: joiSchema,
         },
 		handler: function (request, reply) {
-			return reply( "updateAccount path");
+			return reply( "createAccount path");
+		}
+	},
+	updateAccount: {
+		auth: {
+        	strategy: 'session',
+        },
+        validate:{
+                payload: joiSchema,
+        },
+		handler: function (request, reply) {
+			return reply( "updateMember path");
 		}
 	},
 	deleteAccount: {
