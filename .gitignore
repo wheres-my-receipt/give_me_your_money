@@ -29,6 +29,4 @@ node_modules
 
 .DS_Store
 
-config.js
-
-credentials.js
+creds.json

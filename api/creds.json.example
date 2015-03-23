@@ -1,0 +1,5 @@
+{
+	"dbuser": "<mongo user name>"
+	"dbpwd": "<mongo password>"
+	"dburl": "<mongo db url>"
+}

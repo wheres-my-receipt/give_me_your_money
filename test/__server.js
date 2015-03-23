@@ -39,7 +39,7 @@ lab.experiment("When the admin visits the admin dashboard, ", function() {
 	lab.test("they should be able to email an individual or group", function(done) {
 
 	});
-	lab.test("they should be able to authorise new members, ", function(done) {
+	lab.test("they should be able to authorise new members to occupy a desk", function(done) {
 
 	});
 });
