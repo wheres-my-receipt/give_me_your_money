@@ -1,0 +1,27 @@
+{
+  "name": "give_me_your_money",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "lab -v -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wheres-my-receipt/give_me_your_money.git"
+  },
+  "author": "wheres-my-receipt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wheres-my-receipt/give_me_your_money/issues"
+  },
+  "homepage": "https://github.com/wheres-my-receipt/give_me_your_money",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-lab": "^1.0.5",
+    "lab": "^5.5.0"
+  },
+  "dependencies": {
+    "hapi": "^8.4.0"
+  }
+}
