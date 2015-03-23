@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "lab -v -c"
+    "test": "lab -v -c",
+    "start":"node app.js"
   },
   "repository": {
     "type": "git",
