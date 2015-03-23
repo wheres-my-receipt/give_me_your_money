@@ -22,12 +22,18 @@ server.register([Bell, Cookie], function (err) {
         throw err; // something bad happened loading the plugins
     }
 
+    console.log( 'secret: ' + config.github.secret);
+    console.log( 'secret: ' + config.github.cKey);
+    console.log( 'secret: ' + config.github.cSecret);
     server.auth.strategy('github', 'bell', {
         provider: 'github',
-        password: config.github.password,
+        password: config.github.secret,
         isSecure: false,
-        clientId: config.github.clientId,
-        clientSecret: config.github.clientSecret
+        clientId: config.github.cKey,
+        clientSecret: config.github.cSecret,
+        providerParams: {
+        	redirect_uri: "http://localhost:3000"
+        }
     });
 
     server.auth.strategy('session', 'cookie', {

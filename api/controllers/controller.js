@@ -14,10 +14,17 @@ module.exports = {
 		},
 		handler: function (request, reply) {
 			var g = request.auth.credentials;
-			console.log( g );
-			var profile;
+			// console.log( g );
+			console.log( g.profile.raw );
+			var profile ={
+				username 	: g.username,
+				displayname	: g.displayname,
+				email 		: g.email,
+				avatar 		: g.profile.raw.avatar_url,
+				url 		: g.profile.raw.url
+			};
 	        request.auth.session.set(profile);
-	    	return reply.redirect("/");
+	    	return reply.redirect("/signup");
 		}
 	},
 	signup: {
@@ -30,6 +37,7 @@ module.exports = {
 	},
 	logout: {
 		handler: function (request, reply ){
+			request.auth.session.clear();
 			return reply( "logout path");
 		}
 	},
