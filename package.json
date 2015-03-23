@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/wheres-my-receipt/give_me_your_money",
   "devDependencies": {
+    "chai": "^2.1.2",
     "gulp": "^3.8.11",
     "gulp-lab": "^1.0.5",
     "lab": "^5.5.0"
