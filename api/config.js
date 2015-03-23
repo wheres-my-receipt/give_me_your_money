@@ -14,6 +14,9 @@ module.exports = {
 	},
 	cookie : {
 				password: process.env.COOKIESECRET || creds.cookieSecret
+	},
+	stripe : {
+				sk : process.env.STRIPESECRET || creds.stripe.secret
 	}
 };
 

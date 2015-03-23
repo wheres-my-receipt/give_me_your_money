@@ -1,5 +1,4 @@
 var controller 	= require("../controllers/controller.js");
-var Joi 		= require( "joi");
 
 module.exports 	= [
 
@@ -12,10 +11,12 @@ module.exports 	= [
 	// {path: "/admin/member/{memberid}", 	method: "GET",		config: controller.getMember},
 
 	// {path: "/account", 					method: "GET", 		config: controller.account},
-	// {path: "/account/messages", 		method: "GET", 		config: controller.messages},
+	// {path: "/account/messages", 			method: "GET", 		config: controller.messages},
 
 	{path: "/{param*}", 				method: "GET", 		config: controller.statics},
 
+	// Payment
+	{path: "/payment", 					method: "POST", 	config: controller.payment},
 	// JSON API
 	{path: "/accounts", 				method: "GET", 		config: controller.getAccounts},
 	{path: "/accounts", 				method: "POST",  	config: controller.createAccount},

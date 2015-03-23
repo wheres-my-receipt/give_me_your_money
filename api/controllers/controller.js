@@ -1,7 +1,8 @@
 var Bell 	= require("bell");
 var path 	= require("path");
-var model 	= require("../models/members.js");
 var Joi 	= require("joi");
+var Stripe 	= require("stripe")(require("./config.js").strike.sk);
+var model 	= require("../models/members.js");
 
 var joiSchema = Joi.object().keys({ /* to be defined */});
 
@@ -91,6 +92,29 @@ module.exports = {
 	// 		return reply( "getMember path");
 	// 	}
 	// },
+
+	// Payment with Stripe
+	payment: {
+		handler: function(request, reply) {
+			var stripeToken = request.body.stripeToken;
+
+			var charge = stripe.charges.create({
+			  amount: 1000, // amount in cents, again
+			  currency: "gbp",
+			  source: stripeToken,
+			  description: "payinguser@example.com"
+			}, function(err, charge) {
+			  if (err && err.type === 'StripeCardError') {
+			    return reply(err);// The card has been declined
+			  } else if (err) {
+			  	return reply(err);
+			  } else {
+			  	// write the payment to the DB
+			  	return reply("success!");
+			  }
+			});
+		}
+	},
 
 	// JSON API
 	// /accounts
