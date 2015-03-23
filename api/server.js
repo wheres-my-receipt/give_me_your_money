@@ -3,7 +3,7 @@ var Bell = require('bell');
 var Cookie = require('hapi-auth-cookie');
 var Path = require( 'path');
 var routes = require( './routes/routes.js');
-var config = require('./api/config.js');
+var config = require('./config.js');
 
 var server = new Hapi.Server({
     // connections: {
