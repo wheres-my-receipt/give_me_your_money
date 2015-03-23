@@ -38,11 +38,6 @@ server.register([Bell, Cookie], function (err) {
     });
 
     server.route( routes );
-
-    server.start(function () {
-        console.log('Server running at:', server.info.uri);
-    });
-
 });
 
 
