@@ -20,7 +20,7 @@ To optimally divest your wallet of your membership fee:
 ```
 clone  
 npm install  
-node app.js
+npm start
 cry when it doesn't run
 ```
 
