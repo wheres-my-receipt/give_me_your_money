@@ -36,6 +36,9 @@ module.exports = {
 		}
 	},
 	logout: {
+		auth: {
+			strategy: 'session'
+		},
 		handler: function (request, reply ){
 			request.auth.session.clear();
 			return reply( "logout path");
