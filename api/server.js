@@ -14,6 +14,7 @@ var server = new Hapi.Server({
     //     }
     // }
 });
+
 server.connection({port: (process.env.port || 3000 ) });
 
 server.register([Bell, Cookie], function (err) {
