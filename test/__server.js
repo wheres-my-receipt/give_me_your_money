@@ -6,20 +6,35 @@ var Hapi   		= require("hapi");
 lab.experiment("when the user visits the signup page, ", function() {
 
 	lab.test("Without proper authentication", function(done) {
-		assert.equal(response.statusCode, 302, " they should get a FOUND status code (302)");
-		assert.equal(response.headers.location, "/", " they should be redirected to the login page");
+
+		options = {
+			method: "GET",
+			url: "/signup"
+		};
+		server.inject(options, function(response) {
+			assert.equal(response.statusCode, 302, " they should get a FOUND status code (302)");
+			assert.equal(response.headers.location, "/", " they should be redirected to the login page");
+			done();
+		});
 	});
 
 	lab.test("with proper authentication, they should be able to register as a user", function(done) {
 
 		options = {
 			method: "GET",
-			url: "/signup"
+			url: "/signup",
+			credentials: {
+				name: 	"timmy tester",
+				status: "sith lord"
+			}
 		};
-
-		assert.equal(response.statusCode, 200, " they should get an OK status code (200)");
+		server.inject(options, function(response) {
+			assert.equal(response.statusCode, 200, " they should get an OK status code (200)");
+			assert.includes(response.headers["Content-Type"], "text/html", "they should get an html page back");
+			assert.includes(response.result, "<form", "they should be presented with a form element");
+			done();
+		});
 	});
-
 });
 
 lab.experiment("When visits the home page, ", function() {
