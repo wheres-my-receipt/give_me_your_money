@@ -4,7 +4,7 @@
 A simple money-grabbing app for simple people.  
 
 ## The capitalist manifesto
-To optimally divest your wallet from your membership fee:
+To optimally divest your wallet of your membership fee:
  * Create a basic membership signup system
  * Create a JSON API for client/admin control of accounts
  * Implement a payment system (using stripe) for membership and desk rental 
