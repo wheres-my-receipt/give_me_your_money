@@ -24,6 +24,7 @@
     "lab": "^5.5.0"
   },
   "dependencies": {
-    "hapi": "^8.4.0"
+    "hapi": "^8.4.0",
+    "mailgun-js": "^0.6.8"
   }
 }
