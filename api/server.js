@@ -1,26 +1,15 @@
-var Hapi = require('hapi');
-var Bell = require('bell');
-var Cookie = require('hapi-auth-cookie');
-var Path = require( 'path');
-var routes = require( './routes/routes.js');
-var config = require('./config.js');
-var port = {port: (process.env.port || 3000 ) };
-var server = new Hapi.Server({
-    // connections: {
-    //     routes: {
-    //         files: {
-    //             relativeTo: Path.join(__dirname, 'public/css')
-    //         }
-    //     }
-    // }
-});
+var Hapi 	= require('hapi');
+var Bell 	= require('bell');
+var Cookie 	= require('hapi-auth-cookie');
+var routes 	= require('./routes/routes.js');
+var config 	= require('./config.js');
+var port 	= {port: (process.env.port || 3000 ) };
+var server 	= new Hapi.Server({});
 
-server.connection( port );
+server.connection(port);
 
 server.register([Bell, Cookie], function (err) {
-    if (err) {
-        throw err; // something bad happened loading the plugins
-    }
+    if (err) {throw err;}
 
     server.auth.strategy('github', 'bell', {
         provider: 'github',
@@ -41,7 +30,7 @@ server.register([Bell, Cookie], function (err) {
         isSecure: false
     });
 
-    server.route( routes );
+    server.route(routes);
 });
 
 

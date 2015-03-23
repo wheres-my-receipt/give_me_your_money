@@ -1,21 +1,20 @@
 /* $lab:coverage:off$ */
+var creds = require("./creds.json");
 
 module.exports = {
 	mongo : {
-				dbuser : process.env.DBUSER || require('./creds.json').dbuser,
-				dbpwd  : process.env.DBPWD || require('./creds.json').dbpwd,
-				dburl  : process.env.DBURL || require('./creds.json').dburl
+				dbuser : process.env.DBUSER || creds.dbuser,
+				dbpwd  : process.env.DBPWD || creds.dbpwd,
+				dburl  : process.env.DBURL || creds.dburl
 	},
 	github : {
-				secret 	: process.env.SECRET || require('./creds.json').secret,
-				cKey	: process.env.CKEY || require('./creds.json').cKey,
-				cSecret	: process.env.CSECRET || require('./creds.json').cSecret,
+				secret 	: process.env.SECRET || creds.github.password,
+				cKey	: process.env.CKEY || creds.github.clientId,
+				cSecret	: process.env.CSECRET || creds.github.clientSecret,
 	},
-
 	cookie : {
-		password: process.env.COOKIESECRET || require('./creds.json').cookieSecret
+				password: process.env.COOKIESECRET || creds.cookieSecret
 	}
-
 };
 
 /* $lab:coverage:on$ */

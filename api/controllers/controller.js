@@ -1,5 +1,4 @@
 var Bell 	= require("bell");
-//var Boom 	= require("boom");
 var path 	= require("path");
 var model 	= require("../models/members.js");
 var Joi 	= require("joi");
@@ -8,14 +7,13 @@ var joiSchema = Joi.object().keys({ /* to be defined */});
 
 module.exports = {
 
+	// Static file handling
 	home : {
 		auth: {
 			strategy: "github"
 		},
 		handler: function (request, reply) {
 			var g = request.auth.credentials;
-			// console.log( g );
-			console.log( g.profile.raw );
 			var profile ={
 				username 	: g.username,
 				displayname	: g.displayname,
@@ -27,14 +25,27 @@ module.exports = {
 	    	return reply.redirect("/signup");
 		}
 	},
-	signup: {
+
+	statics: {
 		auth: {
-			strategy: 'session'
+			strategy: "session"
 		},
-		handler: function (request, reply){
-			return reply( 'signup path');
-		}
+	    handler: {
+	        directory: {
+	            path: 'public'
+	        }
+	    }
 	},
+
+	// signup: {
+	// 	auth: {
+	// 		strategy: 'session'
+	// 	},
+	// 	handler: function (request, reply){
+	// 		return reply.file('signup path');
+	// 	}
+	// },
+
 	logout: {
 		auth: {
 			strategy: 'session'
@@ -44,39 +55,46 @@ module.exports = {
 			return reply( "logout path");
 		}
 	},
-	account: {
-		auth: {
-        	strategy: 'session',
-        },
-		handler: function (request, reply) {
-			return reply( "account path");
-		}
-	},
-	messages: {
-		auth: {
-        	strategy: 'session',
-        },
-		handler: function (request, reply) {
-			return reply( "messages path");
-		}
-	},
-	admin: {
-		auth: {
-        	strategy: 'session',
-        },
-		handler: function (request, reply) {
-			return reply( "admin path");
-		}
-	},
-	getMember: {
-		auth: {
-        	strategy: 'session',
-        },
-		handler: function (request, reply) {
-			return reply( "getMember path");
-		}
-	},
-	getAccount: {
+
+	// account: {
+	// 	auth: {
+ //        	strategy: 'session',
+ //        },
+	// 	handler: function (request, reply) {
+	// 		return reply( "account path");
+	// 	}
+	// },
+
+	// messages: {
+	// 	auth: {
+ //        	strategy: 'session',
+ //        },
+	// 	handler: function (request, reply) {
+	// 		return reply( "messages path");
+	// 	}
+	// },
+
+	// admin: {
+	// 	auth: {
+ //        	strategy: 'session',
+ //        },
+	// 	handler: function (request, reply) {
+	// 		return reply( "admin path");
+	// 	}
+	// },
+
+	// getMember: {
+	// 	auth: {
+ //        	strategy: 'session',
+ //        },
+	// 	handler: function (request, reply) {
+	// 		return reply( "getMember path");
+	// 	}
+	// },
+
+	// JSON API
+	// /accounts
+	getAccounts: {
 		auth: {
         	strategy: 'session',
         },
@@ -84,6 +102,7 @@ module.exports = {
 			return reply( "getAccount path");
 		}
 	},
+
 	createAccount: {
 		auth: {
         	strategy: 'session',
@@ -95,7 +114,19 @@ module.exports = {
 			return reply( "createAccount path");
 		}
 	},
-	updateAccount: {
+
+
+	// /accounts/{member}
+	getSingleAccount: {
+		auth: {
+        	strategy: 'session',
+        },
+		handler: function (request, reply) {
+			return reply( "getSingleAccount path");
+		}
+	},
+
+	updateSingleAccount: {
 		auth: {
         	strategy: 'session',
         },
@@ -103,15 +134,16 @@ module.exports = {
                 payload: joiSchema,
         },
 		handler: function (request, reply) {
-			return reply( "updateMember path");
+			return reply( "updateSingleMember path");
 		}
 	},
-	deleteAccount: {
+
+	deleteSingleAccount: {
 		auth: {
         	strategy: 'session',
         },
 		handler: function (request, reply) {
-			return reply( "deleteAccount path");
+			return reply( "deleteSingleAccount path");
 		}
 	}
 };
