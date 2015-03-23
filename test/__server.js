@@ -35,7 +35,6 @@ lab.experiment("when the user visits the signup page, ", function() {
 			done();
 		});
 	});
-
 });
 
 lab.experiment("When visits the home page, ", function() {
