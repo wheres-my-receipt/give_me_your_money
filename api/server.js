@@ -26,7 +26,10 @@ server.register([Bell, Cookie], function (err) {
         password: config.github.password,
         isSecure: false,
         clientId: config.github.clientId,
-        clientSecret: config.github.clientSecret
+        clientSecret: config.github.clientSecret,
+        providerParams: {
+        	redirect_uri: "http://localhost:3000"
+        }
     });
 
     server.auth.strategy('session', 'cookie', {

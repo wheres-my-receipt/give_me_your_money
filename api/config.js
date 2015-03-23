@@ -8,8 +8,8 @@ module.exports = {
 			},
 	github: {
 		password: 'githubsecret',
-		clientId: 'sommit',
-		clientSecret: 'sommitelse'
+		clientId: 'adf7befc4fc9249455db',
+		clientSecret: '08556d92bc509ab90e654d859d6a4d9569c1ca49',
 	},
 	cookie : {
 		password: 'cookiesecret'
