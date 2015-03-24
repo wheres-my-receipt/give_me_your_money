@@ -8,7 +8,6 @@ var joiSchema = Joi.object().keys({ /* to be defined */});
 
 module.exports = {
 
-
 	home: {
 		auth: {
 			mode: 'optional'
@@ -181,8 +180,8 @@ module.exports = {
 
 	getAccount: {
 		handler: function (request, reply) {
-
-			accounts.getAccount(function(err, result) {
+			var userToFind = request.params.member;
+			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {
 					return reply(err);
 				}
@@ -193,15 +192,15 @@ module.exports = {
 
 
 	updateAccount: {
-        validate:{
-                payload: joiSchema,
-        },
+        // validate:{
+        //         payload: joiSchema,
+        // },
 		handler: function (request, reply) {
 
-			var userToUpdate = request.payload.user; // payload.user is just a placeholder data location
-			var updateTheseFields = {};
+			var userToUpdate = request.params.member;
+			var updateTheseFields = request.payload;
 
-			accounts.updateAccount(userToUpdate, function(err, result) {
+			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
 				if (err) {
 					return reply(err);
 				}
@@ -212,8 +211,9 @@ module.exports = {
 
 	deleteAccount: {
 		handler: function (request, reply) {
-
-			var userToDelete = request.payload.user; // payload.user is just a placeholder data location
+			console.log(request);
+			var userToDelete = request.params.member; // payload.user is just a placeholder data location
+			console.log(userToDelete);
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
 				if (err) {

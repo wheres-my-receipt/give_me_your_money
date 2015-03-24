@@ -46,9 +46,11 @@ exports.createAccount = function(accountToCreate, callback) {
 
 exports.deleteAccount = function(username, callback) {
 	Account.findOneAndRemove({username : username}, function(err, result) {
+		console.log(err, result);
 		if (err) {
 			return callback(err);
 		}
+		console.log("success");
 		return callback(null, result);
 	});
 };
