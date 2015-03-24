@@ -117,8 +117,12 @@ module.exports = {
 		}
 	},
 
+	getAccounts: {
+		handler: function(request, reply) {
+			return reply("getAccounts path");
+		}
+	},
 	createAccount: {
-
         validate:{
                 payload: joiSchema,
         },
