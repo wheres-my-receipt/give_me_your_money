@@ -1,8 +1,8 @@
-var Bell 	= require("bell");
-var path 	= require("path");
-var Joi 	= require("joi");
-var Stripe 	= require("stripe")(require("../config.js").stripe.sk);
-var model 	= require("../models/members.js");
+var Bell 	 = require("bell");
+var path 	 = require("path");
+var Joi 	 = require("joi");
+var Stripe 	 = require("stripe")(require("../config.js").stripe.sk);
+var accounts = require("../models/accounts.js");
 
 var joiSchema = Joi.object().keys({ /* to be defined */});
 
@@ -59,7 +59,6 @@ module.exports = {
 		}
 	},
 
-
 	signup: {
 		auth: {
 			mode: 'optional'
@@ -105,11 +104,13 @@ module.exports = {
 		}
 	},
 
+	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
 			return reply( "make a payment");
 		}
 	},
+
 
 	getMember: {
 		handler: function (request, reply) {
@@ -117,23 +118,46 @@ module.exports = {
 		}
 	},
 
-	getAccount: {
-		handler: function (request, reply) {
-			return reply( "getAccount path");
+
+	// DB Operations
+	getAccounts: {
+		handler: function(request, reply) {
+
+			accounts.getAccounts(function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 
-	getAccounts: {
-		handler: function(request, reply) {
-			return reply("getAccounts path");
+	getAccount: {
+		handler: function (request, reply) {
+
+			accounts.getAccounts(function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
+
 	createAccount: {
         validate:{
                 payload: joiSchema,
         },
 		handler: function (request, reply) {
-			return reply( "createAccount path");
+
+			var accountToCreate = request.payload.accountDetails; // User object
+
+			accounts.createAccount(accountToCreate, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 
@@ -142,13 +166,30 @@ module.exports = {
                 payload: joiSchema,
         },
 		handler: function (request, reply) {
-			return reply( "updateSingleMember path");
+
+			var userToUpdate = request.payload.user; // payload.user is just a placeholder data location
+			var updateTheseFields = {};
+
+			accounts.updateAccount(userToUpdate, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 
 	deleteAccount: {
 		handler: function (request, reply) {
-			return reply( "deleteSingleAccount path");
+
+			var userToDelete = request.payload.user; // payload.user is just a placeholder data location
+
+			accounts.deleteAccount(userToDelete, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	}
 };

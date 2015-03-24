@@ -3,9 +3,9 @@ var creds = require("./creds.json");
 
 module.exports = {
 	mongo : {
-				dbuser : process.env.DBUSER || creds.database.user,
-				dbpwd  : process.env.DBPWD || creds.database.pwd,
-				dburl  : process.env.DBURL || creds.database.url
+				dbuser : process.env.DBUSER || creds.database.dbuser,
+				dbpwd  : process.env.DBPWD || creds.database.dbpwd,
+				dburl  : process.env.DBURL || creds.database.dburl,
 	},
 	github : {
 				secret 	: process.env.SECRET || creds.github.secret,
