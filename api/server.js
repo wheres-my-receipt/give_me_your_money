@@ -22,15 +22,19 @@ server.register([Bell, Cookie], function (err) {
         throw err; // something bad happened loading the plugins
     }
 
-    server.auth.strategy('github', 'bell', {
-        provider: 'github',
-        password: config.github.secret,
+    // server.auth.strategy('github', 'bell', {
+    //     provider: 'github',
+    //     password: config.github.secret,
+    //     isSecure: false,
+    //     clientId: config.github.cKey,
+    //     clientSecret: config.github.cSecret
+    // });
+server.auth.strategy('twitter', 'bell', {
+        provider: 'twitter',
+        password: config.twitter.secret,
         isSecure: false,
-        clientId: config.github.cKey,
-        clientSecret: config.github.cSecret,
-        providerParams: {
-        	redirect_uri: "http://localhost:" + port
-        }
+        clientId: config.twitter.cKey,
+        clientSecret: config.twitter.cSecret
     });
 
     server.auth.strategy('session', 'cookie', {
@@ -40,7 +44,7 @@ server.register([Bell, Cookie], function (err) {
         redirectOnTry: false,
         isSecure: false
     });
-
+    server.auth.default('session');
     server.route( routes );
 });
 

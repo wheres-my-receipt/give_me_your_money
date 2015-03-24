@@ -10,84 +10,89 @@ module.exports = {
 
 	home : {
 		auth: {
-			strategy: "github"
+			strategy: "twitter"
 		},
 		handler: function (request, reply) {
-			var g = request.auth.credentials;
-			// console.log( g );
-			console.log( g.profile.raw );
-			var profile ={
-				username 	: g.username,
-				displayname	: g.displayname,
-				email 		: g.email,
-				avatar 		: g.profile.raw.avatar_url,
-				url 		: g.profile.raw.url
-			};
-	        request.auth.session.set(profile);
-	    	return reply.redirect("/signup");
+			if (request.auth.isAuthenticated) {
+				var g = request.auth.credentials;
+				//console.log( g.expiresIn );
+				//console.log( g.profile.raw );
+				var profile ={
+					username 	: g.username,
+					displayname	: g.displayname,
+					email 		: g.email,
+					avatar 		: g.profile.raw.avatar_url,
+					url 		: g.profile.raw.url
+				};
+				console.log( request.auth);
+
+				request.auth.session.clear();
+				console.log( request.auth);
+		        request.auth.session.set(profile);
+				// console.log( request.auth.session );
+
+		    	return reply.redirect("/signup");
+		    }
+		    else reply('Not logged in...').code(401);
 		}
 	},
 	signup: {
 		auth: {
-			strategy: 'session'
+			mode: 'optional'
 		},
 		handler: function (request, reply){
-			return reply( 'signup path');
+			if(request.auth.isAuthenticated) {
+				return reply( 'signup path');
+			}
+			else reply('Not Authenticated Yet');
 		}
 	},
 	logout: {
-		auth: {
-			strategy: 'session'
-		},
+
 		handler: function (request, reply ){
+			console.log( 'in logout handler');
+			console.log( request.auth);
+
 			request.auth.session.clear();
-			return reply( "logout path");
+
+			console.log( 'cleared session ' + request.auth );
+			return reply.redirect('/');
 		}
 	},
 	account: {
-		auth: {
-        	strategy: 'session',
-        },
+
 		handler: function (request, reply) {
-			return reply( "account path");
+			if(request.auth.isAuthenticated) {
+				return reply( "account path");
+			}
 		}
 	},
 	messages: {
-		auth: {
-        	strategy: 'session',
-        },
+
 		handler: function (request, reply) {
 			return reply( "messages path");
 		}
 	},
 	admin: {
-		auth: {
-        	strategy: 'session',
-        },
+
 		handler: function (request, reply) {
 			return reply( "admin path");
 		}
 	},
 	getMember: {
-		auth: {
-        	strategy: 'session',
-        },
+
 		handler: function (request, reply) {
 			return reply( "getMember path");
 		}
 	},
 	getAccount: {
-		auth: {
-        	strategy: 'session',
-        },
+
 		handler: function (request, reply) {
 			return reply( "getAccount path");
 		}
 	},
 	createAccount: {
-		auth: {
-        	strategy: 'session',
-        },
+
         validate:{
                 payload: joiSchema,
         },
@@ -96,9 +101,7 @@ module.exports = {
 		}
 	},
 	updateAccount: {
-		auth: {
-        	strategy: 'session',
-        },
+
         validate:{
                 payload: joiSchema,
         },
@@ -107,9 +110,7 @@ module.exports = {
 		}
 	},
 	deleteAccount: {
-		auth: {
-        	strategy: 'session',
-        },
+
 		handler: function (request, reply) {
 			return reply( "deleteAccount path");
 		}
