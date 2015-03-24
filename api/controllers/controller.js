@@ -14,7 +14,7 @@ module.exports = {
 			mode: 'optional'
 		},
 		handler: function (request, reply ) {
-			return reply.file('/login.html');
+			return reply.file('login.html');
 		}
 	},
 
