@@ -24,10 +24,11 @@ module.exports = {
 				sk : process.env.STRIPESECRET || creds.stripe.secret
 	},
 	mailgunTest : {
-		apiKey : process.env.MGAPIKEY || creds.mailgun.mgApiKey,
-		domain : process.env.MGTESTDOMAIN || creds.mailgun.mgTestDomain,
-		password : process.env.MGTESTDOMAIN || creds.mailgun.mgTestPassword,
-		proxy : process.env.MGTESTDOMAIN || creds.mailgun.mgTestProxy
+		apiKey : process.env.MGAPIKEY || creds.mailgunTest.mgApiKey,
+		domain : process.env.MGTESTDOMAIN || creds.mailgunTest.mgTestDomain,
+		password : process.env.MGTESTPASSWORD || creds.mailgunTest.mgTestPassword,
+		proxy 	: process.env.MGTESTPROXY || creds.mailgunTest.mgTestProxy,
+		mailLists : process.env.MAILLISTS || creds.mailgunTest.mailLists
 
 	},
 	mailgunProd: {
