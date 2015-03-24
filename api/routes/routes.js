@@ -4,16 +4,16 @@ module.exports 	= [
 
 	// STATIC FILES
 	{path: "/", 						method: "GET", 		config: controller.home},
-	// {path: "/signup", 					method: "GET", 		config: controller.signup},
+	{path: "/signup", 					method: "GET", 		config: controller.signup},
 	{path: "/logout", 					method: "GET",		config: controller.logout },
 
-	// {path: "/admin", 					method: "GET", 		config: controller.admin},
-	// {path: "/admin/member/{memberid}", 	method: "GET",		config: controller.getMember},
+	{path: "/admin", 					method: "GET", 		config: controller.admin},
+	{path: "/admin/member/{memberid}", 	method: "GET",		config: controller.getMember},
 
-	// {path: "/account", 					method: "GET", 		config: controller.account},
-	// {path: "/account/messages", 			method: "GET", 		config: controller.messages},
+	{path: "/account", 					method: "GET", 		config: controller.account},
+	{path: "/account/messages", 		method: "GET", 		config: controller.messages},
 
-	{path: "/{param*}", 				method: "GET", 		config: controller.statics},
+	{path: "/public/{param*}", 			method: "GET", 		config: controller.statics},
 
 	// Payment
 	{path: "/payment", 					method: "POST", 	config: controller.payment},

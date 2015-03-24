@@ -123,31 +123,104 @@ lab.experiment("When the user visits the logout page, ", function() {
 
 lab.experiment("When the user visits the account page, ", function() {
 	lab.test("They should be able to change their active/inactive status", function(done) {
-
+		done();
+	});
+	lab.test("If they have just made a successful payment, a 'success' box should appear", function(done) {
+		var options = {
+			method: "GET",
+			url: "/account/bigboy1101?payment=success",
+			credentials : {
+				username 	: "Timmy Tester",
+				displayname	: "bigboy1101",
+				email 		: "timothyandthecrew@testing.com",
+				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
+				url 		: "https://github.com/MIJOTHY"
+			}
+		};
+		done();
 	});
 });
 
+// Testing payment
 lab.experiment("When the user make a membership payment, ", function() {
-	lab.test("the details should be stored in the database", function(done) {
 
+	lab.test("on a card decline, the user should receive an error message", function(done) {
+
+		var options = {
+			url: 	"/payment",
+			method: "POST",
+			credentials: {
+				name: "blahblah"
+			},
+			payload: {
+				stripeToken: "badtoken"
+			}
+		};
+
+		server.inject(options, function(response) {
+			assert.include(response.message, "error", "that notifies them that there has been an error");
+			assert.include(response.message, "card declined", "that outlines the error with adequate specificity");
+			done();
+		});
+	});
+
+	lab.test("on some non-decline error, the user should receive a message", function(done) {
+
+		var options = {
+			url: 	"/payment",
+			method: "POST",
+			credentials: {
+				name: "blahblah"
+			},
+			payload: {
+				stripeToken: "worsetoken"
+			}
+		};
+
+		server.inject(options, function(response) {
+			assert.include(response.message, "error", "that notifies them that there has been an error");
+			assert.include(response.message, "database error", "that outlines the error with adequate specificity");
+			done();
+		});
+	});
+
+	lab.test("if successful, the details of the transaction should be stored in the database", function(done) {
+
+		var options = {
+			url: 	"/payment",
+			method: "POST",
+			credentials: {
+				name: "blahblah"
+			},
+			payload: {
+				stripeToken: "goodtoken"
+			}
+		};
+
+		server.inject(options, function(response) {
+			assert.include(response.statusCode, 302, "they should get a FOUND status code (302)");
+			assert.include(response.payload, "success!", "that informs them of the successful payment with adequate specificity");
+			assert.include(response.headers.location, "/account", "that refreshes their account page");
+			done();
+		});
 	});
 });
 
 lab.experiment("When a user tries to visit the admin page, ", function() {
 	lab.test("they should be ruthlessly evacuated from the premises", function(done) {
-
+		done();
 	});
 });
 
 lab.experiment("When the admin visits the admin dashboard, ", function() {
 	lab.test("they should be able to see a list of members, their status in the space, and their monthly rent", function(done) {
-
+		done();
 	});
 	lab.test("they should be able to email an individual or group", function(done) {
-
+		done();
 	});
 	lab.test("they should be able to authorise new members, ", function(done) {
-
+		done();
 	});
 });
 

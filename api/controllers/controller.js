@@ -1,7 +1,7 @@
 var Bell 	= require("bell");
 var path 	= require("path");
 var Joi 	= require("joi");
-var Stripe 	= require("stripe")(require("./config.js").strike.sk);
+var Stripe 	= require("stripe")(require("../config.js").stripe.sk);
 var model 	= require("../models/members.js");
 
 var joiSchema = Joi.object().keys({ /* to be defined */});
@@ -38,14 +38,14 @@ module.exports = {
 	    }
 	},
 
-	// signup: {
-	// 	auth: {
-	// 		strategy: 'session'
-	// 	},
-	// 	handler: function (request, reply){
-	// 		return reply.file('signup path');
-	// 	}
-	// },
+	signup: {
+		auth: {
+			strategy: 'session'
+		},
+		handler: function (request, reply){
+			return reply.file('signup path');
+		}
+	},
 
 	logout: {
 		auth: {
@@ -57,48 +57,51 @@ module.exports = {
 		}
 	},
 
-	// account: {
-	// 	auth: {
- //        	strategy: 'session',
- //        },
-	// 	handler: function (request, reply) {
-	// 		return reply( "account path");
-	// 	}
-	// },
+	account: {
+		auth: {
+        	strategy: 'session',
+        },
+		handler: function (request, reply) {
+			return reply( "account path");
+		}
+	},
 
-	// messages: {
-	// 	auth: {
- //        	strategy: 'session',
- //        },
-	// 	handler: function (request, reply) {
-	// 		return reply( "messages path");
-	// 	}
-	// },
+	messages: {
+		auth: {
+        	strategy: 'session',
+        },
+		handler: function (request, reply) {
+			return reply( "messages path");
+		}
+	},
 
-	// admin: {
-	// 	auth: {
- //        	strategy: 'session',
- //        },
-	// 	handler: function (request, reply) {
-	// 		return reply( "admin path");
-	// 	}
-	// },
+	admin: {
+		auth: {
+        	strategy: 'session',
+        },
+		handler: function (request, reply) {
+			return reply( "admin path");
+		}
+	},
 
-	// getMember: {
-	// 	auth: {
- //        	strategy: 'session',
- //        },
-	// 	handler: function (request, reply) {
-	// 		return reply( "getMember path");
-	// 	}
-	// },
+	getMember: {
+		auth: {
+        	strategy: 'session',
+        },
+		handler: function (request, reply) {
+			return reply( "getMember path");
+		}
+	},
 
 	// Payment with Stripe
 	payment: {
+		auth: {
+			strategy: "session"
+		},
 		handler: function(request, reply) {
-			var stripeToken = request.body.stripeToken;
+			var stripeToken = request.payload.stripeToken;
 
-			var charge = stripe.charges.create({
+			var charge = Stripe.charges.create({
 			  amount: 1000, // amount in cents, again
 			  currency: "gbp",
 			  source: stripeToken,
