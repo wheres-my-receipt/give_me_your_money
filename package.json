@@ -29,7 +29,6 @@
     "hapi-auth-cookie": "^2.0.0",
     "mailgun-js": "^0.6.8",
     "joi": "^6.0.8",
-    "mailgun-js": "^0.6.8",
-    "path": "^0.11.14"
+    "mailgun-js": "^0.6.8"
   }
 }

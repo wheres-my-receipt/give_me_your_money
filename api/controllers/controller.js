@@ -8,9 +8,18 @@ var joiSchema = Joi.object().keys({ /* to be defined */});
 
 module.exports = {
 
-	home : {
+	home: {
 		auth: {
-			strategy: "twitter"
+			mode: 'optional'
+		},
+		handler: function (request, reply ) {
+			return reply.file('views/login.html');
+		}
+	},
+
+	login : {
+		auth: {
+			strategy: "github"
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
@@ -36,17 +45,7 @@ module.exports = {
 		    else reply('Not logged in...').code(401);
 		}
 	},
-	signup: {
-		auth: {
-			mode: 'optional'
-		},
-		handler: function (request, reply){
-			if(request.auth.isAuthenticated) {
-				return reply( 'signup path');
-			}
-			else reply('Not Authenticated Yet');
-		}
-	},
+
 	logout: {
 
 		handler: function (request, reply ){
@@ -59,12 +58,26 @@ module.exports = {
 			return reply.redirect('/');
 		}
 	},
+
+	signup: {
+		auth: {
+			mode: 'optional'
+		},
+		handler: function (request, reply){
+			if(request.auth.isAuthenticated) {
+				return reply( 'signup path');
+			}
+			else return reply.redirect('/');
+		}
+	},
+
 	account: {
 
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
 				return reply( "account path");
 			}
+			else return reply.redirect('/');
 		}
 	},
 	messages: {
@@ -79,6 +92,18 @@ module.exports = {
 			return reply( "admin path");
 		}
 	},
+
+	serveFile: {
+		auth: {
+			mode: 'optional'
+		},
+		handler: {
+			directory: {
+				path: '../public'
+			}
+		}
+	},
+
 	getMember: {
 
 		handler: function (request, reply) {
