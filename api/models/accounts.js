@@ -2,55 +2,76 @@ var mongoose 	= require("mongoose");
 var Account 	= require("./schema.js").Account;
 
 // Multiple account operations
-exports.getAccounts = function(callback) {
+exports.getAccounts = function(onComplete) {
 	Account.find({}, function(err, result) {
 		if (err) {
-			return callback(err);
+			return onComplete(err);
 		}
-		return callback(null, result);
+		return onComplete(null, result);
 	});
 };
 
 // Single account operations
-exports.getAccount = function(username, callback) {
+exports.getAccount = function(username, onComplete) {
 	Account.find({username : username}, function(err, result) {
 		if (err) {
-			return callback(err);
+			return onComplete(err);
 		}
-		return callback(null, result);
+		return onComplete(null, result);
 	});
 };
 
-exports.updateAccount = function(username, updateObject, callback) {
-	Account.findOneAndUpdate({username : username}, updateObject, function(err, result) {
+exports.updateAccount = function(username, updateObject, onComplete) {
+	Account.update({username : username}, updateObject, function(err, result) {
 		if (err) {
-			return callback(err);
+			return onComplete(err);
 		}
-		return callback(null, result);
+		return onComplete(null, result);
 	});
 };
 
-exports.createAccount = function(accountToCreate, callback) {
+exports.createAccount = function(accountToCreate, onComplete) {
 
 	var newAccount = new Account(accountToCreate);
 
 	newAccount.save(function(err, result) {
 		if (err) {
 			console.log(err);
-			return callback(err);
+			return onComplete(err);
 		}
 		console.log(result);
-		return callback(null, result);
+		return onComplete(null, result);
 	});
 };
 
-exports.deleteAccount = function(username, callback) {
-	Account.findOneAndRemove({username : username}, function(err, result) {
+exports.deleteAccount = function(username, onComplete) {
+	Account.remove({username : username}, function(err, result) {
 		console.log(err, result);
 		if (err) {
-			return callback(err);
+			return onComplete(err);
 		}
 		console.log("success");
-		return callback(null, result);
+		return onComplete(null, result);
 	});
+};
+
+// Payment operations
+exports.newTransaction = function(username, transaction, onComplete) {
+
+	Account.findOne({username: username}, function(err, result) {
+		console.log(result);
+		if(err) {
+			console.log(err);
+			onComplete(err);
+		}
+		result.transaction_history.push(transaction);
+		result.save(function(err, result) {
+			if(err) {
+				console.log(err);
+				return onComplete(err);
+			}
+			return onComplete(null, result);
+		});
+	});
+
 };

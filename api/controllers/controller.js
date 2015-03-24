@@ -101,8 +101,9 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			console.log(request);
+
 			var stripeToken = request.payload.stripeToken;
+			var accountToUpdate = request.auth.credentials.username;
 
 			var charge = stripe.charges.create({
 			  amount: 1000, // amount in cents, again
@@ -110,10 +111,20 @@ module.exports = {
 			  source: stripeToken,
 			  description: "payinguser@example.com"
 			}, function(err, charge) {
-				if (err && err.type === 'StripeCardError') {
+				if (err) {
 			    	return reply(err);
 				}
-				return reply(charge);
+				var transactionObject = {
+					name: request.payload.stripeEmail,
+					date: charge.created + "000",
+					amount: charge.amount,
+				};
+				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
+					if (err) {
+						return reply(err);
+					}
+					return reply(result);
+				});
 			});
 		}
 	},
@@ -162,10 +173,6 @@ module.exports = {
 				desk_authorization: false,
 
 				desk_rental_rate: 50,
-
-
-				transaction_history: ["temporary"],
-				message_history: ["temporary"]
 			};
 
 

@@ -1,6 +1,19 @@
 var mongoose = require("mongoose");
 var Schema 	= mongoose.Schema;
 
+var messageSchema = new Schema({
+	to: {type: String, required: true},
+	from: {type: String, required: true},
+	date: {type: Date, required: true},
+	contents: {type: String, required: true},
+});
+
+var transactionSchema = new Schema({
+	name: {type: String, required: true},
+	date: {type: Date, required: true},
+	amount: {type: String, required: true},
+});
+
 var accountSchema = new Schema({
 
 	email: {type: String, required: true, unique: true},
@@ -20,14 +33,21 @@ var accountSchema = new Schema({
 
 	desk_rental_rate: {type: Number}, //rate of desk (e.g 50/100/200)
 
-	transaction_history:  {type: Array, required: true}, // each object is a payment - date, amount, type, reference
-	message_history: {type: Array} // each object is a message - to, from, date, contents
+	transaction_history:  [transactionSchema],
+	message_history: [messageSchema]
 });
 
+
+
+
 var Account = mongoose.model("account", accountSchema, "Accounts");
+var Transaction = mongoose.model("transaction", transactionSchema);
+var Message = mongoose.model("message", messageSchema);
 
 module.exports = {
-	Account: Account
+	Account: Account,
+	Transaction: Transaction,
+	Message : Message
 };
 
 /* NOTE - After speaking to dan, he mentioned it might be easier and wiser to adopt a system along the lines
