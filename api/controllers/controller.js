@@ -1,7 +1,7 @@
 var Bell 	 = require("bell");
 var path 	 = require("path");
 var Joi 	 = require("joi");
-var Stripe 	 = require("stripe")(require("../config.js").stripe.sk);
+var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var accounts = require("../models/accounts.js");
 
 var joiSchema = Joi.object().keys({ /* to be defined */});
@@ -25,21 +25,16 @@ module.exports = {
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
 				var g = request.auth.credentials;
-				//console.log( g.expiresIn );
-				//console.log( g.profile.raw );
+				console.log(g);
 				var profile ={
-					username 	: g.username,
-					displayname	: g.displayname,
-					email 		: g.email,
+					username 	: g.profile.username,
+					email 		: g.profile.email,
 					avatar 		: g.profile.raw.avatar_url,
 					url 		: g.profile.raw.url
 				};
-				console.log( request.auth);
 
 				request.auth.session.clear();
-				console.log( request.auth);
 		        request.auth.session.set(profile);
-				// console.log( request.auth.session );
 
 		    	return reply.redirect("/signup");
 		    }
@@ -65,7 +60,7 @@ module.exports = {
 		},
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
-				return reply( 'signup path');
+				return reply.file("signup.html");
 			}
 			else return reply.redirect('/');
 		}
@@ -74,7 +69,7 @@ module.exports = {
 	account: {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
-				return reply( "account path");
+				return reply.file('account.html');
 			}
 			else return reply.redirect('/');
 		}
@@ -107,7 +102,20 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			return reply( "make a payment");
+			console.log(request);
+			var stripeToken = request.payload.stripeToken;
+
+			var charge = stripe.charges.create({
+			  amount: 1000, // amount in cents, again
+			  currency: "gbp",
+			  source: stripeToken,
+			  description: "payinguser@example.com"
+			}, function(err, charge) {
+				if (err && err.type === 'StripeCardError') {
+			    	return reply(err);
+				}
+				return reply(charge);
+			});
 		}
 	},
 
@@ -131,26 +139,36 @@ module.exports = {
 			});
 		}
 	},
-
-	getAccount: {
-		handler: function (request, reply) {
-
-			accounts.getAccounts(function(err, result) {
-				if (err) {
-					return reply(err);
-				}
-				return reply(result);
-			});
-		}
-	},
-
 	createAccount: {
-        validate:{
-                payload: joiSchema,
-        },
+        // validate:{
+        //         payload: joiSchema,
+        // },
 		handler: function (request, reply) {
 
-			var accountToCreate = request.payload.accountDetails; // User object
+			var user = request.payload;
+			var accountToCreate = {
+
+				email: user.email || request.auth.credentials.email,
+				username: request.auth.credentials.username,
+				first_name: user.first_name,
+				last_name: user.last_name,
+				member_since: new Date(),
+				phone_number: user.phone_number,
+
+				github_link: request.auth.credentials.url,
+				github_avatar: request.auth.credentials.avatar,
+
+				membership_active_status: false,
+
+				desk_authorization: false,
+
+				desk_rental_rate: 50,
+
+
+				transaction_history: ["temporary"],
+				message_history: ["temporary"]
+			};
+
 
 			accounts.createAccount(accountToCreate, function(err, result) {
 				if (err) {
@@ -160,6 +178,19 @@ module.exports = {
 			});
 		}
 	},
+
+	getAccount: {
+		handler: function (request, reply) {
+
+			accounts.getAccount(function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
+		}
+	},
+
 
 	updateAccount: {
         validate:{
