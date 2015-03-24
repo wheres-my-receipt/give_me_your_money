@@ -8,9 +8,7 @@ module.exports 	= [
 	{path: "/login", 					method: "GET", 		config: controller.login},
 	{path: "/logout", 					method: "GET",		config: controller.logout },
 	{path: "/signup", 					method: "GET", 		config: controller.signup},
-	{path: "/account", 					method: "GET", 		config: controller.account},
 	{path: "/admin", 					method: "GET", 		config: controller.admin},
-	{path: "/account/messages", 		method: "GET", 		config: controller.messages},
 
 	{path: "/admin/member/{memberid}", 	method: "GET",		config: controller.getMember},
 	{path: "/{file*}",					method: "GET",		config: controller.serveFile},
