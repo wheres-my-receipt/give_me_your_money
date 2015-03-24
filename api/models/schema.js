@@ -40,9 +40,9 @@ var accountSchema = new Schema({
 
 
 
-var Account = mongoose.model("account", accountSchema, "Accounts");
+var Account 	= mongoose.model("account", accountSchema, "Accounts");
 var Transaction = mongoose.model("transaction", transactionSchema);
-var Message = mongoose.model("message", messageSchema);
+var Message 	= mongoose.model("message", messageSchema);
 
 module.exports = {
 	Account: Account,

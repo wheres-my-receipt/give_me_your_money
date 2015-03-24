@@ -24,7 +24,6 @@ module.exports = {
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
 				var g = request.auth.credentials;
-				console.log(g);
 				var profile ={
 					username 	: g.profile.username,
 					email 		: g.profile.email,
@@ -43,8 +42,6 @@ module.exports = {
 
 	logout: {
 		handler: function (request, reply ){
-			console.log( 'in logout handler');
-			console.log( request.auth);
 
 			request.auth.session.clear();
 
@@ -218,8 +215,7 @@ module.exports = {
 
 	deleteAccount: {
 		handler: function (request, reply) {
-			console.log(request);
-			var userToDelete = request.params.member; // payload.user is just a placeholder data location
+			var userToDelete = request.params.member;
 			console.log(userToDelete);
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
