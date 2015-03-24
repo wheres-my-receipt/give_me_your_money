@@ -4,7 +4,7 @@ module.exports 	= [
 
 	// STATIC FILES
 	{path: "/", 						method: "GET", 		config: controller.home},
-	{path: "/signup", 					method: "GET", 		config: controller.signup},
+	// {path: "/signup", 					method: "GET", 		config: controller.signup},
 	{path: "/logout", 					method: "GET",		config: controller.logout },
 
 	{path: "/admin", 					method: "GET", 		config: controller.admin},

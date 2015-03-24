@@ -38,14 +38,14 @@ module.exports = {
 	    }
 	},
 
-	signup: {
-		auth: {
-			strategy: 'session'
-		},
-		handler: function (request, reply){
-			return reply.file('signup path');
-		}
-	},
+	// signup: {
+	// 	auth: {
+	// 		strategy: 'session'
+	// 	},
+	// 	handler: function (request, reply){
+	// 		return reply.file();
+	// 	}
+	// },
 
 	logout: {
 		auth: {
