@@ -4,7 +4,19 @@ var Joi 	 = require("joi");
 var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var accounts = require("../models/accounts.js");
 
-var joiSchema = Joi.object().keys({ /* to be defined */});
+var creationValidation = Joi.object({
+	email: Joi.string().email().required(),
+	first_name: Joi.string().required(),
+	last_name: Joi.string().required(),
+	phone_number: Joi.number().required()
+});
+
+var updateValidation = Joi.object({
+	email: Joi.string().email(),
+	first_name: Joi.string(),
+	last_name: Joi.string(),
+	phone_number: Joi.number()
+}).or("email", "first_name", "last_name", "phone_number");
 
 module.exports = {
 
@@ -98,16 +110,17 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-
 			var stripeToken = request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
 
-			var charge = stripe.charges.create({
+			var membershipCharge = {
 			  amount: 1000, // amount in cents, again
 			  currency: "gbp",
 			  source: stripeToken,
-			  description: "payinguser@example.com"
-			}, function(err, charge) {
+			  description: "Membership Fee"
+			};
+
+			var charge = stripe.charges.create(membershipCharge, function(err, charge) {
 				if (err) {
 			    	return reply(err);
 				}
@@ -147,9 +160,9 @@ module.exports = {
 		}
 	},
 	createAccount: {
-        // validate:{
-        //         payload: joiSchema,
-        // },
+        validate:{
+                payload: creationValidation,
+        },
 		handler: function (request, reply) {
 
 			var user = request.payload;
@@ -196,9 +209,9 @@ module.exports = {
 
 
 	updateAccount: {
-        // validate:{
-        //         payload: joiSchema,
-        // },
+        validate:{
+                payload: updateValidation,
+        },
 		handler: function (request, reply) {
 
 			var userToUpdate = request.params.member;
