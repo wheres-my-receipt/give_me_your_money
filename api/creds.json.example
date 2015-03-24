@@ -2,4 +2,8 @@
 	"dbuser": "<mongo user name>"
 	"dbpwd": "<mongo password>"
 	"dburl": "<mongo db url>"
+	"secret": "<github auth secret>",
+	"cKey": "<github auth client key>",
+	"cSecret": "<github auth client secret>",
+	"cookieSecret": "<arbitrary string>"
 }

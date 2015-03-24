@@ -8,132 +8,117 @@ var joiSchema = Joi.object().keys({ /* to be defined */});
 
 module.exports = {
 
-	// Static file handling
-	home : {
+
+	home: {
+		auth: {
+			mode: 'optional'
+		},
+		handler: function (request, reply ) {
+			return reply.file('views/login.html');
+		}
+	},
+
+	login : {
 		auth: {
 			strategy: "github"
 		},
 		handler: function (request, reply) {
-			var g = request.auth.credentials;
-			var profile ={
-				username 	: g.username,
-				displayname	: g.displayname,
-				email 		: g.email,
-				avatar 		: g.profile.raw.avatar_url,
-				url 		: g.profile.raw.url
-			};
-	        request.auth.session.set(profile);
-	    	return reply.redirect("/signup");
+			if (request.auth.isAuthenticated) {
+				var g = request.auth.credentials;
+				//console.log( g.expiresIn );
+				//console.log( g.profile.raw );
+				var profile ={
+					username 	: g.username,
+					displayname	: g.displayname,
+					email 		: g.email,
+					avatar 		: g.profile.raw.avatar_url,
+					url 		: g.profile.raw.url
+				};
+				console.log( request.auth);
+
+				request.auth.session.clear();
+				console.log( request.auth);
+		        request.auth.session.set(profile);
+				// console.log( request.auth.session );
+
+		    	return reply.redirect("/signup");
+		    }
+		    else reply('Not logged in...').code(401);
 		}
 	},
 
-	statics: {
-		auth: {
-			strategy: "session"
-		},
-	    handler: {
-	        directory: {
-	            path: 'public'
-	        }
-	    }
+	logout: {
+		handler: function (request, reply ){
+			console.log( 'in logout handler');
+			console.log( request.auth);
+
+			request.auth.session.clear();
+
+			console.log( 'cleared session ' + request.auth );
+			return reply.redirect('/');
+		}
 	},
 
-	// signup: {
-	// 	auth: {
-	// 		strategy: 'session'
-	// 	},
-	// 	handler: function (request, reply){
-	// 		return reply.file();
-	// 	}
-	// },
 
-	logout: {
+	signup: {
 		auth: {
-			strategy: 'session'
+			mode: 'optional'
 		},
-		handler: function (request, reply ){
-			request.auth.session.clear();
-			return reply( "logout path");
+		handler: function (request, reply){
+			if(request.auth.isAuthenticated) {
+				return reply( 'signup path');
+			}
+			else return reply.redirect('/');
 		}
 	},
 
 	account: {
-		auth: {
-        	strategy: 'session',
-        },
 		handler: function (request, reply) {
-			return reply( "account path");
+			if(request.auth.isAuthenticated) {
+				return reply( "account path");
+			}
+			else return reply.redirect('/');
 		}
 	},
 
 	messages: {
-		auth: {
-        	strategy: 'session',
-        },
 		handler: function (request, reply) {
 			return reply( "messages path");
 		}
 	},
 
 	admin: {
-		auth: {
-        	strategy: 'session',
-        },
 		handler: function (request, reply) {
 			return reply( "admin path");
 		}
 	},
 
-	getMember: {
+
+	serveFile: {
 		auth: {
-        	strategy: 'session',
-        },
+			mode: 'optional'
+		},
+		handler: {
+			directory: {
+				path: '../public'
+			}
+		}
+	},
+
+	getMember: {
 		handler: function (request, reply) {
 			return reply( "getMember path");
 		}
 	},
 
-	// Payment with Stripe
-	payment: {
-		auth: {
-			strategy: "session"
-		},
-		handler: function(request, reply) {
-			var stripeToken = request.payload.stripeToken;
-
-			var charge = Stripe.charges.create({
-			  amount: 1000, // amount in cents, again
-			  currency: "gbp",
-			  source: stripeToken,
-			  description: "payinguser@example.com"
-			}, function(err, charge) {
-			  if (err && err.type === 'StripeCardError') {
-			    return reply(err);// The card has been declined
-			  } else if (err) {
-			  	return reply(err);
-			  } else {
-			  	// write the payment to the DB
-			  	return reply("success!");
-			  }
-			});
-		}
-	},
-
-	// JSON API
-	// /accounts
-	getAccounts: {
-		auth: {
-        	strategy: 'session',
-        },
+	getAccount: {
 		handler: function (request, reply) {
 			return reply( "getAccount path");
 		}
 	},
 
 	createAccount: {
-		auth: {
-        	strategy: 'session',
-        },
+
         validate:{
                 payload: joiSchema,
         },
@@ -142,21 +127,7 @@ module.exports = {
 		}
 	},
 
-
-	// /accounts/{member}
-	getSingleAccount: {
-		auth: {
-        	strategy: 'session',
-        },
-		handler: function (request, reply) {
-			return reply( "getSingleAccount path");
-		}
-	},
-
-	updateSingleAccount: {
-		auth: {
-        	strategy: 'session',
-        },
+	updateAccount: {
         validate:{
                 payload: joiSchema,
         },
@@ -165,10 +136,7 @@ module.exports = {
 		}
 	},
 
-	deleteSingleAccount: {
-		auth: {
-        	strategy: 'session',
-        },
+	deleteAccount: {
 		handler: function (request, reply) {
 			return reply( "deleteSingleAccount path");
 		}
