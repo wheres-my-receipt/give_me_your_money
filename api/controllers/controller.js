@@ -1,13 +1,12 @@
-var Bell 	= require("bell");
-var path 	= require("path");
-var Joi 	= require("joi");
-var Stripe 	= require("stripe")(require("../config.js").stripe.sk);
-var model 	= require("../models/members.js");
+var Bell 	 = require("bell");
+var path 	 = require("path");
+var Joi 	 = require("joi");
+var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
+var accounts = require("../models/accounts.js");
 
 var joiSchema = Joi.object().keys({ /* to be defined */});
 
 module.exports = {
-
 
 	home: {
 		auth: {
@@ -25,21 +24,15 @@ module.exports = {
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
 				var g = request.auth.credentials;
-				//console.log( g.expiresIn );
-				//console.log( g.profile.raw );
 				var profile ={
-					username 	: g.username,
-					displayname	: g.displayname,
-					email 		: g.email,
+					username 	: g.profile.username,
+					email 		: g.profile.email,
 					avatar 		: g.profile.raw.avatar_url,
 					url 		: g.profile.raw.url
 				};
-				console.log( request.auth);
 
 				request.auth.session.clear();
-				console.log( request.auth);
 		        request.auth.session.set(profile);
-				// console.log( request.auth.session );
 
 		    	return reply.redirect("/signup");
 		    }
@@ -49,8 +42,6 @@ module.exports = {
 
 	logout: {
 		handler: function (request, reply ){
-			console.log( 'in logout handler');
-			console.log( request.auth);
 
 			request.auth.session.clear();
 
@@ -59,14 +50,13 @@ module.exports = {
 		}
 	},
 
-
 	signup: {
 		auth: {
 			mode: 'optional'
 		},
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
-				return reply( 'signup path');
+				return reply.file("signup.html");
 			}
 			else return reply.redirect('/');
 		}
@@ -75,7 +65,7 @@ module.exports = {
 	account: {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
-				return reply( "account path");
+				return reply.file('account.html');
 			}
 			else return reply.redirect('/');
 		}
@@ -105,11 +95,37 @@ module.exports = {
 		}
 	},
 
+	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			return reply( "make a payment");
+
+			var stripeToken = request.payload.stripeToken;
+			var accountToUpdate = request.auth.credentials.username;
+
+			var charge = stripe.charges.create({
+			  amount: 1000, // amount in cents, again
+			  currency: "gbp",
+			  source: stripeToken,
+			  description: "payinguser@example.com"
+			}, function(err, charge) {
+				if (err) {
+			    	return reply(err);
+				}
+				var transactionObject = {
+					name: request.payload.stripeEmail,
+					date: charge.created + "000",
+					amount: charge.amount,
+				};
+				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
+					if (err) {
+						return reply(err);
+					}
+					return reply(result);
+				});
+			});
 		}
 	},
+
 
 	getMember: {
 		handler: function (request, reply) {
@@ -117,38 +133,97 @@ module.exports = {
 		}
 	},
 
-	getAccount: {
-		handler: function (request, reply) {
-			return reply( "getAccount path");
-		}
-	},
 
+	// DB Operations
 	getAccounts: {
 		handler: function(request, reply) {
-			return reply("getAccounts path");
+
+			accounts.getAccounts(function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 	createAccount: {
-        validate:{
-                payload: joiSchema,
-        },
+        // validate:{
+        //         payload: joiSchema,
+        // },
 		handler: function (request, reply) {
-			return reply( "createAccount path");
+
+			var user = request.payload;
+			var accountToCreate = {
+
+				email: user.email || request.auth.credentials.email,
+				username: request.auth.credentials.username,
+				first_name: user.first_name,
+				last_name: user.last_name,
+				member_since: new Date(),
+				phone_number: user.phone_number,
+
+				github_link: request.auth.credentials.url,
+				github_avatar: request.auth.credentials.avatar,
+
+				membership_active_status: false,
+
+				desk_authorization: false,
+
+				desk_rental_rate: 50,
+			};
+
+
+			accounts.createAccount(accountToCreate, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 
-	updateAccount: {
-        validate:{
-                payload: joiSchema,
-        },
+	getAccount: {
 		handler: function (request, reply) {
-			return reply( "updateSingleMember path");
+			var userToFind = request.params.member;
+			accounts.getAccount(userToFind, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
+		}
+	},
+
+
+	updateAccount: {
+        // validate:{
+        //         payload: joiSchema,
+        // },
+		handler: function (request, reply) {
+
+			var userToUpdate = request.params.member;
+			var updateTheseFields = request.payload;
+
+			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 
 	deleteAccount: {
 		handler: function (request, reply) {
-			return reply( "deleteSingleAccount path");
+			var userToDelete = request.params.member;
+			console.log(userToDelete);
+
+			accounts.deleteAccount(userToDelete, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	}
 };
