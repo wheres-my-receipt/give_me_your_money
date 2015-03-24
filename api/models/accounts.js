@@ -1,8 +1,5 @@
 var mongoose 	= require("mongoose");
-var config 		= require("../config.js").mongo;
 var Account 	= require("./schema.js").Account;
-
-var mongodbUri = "mongodb://" + config.dbuser + ":" + config.dbpwd + config.dburl;
 
 // Multiple account operations
 exports.getAccounts = function(callback) {
