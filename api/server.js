@@ -16,12 +16,10 @@ var server = new Hapi.Server({
     }
 });
 
-server.connection( port );
+server.connection(port);
 
 server.register([Bell, Cookie], function (err) {
-    if (err) {
-        throw err; // something bad happened loading the plugins
-    }
+    if (err) {throw err;}
 
        server.auth.strategy('session', 'cookie', {
         password: config.cookie.password,

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+
+		<meta charset="utf-8"/>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="css/bootstrap.min.css" rel="stylesheet"/>
+		<link href="css/main.css" rel="stylesheet"/>
+
+		<script src="scripts/main.js"></script>
+
+	</head>
+
+	<body>
+
+		<form action="" method="POST">
+		  <script
+		    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+		    data-key="pk_test_PAiIYQoiJwUEIs35XP50WNi8"
+		    data-amount="2000"
+		    data-name="Demo Site"
+		    data-description="2 widgets ($20.00)"
+		    data-image="/128x128.png">
+		  </script>
+		</form>
+		<script src="lib/jquery-2.1.3.js"></script>
+		<script src="lib/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+		<script type="text/javascript">
+			Stripe.card.createToken({
+			  number: $('.card-number').val(),
+			  cvc: $('.card-cvc').val(),
+			  exp_month: $('.card-expiry-month').val(),
+			  exp_year: $('.card-expiry-year').val()
+			}, stripeResponseHandler);
+		</script>
+	</body>
+</html>

@@ -1,12 +1,13 @@
 var Bell 	= require("bell");
-//var Boom 	= require("boom");
 var path 	= require("path");
-var model 	= require("../models/members.js");
 var Joi 	= require("joi");
+var Stripe 	= require("stripe")(require("../config.js").stripe.sk);
+var model 	= require("../models/members.js");
 
 var joiSchema = Joi.object().keys({ /* to be defined */});
 
 module.exports = {
+
 
 	home: {
 		auth: {
@@ -47,7 +48,6 @@ module.exports = {
 	},
 
 	logout: {
-
 		handler: function (request, reply ){
 			console.log( 'in logout handler');
 			console.log( request.auth);
@@ -58,6 +58,7 @@ module.exports = {
 			return reply.redirect('/');
 		}
 	},
+
 
 	signup: {
 		auth: {
@@ -72,7 +73,6 @@ module.exports = {
 	},
 
 	account: {
-
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
 				return reply( "account path");
@@ -80,18 +80,19 @@ module.exports = {
 			else return reply.redirect('/');
 		}
 	},
-	messages: {
 
+	messages: {
 		handler: function (request, reply) {
 			return reply( "messages path");
 		}
 	},
-	admin: {
 
+	admin: {
 		handler: function (request, reply) {
 			return reply( "admin path");
 		}
 	},
+
 
 	serveFile: {
 		auth: {
@@ -105,17 +106,17 @@ module.exports = {
 	},
 
 	getMember: {
-
 		handler: function (request, reply) {
 			return reply( "getMember path");
 		}
 	},
-	getAccount: {
 
+	getAccount: {
 		handler: function (request, reply) {
 			return reply( "getAccount path");
 		}
 	},
+
 	createAccount: {
 
         validate:{
@@ -125,19 +126,19 @@ module.exports = {
 			return reply( "createAccount path");
 		}
 	},
-	updateAccount: {
 
+	updateAccount: {
         validate:{
                 payload: joiSchema,
         },
 		handler: function (request, reply) {
-			return reply( "updateMember path");
+			return reply( "updateSingleMember path");
 		}
 	},
-	deleteAccount: {
 
+	deleteAccount: {
 		handler: function (request, reply) {
-			return reply( "deleteAccount path");
+			return reply( "deleteSingleAccount path");
 		}
 	}
 };
