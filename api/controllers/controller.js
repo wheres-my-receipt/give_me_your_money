@@ -14,7 +14,7 @@ module.exports = {
 			mode: 'optional'
 		},
 		handler: function (request, reply ) {
-			return reply.file('views/login.html');
+			return reply.file('/login.html');
 		}
 	},
 
@@ -102,6 +102,12 @@ module.exports = {
 			directory: {
 				path: '../public'
 			}
+		}
+	},
+
+	payment: {
+		handler: function (request, reply) {
+			return reply( "make a payment");
 		}
 	},
 

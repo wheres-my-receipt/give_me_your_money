@@ -8,7 +8,6 @@ module.exports 	= [
 	{path: "/login", 					method: "GET", 		config: controller.login},
 	{path: "/logout", 					method: "GET",		config: controller.logout },
 	{path: "/signup", 					method: "GET", 		config: controller.signup},
-
 	{path: "/admin", 					method: "GET", 		config: controller.admin},
 	{path: "/admin/member/{memberid}", 	method: "GET",		config: controller.getMember},
 
@@ -16,6 +15,9 @@ module.exports 	= [
 
 	{path: "/account", 					method: "GET", 		config: controller.account},
 	{path: "/account/messages", 		method: "GET", 		config: controller.messages},
+
+	// Payment
+	{path: "/payment", 					method: "POST", 	config: controller.payment},
 
 	// JSON API
 	{path: "/accounts", 				method: "GET", 		config: controller.getAccounts},
