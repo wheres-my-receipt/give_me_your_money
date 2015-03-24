@@ -8,9 +8,9 @@ module.exports = {
 				dburl  : process.env.DBURL || creds.database.url
 	},
 	github : {
-				secret 	: process.env.SECRET || creds.github.password,
-				cKey	: process.env.CKEY || creds.github.clientId,
-				cSecret	: process.env.CSECRET || creds.github.clientSecret,
+				secret 	: process.env.SECRET || creds.github.secret,
+				cKey	: process.env.CKEY || creds.github.cKey,
+				cSecret	: process.env.CSECRET || creds.github.cSecret,
 	},
 	twitter : {
 				secret 	: process.env.SECRET || creds.twitter.secret,

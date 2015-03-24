@@ -8,25 +8,20 @@ module.exports 	= [
 	{path: "/login", 					method: "GET", 		config: controller.login},
 	{path: "/logout", 					method: "GET",		config: controller.logout },
 	{path: "/signup", 					method: "GET", 		config: controller.signup},
-	{path: "/account", 					method: "GET", 		config: controller.account},
-	{path: "/admin", 					method: "GET", 		config: controller.admin},
-	{path: "/account/messages", 		method: "GET", 		config: controller.messages},
 
+	{path: "/admin", 					method: "GET", 		config: controller.admin},
 	{path: "/admin/member/{memberid}", 	method: "GET",		config: controller.getMember},
+
 	{path: "/{file*}",					method: "GET",		config: controller.serveFile},
 
 	{path: "/account", 					method: "GET", 		config: controller.account},
 	{path: "/account/messages", 		method: "GET", 		config: controller.messages},
 
-	{path: "/public/{param*}", 			method: "GET", 		config: controller.statics},
-
-	// Payment
-	{path: "/payment", 					method: "POST", 	config: controller.payment},
 	// JSON API
 	{path: "/accounts", 				method: "GET", 		config: controller.getAccounts},
 	{path: "/accounts", 				method: "POST",  	config: controller.createAccount},
 
-	{path: "/accounts/{member}", 		method: "GET", 		config: controller.getSingleAccount},
-	{path: "/accounts/{member}", 		method: "PUT",  	config: controller.updateSingleAccount},
-	{path: "/accounts/{member}", 		method: "DELETE", 	config: controller.deleteSingleAccount},
+	{path: "/accounts/{member}", 		method: "GET", 		config: controller.getAccount},
+	{path: "/accounts/{member}", 		method: "PUT",  	config: controller.updateAccount},
+	{path: "/accounts/{member}", 		method: "DELETE", 	config: controller.deleteAccount},
 ];
