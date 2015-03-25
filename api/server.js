@@ -24,7 +24,7 @@ server.register([Bell, Cookie], function (err) {
 	server.auth.strategy('session', 'cookie', {
         password: config.cookie.password,
         cookie: 'sid',
-        // redirectTo: '/', //causes redirect
+        redirectTo: '/',
         redirectOnTry: false,
         isSecure: false
     });
@@ -37,6 +37,7 @@ server.register([Bell, Cookie], function (err) {
         clientId: config.github.cKey,
         clientSecret: config.github.cSecret
     });
+
 	// server.auth.strategy('twitter', 'bell', {
  //        provider: 'twitter',
  //        password: config.twitter.secret,

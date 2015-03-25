@@ -26,4 +26,6 @@ module.exports 	= [
 	{path: "/accounts/{member}", 		method: "GET", 		config: controller.getAccount},
 	{path: "/accounts/{member}", 		method: "PUT",  	config: controller.updateAccount},
 	{path: "/accounts/{member}", 		method: "DELETE", 	config: controller.deleteAccount},
+	{path: "/messages/{member}",		method: "POST",		config: controller.createMessage},
+
 ];
