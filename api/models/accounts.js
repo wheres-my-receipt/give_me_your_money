@@ -15,7 +15,6 @@ exports.getAccounts = function(onComplete) {
 
 // Single account operations
 exports.getAccount = function(username, onComplete) {
-	// QUERY: should be findOne? find will return an array of 1, and username should be unique
 	Account.findOne({username : username}, function(err, result) {
 		if (err) {
 			return onComplete(err);

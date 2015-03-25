@@ -92,6 +92,7 @@ module.exports = {
 					return reply(err);
 				}
 				console.log( "Account View: " + result );
+
 				return reply.view('account.jade', {user: result});
 			});
 		}
