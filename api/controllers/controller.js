@@ -97,7 +97,7 @@ module.exports = {
 
 	messages: {
 		handler: function (request, reply) {
-			return reply( "messages path");
+			return reply.file( "messages.html");
 		}
 	},
 
