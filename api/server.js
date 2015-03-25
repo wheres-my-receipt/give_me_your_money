@@ -1,10 +1,10 @@
-var Hapi = require('hapi');
-var Bell = require('bell');
-var Cookie = require('hapi-auth-cookie');
-var path = require( 'path');
-var routes = require( './routes/routes.js');
-var config = require('./config.js');
-var port = {port: (process.env.port || 3000 ) };
+var Hapi 	= require('hapi');
+var Bell 	= require('bell');
+var Cookie 	= require('hapi-auth-cookie');
+var path 	= require('path');
+var routes 	= require('./routes/routes.js');
+var config 	= require('./config.js');
+var port 	= {port: (process.env.port || 3000 ) };
 
 var server = new Hapi.Server({
     connections: {
@@ -33,6 +33,7 @@ server.register([Bell, Cookie], function (err) {
         provider: 'github',
         password: config.github.secret,
         isSecure: false,
+        ttl: 20000, // 10s ttl for the cookies used by bell to manage the temp state - an attempt to fix the logout problem
         clientId: config.github.cKey,
         clientSecret: config.github.cSecret
     });

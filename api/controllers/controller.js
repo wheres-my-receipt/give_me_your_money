@@ -5,18 +5,18 @@ var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var accounts = require("../models/accounts.js");
 
 var creationValidation = Joi.object({
-	email: Joi.string().email().required(),
-	first_name: Joi.string().required(),
-	last_name: Joi.string().required(),
-	phone_number: Joi.number().required()
-});
+		email: Joi.string().email().required(),
+		first_name: Joi.string().required(),
+		last_name: Joi.string().required(),
+		phone_number: Joi.number().required()
+	});
 
 var updateValidation = Joi.object({
-	email: Joi.string().email(),
-	first_name: Joi.string(),
-	last_name: Joi.string(),
-	phone_number: Joi.number()
-}).or("email", "first_name", "last_name", "phone_number");
+		email: Joi.string().email(),
+		first_name: Joi.string(),
+		last_name: Joi.string(),
+		phone_number: Joi.number()
+	}).or("email", "first_name", "last_name", "phone_number");
 
 module.exports = {
 
@@ -110,29 +110,27 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			var stripeToken = request.payload.stripeToken;
+
+			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
 
 			var membershipCharge = {
-			  amount: 1000, // amount in cents, again
+			  amount: 1000,
 			  currency: "gbp",
 			  source: stripeToken,
 			  description: "Membership Fee"
 			};
 
 			var charge = stripe.charges.create(membershipCharge, function(err, charge) {
-				if (err) {
-			    	return reply(err);
-				}
+				if (err) {return reply(err);}
+
 				var transactionObject = {
 					name: request.payload.stripeEmail,
 					date: charge.created + "000",
 					amount: charge.amount,
 				};
 				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
-					if (err) {
-						return reply(err);
-					}
+					if (err) {return reply(err);}
 					return reply(result);
 				});
 			});
@@ -152,9 +150,7 @@ module.exports = {
 		handler: function(request, reply) {
 
 			accounts.getAccounts(function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -187,9 +183,7 @@ module.exports = {
 
 
 			accounts.createAccount(accountToCreate, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -199,9 +193,7 @@ module.exports = {
 		handler: function (request, reply) {
 			var userToFind = request.params.member;
 			accounts.getAccount(userToFind, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -218,9 +210,7 @@ module.exports = {
 			var updateTheseFields = request.payload;
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -232,9 +222,7 @@ module.exports = {
 			console.log(userToDelete);
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
