@@ -27,9 +27,9 @@
     "bell": "^2.2.0",
     "hapi": "^8.4.0",
     "hapi-auth-cookie": "^2.0.0",
-    "mailgun-js": "^0.6.8",
     "joi": "^6.0.8",
     "mailgun-js": "^0.6.8",
-    "path": "^0.11.14"
+    "mongoose": "^3.8.25",
+    "stripe": "^3.3.2"
   }
 }
