@@ -2,6 +2,27 @@ var mongoose 	= require("mongoose");
 var Account 	= require("./schema.js").Account;
 
 // Multiple account operations
+
+exports.search  = function(queryObj, filterObj, onComplete) {
+
+	if (filterObj) {
+		Account.find(queryObj, filterObj, function(err, result){
+			if (err) {
+				return onComplete(err);
+			}
+			return onComplete(null, result);
+		});
+	}
+	else {
+		Account.find(queryObj, function(err, result){
+			if (err) {
+				return onComplete(err);
+			}
+			return onComplete(null, result);
+		});
+	}
+};
+
 exports.getAccounts = function(onComplete) {
 
 	Account.find({}, function(err, result) {

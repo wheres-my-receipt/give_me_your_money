@@ -16,9 +16,12 @@ var messageTemplates = {
 	verifyAccount: function (message, data) {
 		message.subject = "Account Verified";
 		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
+		return message;
 	},
 	annualSubscriptionReminder : function (message, data) {
-
+		message.subject = "Annual Subscription nearly up!";
+		message.text = "Hello " + data.first_name + ". Your annual subscription expires in one week.";
+		return message;
 	},
 	deskRentalPaymentReminder : function (message, data) {
 
@@ -102,11 +105,27 @@ module.exports = {
 				console.log("Created: " + data);
 		});
 	},
-
+	// SUGGESTION: refactor so that email type is separate param, seems odd to have it as a property of the user object
 	sendEmail: function( data, onComplete ){
-		// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
+		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
 
 		var message = createMessage( data.emailType, data );
+		mailgun.messages().send(message, function (error, body) {
+			if( error ) {
+				console.log( "Error: " + error );
+				onComplete( error );
+			}
+			else {
+				console.log( "Sent email: " + body);
+				onComplete( null, body );
+			}
+		});
+	},
+
+	sendEmailRefactor: function(data, emailType, onComplete ){
+		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
+
+		var message = createMessage(emailType, data );
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
 				console.log( "Error: " + error );

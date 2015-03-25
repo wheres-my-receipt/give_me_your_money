@@ -121,7 +121,6 @@ module.exports = {
 
 	serveFile: {
 		// set to false so that resources load when logged out
-		// but, security issue if a page is requested by path. Might need to need 'views' out of public
 		auth: false,
 		handler: {
 			directory: {
