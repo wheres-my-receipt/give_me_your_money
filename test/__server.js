@@ -278,6 +278,10 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 		var options = {
 			url: "/accounts",
 			method: "POST",
+			payload : {
+				firstname: "Sarah",
+      			email: "sarahabimay@gmail.com"
+			},
 			credentials: {
 				username 	: "Timmy Tester",
 				displayname	: "bigboy1101",
@@ -288,6 +292,7 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 		};
 
 		server.inject(options, function(response) {
+			assert.equal(response.statusCode, 200, " they should get an OK status code (200)");
 			done();
 		});
 	});
