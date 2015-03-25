@@ -6,11 +6,31 @@ var server		= require("../api/server.js");
 // User testing
 lab.experiment("When a user visits the home page, ", function() {
 
-	lab.test("without proper authentication, they should be asked to log in, ", function(done) {
+	lab.test("if not authenticated, they should see the home page, ", function(done) {
 
 		var options = {
 			url 	: "/",
 			method 	: "GET",
+		};
+
+		server.inject(options, function(response) {
+			assert.equal(response.statusCode, 200, " they should get an OK status code (200)");
+			assert.include(response.payload, "href=\"/login\"", "there should be a button to direct them to login page");
+			done();
+		});
+	});
+
+	lab.test("if already authenticated, they should be redirected to their account page, ", function(done) {
+
+		var options = {
+			url 	: "/",
+			method 	: "GET",
+			credentials : {
+				username 	: "Timmy Tester",
+				email 		: "timothyandthecrew@testing.com",
+				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
+				url 		: "https://github.com/MIJOTHY"
+			}
 		};
 
 		server.inject(options, function(response) {
@@ -19,11 +39,14 @@ lab.experiment("When a user visits the home page, ", function() {
 			done();
 		});
 	});
+});
 
-	lab.test("with proper authentication, they should be redirected to their account page, ", function(done) {
+lab.experiment("When a user visits the login page", function() {
+
+	lab.test("if already authenticated, they should be redirected to their account page, ", function(done) {
 
 		var options = {
-			url 		: "/",
+			url 		: "/login",
 			method 		: "GET",
 			credentials : {
 				username 	: "Timmy Tester",
@@ -77,8 +100,10 @@ lab.experiment("When a user visits the signup page, ", function() {
 		};
 		server.inject(options, function(response) {
 			assert.equal(response.statusCode, 200, " they should get an OK status code (200)");
-			assert.include(response.headers["Content-Type"], "text/html", "they should get an html page back");
+			assert.include(response.headers["content-type"], "text/html", "they should get an html page back");
 			assert.include(response.result, "<form", "they should be returned a form element");
+			assert.include(response.result, "method=\"POST\"", "they should be returned a form element that POSTs");
+			assert.include(response.result, "action=\"/accounts\"", "they should be returned a form element pointed towards accounts");
 			done();
 		});
 	});
@@ -94,7 +119,7 @@ lab.experiment("When the user visits the logout page, ", function() {
 		};
 		server.inject(options, function(response) {
 			assert.equal(response.statusCode, 302, "they should get a FOUND status code (302)");
-			assert.equal(response.headers.location, "/", "they should be redirected to the login page");
+			assert.equal(response.headers.location, "/", "they should be redirected to the home page");
 			done();
 		});
 	});
@@ -113,8 +138,9 @@ lab.experiment("When the user visits the logout page, ", function() {
 			}
 		};
 		server.inject(options, function(response) {
-			assert.equal(response.statusCode, 200, " they should get an OK status code (200)");
+			assert.equal(response.statusCode, 302, " they should get a FOUND status code (302)");
 			assert.include(response.headers["set-cookie"][0], "Expires=Thu, 01 Jan 1970 00:00:00 GMT", "their session should be cleared");
+			assert.equal(response.headers.location, "/", "they should be redirected to the home page");
 			done();
 		});
 	});

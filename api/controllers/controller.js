@@ -1,20 +1,29 @@
 var Bell 	= require("bell");
 var path 	= require("path");
-var Stripe 	= require("stripe")(require("../config.js").stripe.sk);
-var model 	= require("../models/members.js");
+var stripe 	= require("stripe")(require("../config.js").stripe.sk);
 var config 	= require('../config.js');
-var api_key = config.mailgunTest.apiKey;
-var domain 	= config.mailgunTest.domain;
-var port = {port: (process.env.port || 3000 ) };
-//var proxy 	= config.mailgunTest.proxy + port;
-var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
-var allMembersList = config.mailgunTest.mailLists.allMembersList;
-var deskOccupantsList = config.mailgunTest.mailLists.deskOccupantsList;
 var Joi 	= require("joi");
 var joiSchema = Joi.object().keys({ /* to be defined */});
 
-module.exports = {
+var accounts = require("../models/accounts.js");
 
+var messages = require("../messages/messages.js");
+
+var creationValidation = Joi.object({
+	email: Joi.string().email().required(),
+	first_name: Joi.string().required(),
+	last_name: Joi.string().required(),
+	phone_number: Joi.number().required()
+});
+
+var updateValidation = Joi.object({
+	email: Joi.string().email(),
+	first_name: Joi.string(),
+	last_name: Joi.string(),
+	phone_number: Joi.number()
+}).or("email", "first_name", "last_name", "phone_number");
+
+module.exports = {
 
 	home: {
 		auth: {
@@ -27,26 +36,20 @@ module.exports = {
 
 	login : {
 		auth: {
-			strategy: "twitter"
+			strategy: "github"
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
 				var g = request.auth.credentials;
-				//console.log( g.expiresIn );
-				//console.log( g.profile.raw );
 				var profile ={
-					username 	: g.username,
-					displayname	: g.displayname,
-					email 		: g.email,
+					username 	: g.profile.username,
+					email 		: g.profile.email,
 					avatar 		: g.profile.raw.avatar_url,
 					url 		: g.profile.raw.url
 				};
-				// console.log( request.auth);
 
 				request.auth.session.clear();
-				// console.log( request.auth);
 		        request.auth.session.set(profile);
-				// console.log( request.auth.session );
 
 		    	return reply.redirect("/signup");
 		    }
@@ -56,9 +59,6 @@ module.exports = {
 
 	logout: {
 		handler: function (request, reply ){
-			console.log( 'in logout handler');
-			// console.log( request.auth);
-
 			request.auth.session.clear();
 
 			// console.log( 'cleared session ' + request.auth );
@@ -66,14 +66,13 @@ module.exports = {
 		}
 	},
 
-
 	signup: {
 		auth: {
 			mode: 'optional'
 		},
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
-				return reply.file('signup.html');
+				return reply.file("signup.html");
 			}
 			else return reply.redirect('/');
 		}
@@ -82,7 +81,7 @@ module.exports = {
 	account: {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
-				return reply( "account path");
+				return reply.file('account.html');
 			}
 			else return reply.redirect('/');
 		}
@@ -112,11 +111,38 @@ module.exports = {
 		}
 	},
 
+	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			return reply( "make a payment");
+			var stripeToken = request.payload.stripeToken;
+			var accountToUpdate = request.auth.credentials.username;
+
+			var membershipCharge = {
+			  amount: 1000, // amount in cents, again
+			  currency: "gbp",
+			  source: stripeToken,
+			  description: "Membership Fee"
+			};
+
+			var charge = stripe.charges.create(membershipCharge, function(err, charge) {
+				if (err) {
+			    	return reply(err);
+				}
+				var transactionObject = {
+					name: request.payload.stripeEmail,
+					date: charge.created + "000",
+					amount: charge.amount,
+				};
+				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
+					if (err) {
+						return reply(err);
+					}
+					return reply(result);
+				});
+			});
 		}
 	},
+
 
 	getMember: {
 		handler: function (request, reply) {
@@ -124,84 +150,102 @@ module.exports = {
 		}
 	},
 
-	getAccount: {
-		handler: function (request, reply) {
-			return reply( "getAccount path");
-		}
-	},
 
+	// DB Operations
 	getAccounts: {
 		handler: function(request, reply) {
-			return reply("getAccounts path");
+
+			accounts.getAccounts(function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 	createAccount: {
+
         // validate:{
-        //         payload: joiSchema,
+        //         payload: creationValidation,
         // },
 		handler: function (request, reply) {
-			console.log( 'In createAccount');
-			// == ADD NEW ACCOUNT MEMBER TO "all_members" EMAIL LIST
-			var list = mailgun.lists(allMembersList);
+			console.log('In createAccount');
+			var user = request.payload;
+			var accountToCreate = {
 
-			list.info(function (err, data) {
-			  // `data` is mailing list info
-			  if( err )
-			  	console.log( "Error: " + err );
-			  else
-			  	console.log(data);
-			});
-			var newMember = {
-  				subscribed: true,
-  				address: request.payload.email,
-  				name: request.payload.firstname + ' ' + request.payload.lastname
+				email: user.email || request.auth.credentials.email,
+				username: request.auth.credentials.username,
+				first_name: user.first_name,
+				last_name: user.last_name,
+				member_since: new Date(),
+				phone_number: user.phone_number,
+
+				github_link: request.auth.credentials.url,
+				github_avatar: request.auth.credentials.avatar,
+
+				membership_active_status: false,
+
+				desk_authorization: false,
+
+				desk_rental_rate: 50,
 			};
 
-			list.members().create(newMember, function (err, data) {
-				// `data` is the member details
-				if( err )
-					console.log("Created Error: " + err);
-				else
-					console.log("Created: " + data);
-				list.members().list(function (err, members) {
-					if( err )
-						console.log("Created Error: " + err);
-					else// `members` is the list of members
-						console.log("Members: " + members);
-				});
-			});
-			// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
-			var data = {
-				from: 'facmembershipadmin@gmail.com',
-				to: request.payload.email,
-				subject: "Welcome to Founders & Coders!",
-				text: "Hello " + request.payload.firstName + "! Thank you for joining Founders and Coders! We will be in touch to verify your account very shortly!"
-			};
 
-			mailgun.messages().send(data, function (error, body) {
-				if( error ) {
-					console.log( "Error: " + error );
+			accounts.createAccount(accountToCreate, function(err, result) {
+				if (err) {
+					console.log( "Error: " + err );
+					return reply(err);
 				}
-				else {
-					console.log( "Sent email: " + body);
-				}
+				// add to all members email group and send ack email
+				messages.addToMembersList( user);
+				messages.sendEmail( "acknowledge", user );
+				return reply(result);
 			});
-			return reply( "createAccount path");
 		}
 	},
 
+	getAccount: {
+		handler: function (request, reply) {
+			var userToFind = request.params.member;
+			accounts.getAccount(userToFind, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
+		}
+	},
+
+
 	updateAccount: {
         validate:{
-                payload: joiSchema,
+                payload: updateValidation,
         },
 		handler: function (request, reply) {
-			return reply( "updateSingleMember path");
+
+			var userToUpdate = request.params.member;
+			var updateTheseFields = request.payload;
+
+			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	},
 
 	deleteAccount: {
 		handler: function (request, reply) {
-			return reply( "deleteSingleAccount path");
+			var userToDelete = request.params.member;
+			console.log(userToDelete);
+
+			accounts.deleteAccount(userToDelete, function(err, result) {
+				if (err) {
+					return reply(err);
+				}
+				return reply(result);
+			});
 		}
 	}
 };
