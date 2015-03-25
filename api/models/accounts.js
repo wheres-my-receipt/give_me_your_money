@@ -1,6 +1,8 @@
 var mongoose 	= require("mongoose");
 var moment 		= require("moment");
-var Account 	= require("./schema.js").Account;
+var schema 		= require("./schema.js");
+var Account 	= schema.Account;
+var DeskRental  = schema.DeskRental;
 
 // Multiple account operations
 exports.getAccounts = function(onComplete) {
@@ -17,6 +19,7 @@ exports.getAccounts = function(onComplete) {
 exports.getAccount = function(username, onComplete) {
 	Account.findOne({username : username}, function(err, result) {
 		if (err) {
+			console.log(err);
 			return onComplete(err);
 		}
 		return onComplete(null, result);
@@ -29,7 +32,6 @@ exports.updateAccount = function(username, updateObject, onComplete) {
 		if (err) {
 			return onComplete(err);
 		}
-		console.log(result);
 		return onComplete(null, result);
 	});
 };
@@ -63,23 +65,23 @@ exports.newTransaction = function(username, transaction, onComplete) {
 		if(err) {
 			return onComplete(err);
 		}
-
+// TBDONE
 		var now = new Date(+transaction.date);
-		// bloated first pass, see controller for next version (tbd tomorrow i need to go home soon and im tired)
 
 		if (transaction.type === "membership") {
 			result.membership_active_status = true;
 			result.membership_paid = now;
 		}
 		else if (transaction.type === "desk") {
-			if (result.desk_authorization === false) {
-				return onComplete("not authorized for desks bruv");
-			}
+
 			var deskHistory = result.desk_rental_status;
 			var currentYear = now.getYear();
 			var currentMonth = now.getMonth();
+
 			if (!deskHistory[currentYear]) {
-				deskHistory[currentYear] = {};
+				deskHistory[currentYear] = new DeskRental();
+			} else if (deskHistory[currentYear][currentMonth] === "paid") {
+				return onComplete(err);
 			}
 			deskHistory[currentYear][currentMonth] = "paid";
 		}

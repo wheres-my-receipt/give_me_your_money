@@ -19,7 +19,8 @@ var updateValidation = Joi.object({
 		first_name: Joi.string(),
 		last_name: Joi.string(),
 		phone_number: Joi.number()
-	}).or("email", "first_name", "last_name", "phone_number");
+	}).options({allowUnknown: true});
+// .or("email", "first_name", "last_name", "phone_number");
 
 module.exports = {
 
@@ -91,7 +92,6 @@ module.exports = {
 
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {return reply(err);}
-				console.log(result);
 				return reply.view('account.jade', {user: result});
 			});
 		}
@@ -133,64 +133,70 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
+			// First, check the type of payment
+			// If the type of payment is 'desk', check whether they are authorized
+			// And if they have already paid for this month's desk space, deny the request?
+			// If not, grab the rate from the DB and charge them for it
+			// And add the 'paid' status to the current month of the year in the db
+
+			// If the type of payment is 'membership', check their active status
+			// If active, deny the request?
+			// If not, charge them for 50 squid and set active_status to true
+			// If they paid for their membership less than a year from today,
+			// then extend membership_paid by 1 year.
+			// else set membership_paid to now.
 
 			var paymentFor 		= request.params.type;
 			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
 			var newCharge;
 
-			// Change this all to do a DB query 'pon receipt, check their status here, then proceed
-			// Do the charge stuff
-			var paymentSchemes = {
-				membership: {
-					amount: 5000,
-					description: "Membership for 1 year",
-					type: "membership"
-				},
-				desk1: {
-					amount: 5000,
-					description: "Desk rental 1 month - tier 1",
-					type: "desk"
-				},
-				desk2: {
-					amount: 10000,
-					description: "Desk rental 1 month - tier 2",
-					type: "desk",
-				},
-				desk3: {
-					amount: 20000,
-					description: "Desk rental 1 month - tier 3",
-					type: "desk"
+			accounts.getAccount(accountToUpdate, function(err, result) {
+				var paymentSchemes = {
+					membership: {
+						amount: 5000,
+						description: "Membership for 1 year",
+					},
+					desk: {
+						amount: result.desk_rental_rate,
+						description: "Desk rental 1 month",
+					}
+				};
+
+				var chargeMaker = function(paymentScheme, token) {
+					return {
+						amount: paymentScheme.amount,
+						currency: "gbp",
+						source: token,
+						description: paymentScheme.description,
+					};
+				};
+
+				if (paymentFor === "desk") {
+					if (!result.desk_authorization) {
+						return reply("You're not authorized to do that yet!");
+					} else {
+						newCharge = chargeMaker(paymentSchemes[paymentFor], stripeToken);
+					}
+				} else if (paymentFor === "membership") {
+					newCharge = chargeMaker(paymentSchemes[paymentFor], stripeToken);
+				} else {
+					return reply("Unknown payment scheme");
 				}
-			};
-
-			var chargeMaker = function(paymentScheme, token) {
-				return {
-					amount: paymentScheme.amount,
-					currency: "gbp",
-					source: token,
-					description: paymentScheme.description,
-				};
-			};
-
-			if (paymentSchemes[paymentFor]) {
-				newCharge =	chargeMaker(paymentSchemes[paymentFor], stripeToken);
-			} else {
-				return reply("Naughty naughty!");
-			}
-
-			var charge = stripe.charges.create(newCharge, function(err, charge) {
-				if (err) {return reply(err);}
-
-				var transactionObject = {
-					name: request.payload.stripeEmail,
-					date: charge.created + "000",
-					amount: charge.amount,
-					type: paymentSchemes[paymentFor].type,
-				};
-				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
+				var charge = stripe.charges.create(newCharge, function(err, charge) {
 					if (err) {return reply(err);}
-					return reply(result);
+
+					var transactionObject = {
+						name: request.payload.stripeEmail,
+						date: charge.created + "000",
+						amount: charge.amount,
+						type: paymentFor
+					};
+
+					return accounts.newTransaction(accountToUpdate, transactionObject, function(err, success) {
+						if (err) {return reply(err);}
+						return reply(success);
+					});
 				});
 			});
 		}
@@ -296,7 +302,7 @@ module.exports = {
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
 				if (err) {return reply(err);}
-				return reply(result).location("/logout");
+				return reply(result).redirect("/logout");
 			});
 		}
 	},
