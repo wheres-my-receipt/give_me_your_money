@@ -14,7 +14,7 @@ exports.getAccounts = function(onComplete) {
 
 // Single account operations
 exports.getAccount = function(username, onComplete) {
-
+	// QUERY: should be findOne? find will return an array of 1, and username should be unique
 	Account.find({username : username}, function(err, result) {
 		if (err) {
 			return onComplete(err);
@@ -25,10 +25,11 @@ exports.getAccount = function(username, onComplete) {
 
 exports.updateAccount = function(username, updateObject, onComplete) {
 
-	Account.update({username : username}, updateObject, function(err, result) {
+	Account.findOneAndUpdate({username : username}, updateObject, function(err, result) {
 		if (err) {
 			return onComplete(err);
 		}
+		console.log(result);
 		return onComplete(null, result);
 	});
 };
@@ -47,8 +48,7 @@ exports.createAccount = function(accountToCreate, onComplete) {
 
 exports.deleteAccount = function(username, onComplete) {
 
-	Account.remove({username : username}, function(err, result) {
-
+	Account.findOneAndRemove({username : username}, function(err, result) {
 		if (err) {
 			return onComplete(err);
 		}

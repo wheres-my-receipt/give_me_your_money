@@ -71,7 +71,7 @@ module.exports = {
 		};
 
 		list.members().create( newMember, function (err, data) {
-			// `data` is the member details
+
 			if( err )
 				console.log("Created Error: " + err);
 			else

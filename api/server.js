@@ -46,6 +46,17 @@ server.register([Bell, Cookie], function (err) {
  //        clientSecret: config.twitter.cSecret
  //    });
 
+	server.views({
+		engines: {
+			jade: require("jade")
+		},
+		compileOptions: {
+			pretty: true
+		},
+		relativeTo: __dirname,
+		path: 		  "./views",
+		isCached: false
+	});
 
     server.auth.default('session');
     server.route( routes );

@@ -29,11 +29,11 @@ module.exports = {
 			console.log( 'in home handler');
 			if(request.auth.isAuthenticated) {
 				console.log( 'in home handler');
-				return reply.file('index.html');
+				return reply.redirect("/account");
 			}
 			console.log( 'Not Authenticated home handler');
 
-			return reply.file('login.html');
+			return reply.view('login.jade');
 		}
 	},
 
@@ -72,7 +72,6 @@ module.exports = {
 		handler: function (request, reply ){
 			console.log( 'in logout handler');
 			request.auth.session.clear();
-			// console.log( 'cleared session ' + request.auth );
 			return reply.redirect('/');
 		}
 	},
@@ -80,16 +79,21 @@ module.exports = {
 	signup: {
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
-				return reply.file("signup.html");
+				return reply.view("signup.jade");
 			}
 		}
 	},
 
 	account: {
 		handler: function (request, reply) {
-			if(request.auth.isAuthenticated) {
-				return reply.file('account.html');
-			}
+
+			var userToFind = request.auth.credentials.username;
+
+			accounts.getAccount(userToFind, function(err, result) {
+				if (err) {return reply(err);}
+				console.log(result[0]);
+				return reply.view('account.jade', {user: result[0]});
+			});
 		}
 	},
 
@@ -104,7 +108,6 @@ module.exports = {
 				});
 			}
 			// get all messages from mailgun or database
-			reply( 'All Messages');
 			return reply.file( "messages.html");
 		}
 	},
@@ -175,6 +178,7 @@ module.exports = {
 			});
 		}
 	},
+
 	createAccount: {
         validate:{
                 payload: creationValidation,
@@ -217,6 +221,7 @@ module.exports = {
 					}
 					return reply( result );
 				});
+
 			});
 		}
 	},
