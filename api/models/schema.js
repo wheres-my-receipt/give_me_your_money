@@ -37,9 +37,6 @@ var accountSchema = new Schema({
 	message_history: [messageSchema]
 });
 
-
-
-
 var Account 	= mongoose.model("account", accountSchema, "Accounts");
 var Transaction = mongoose.model("transaction", transactionSchema);
 var Message 	= mongoose.model("message", messageSchema);

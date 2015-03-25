@@ -1,40 +1,44 @@
-var Bell 	= require("bell");
-var path 	= require("path");
-var stripe 	= require("stripe")(require("../config.js").stripe.sk);
-var config 	= require('../config.js');
-var Joi 	= require("joi");
-var joiSchema = Joi.object().keys({ /* to be defined */});
-
+var Bell 	 = require("bell");
+var path 	 = require("path");
+var Joi 	 = require("joi");
+var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
+var config 	 = require('../config.js');
 var accounts = require("../models/accounts.js");
-
 var messages = require("../messages/messages.js");
 
 var creationValidation = Joi.object({
-	email: Joi.string().email().required(),
-	first_name: Joi.string().required(),
-	last_name: Joi.string().required(),
-	phone_number: Joi.number().required()
-});
+		email: Joi.string().email().required(),
+		first_name: Joi.string().required(),
+		last_name: Joi.string().required(),
+		phone_number: Joi.number().required()
+	});
 
 var updateValidation = Joi.object({
-	email: Joi.string().email(),
-	first_name: Joi.string(),
-	last_name: Joi.string(),
-	phone_number: Joi.number()
-}).or("email", "first_name", "last_name", "phone_number");
+		email: Joi.string().email(),
+		first_name: Joi.string(),
+		last_name: Joi.string(),
+		phone_number: Joi.number()
+	}).or("email", "first_name", "last_name", "phone_number");
 
 module.exports = {
 
 	home: {
 		auth: false,
 		handler: function (request, reply ) {
+			console.log( 'in home handler');
+			if(request.auth.isAuthenticated) {
+				console.log( 'in home handler');
+				return reply.file('index.html');
+			}
+			console.log( 'Not Authenticated home handler');
+
 			return reply.file('login.html');
 		}
 	},
 
 	login : {
 		auth: {
-			strategy: "github"
+			strategy: "twitter"
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
@@ -46,17 +50,26 @@ module.exports = {
 					url 		: g.profile.raw.url
 				};
 
+				// var t = request.auth.credentials;
+		  //       var profile = {
+		  //           token: t.token,
+		  //           secret: t.secret,
+		  //           twitterId: t.profile.id,
+		  //           twitterName: t.profile.username,
+		  //           fullName: t.profile.displayName,
+		  //       };
 				request.auth.session.clear();
 		        request.auth.session.set(profile);
 
 		    	return reply.redirect("/signup");
 		    }
-		    else reply('Not logged in...').code(401);
+		    else reply('Not logged in, should be forwarded to bell login...').code(401);
 		}
 	},
 
 	logout: {
 		handler: function (request, reply ){
+			console.log( 'in logout handler');
 			request.auth.session.clear();
 			// console.log( 'cleared session ' + request.auth );
 			return reply.redirect('/');
@@ -106,29 +119,27 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			var stripeToken = request.payload.stripeToken;
+
+			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
 
 			var membershipCharge = {
-			  amount: 1000, // amount in cents, again
+			  amount: 1000,
 			  currency: "gbp",
 			  source: stripeToken,
 			  description: "Membership Fee"
 			};
 
 			var charge = stripe.charges.create(membershipCharge, function(err, charge) {
-				if (err) {
-			    	return reply(err);
-				}
+				if (err) {return reply(err);}
+
 				var transactionObject = {
 					name: request.payload.stripeEmail,
 					date: charge.created + "000",
 					amount: charge.amount,
 				};
 				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
-					if (err) {
-						return reply(err);
-					}
+					if (err) {return reply(err);}
 					return reply(result);
 				});
 			});
@@ -148,18 +159,15 @@ module.exports = {
 		handler: function(request, reply) {
 
 			accounts.getAccounts(function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
 	},
 	createAccount: {
-
-        // validate:{
-        //         payload: creationValidation,
-        // },
+        validate:{
+                payload: creationValidation,
+        },
 		handler: function (request, reply) {
 			console.log('In createAccount');
 			var user = request.payload;
@@ -189,8 +197,8 @@ module.exports = {
 					return reply(err);
 				}
 				// add to all members email group and send ack email
-				messages.addToMembersList( user);
-				messages.sendEmail( "acknowledge", user );
+				messages.addToMembersList(user);
+				messages.sendEmail("acknowledge", user);
 				return reply(result);
 			});
 		}
@@ -200,9 +208,7 @@ module.exports = {
 		handler: function (request, reply) {
 			var userToFind = request.params.member;
 			accounts.getAccount(userToFind, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -219,9 +225,7 @@ module.exports = {
 			var updateTheseFields = request.payload;
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -233,11 +237,28 @@ module.exports = {
 			console.log(userToDelete);
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
+		}
+	},
+
+	getMessages : {
+		handler : function (request, reply) {
+			var member = request.params.member;
+			console.log( 'In getMessages, member: ' + member );
+			// get all messages from mailgun or database
+			reply( 'All Messages');
+		}
+	},
+	createMessage : {
+		handler : function (request, reply) {
+			var member = request.params.member;
+			console.log( 'In createMessages, member: ' + member );
+			var message = request.payload;
+			console.log( 'Message to send: '+ message );
+			// send a message to 'member'
+			reply( 'Successfully Sent Message to ' + member );
 		}
 	}
 };
