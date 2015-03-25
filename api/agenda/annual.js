@@ -13,17 +13,25 @@ function annualReminder(agenda) {
 				done();
 			}
 			else {
-				result.forEach(function(user){
-					var emailDetails = user;
-					emailDetails.emailType = "annualSubscriptionReminder";
-					messages.sendEmail(emailDetails, function( error, data ) {
-						if( err ) {
-							console.log( "Error sending acknowledge email: " + error );
-						}
-						if (index === result.length - 1) {
-						done();
-						}
-					});
+				result.forEach(function(user, index){
+					if (!user.membership_reminder_sent) {
+						messages.sendEmailRefactor(user, "annualSubscriptionReminder", function( error, data ) {
+							if( err ) {
+								console.log( "Annual sub reminder email error: " + error );
+								if (index === result.length - 1) {
+									done();
+								}
+							}
+							else {
+								db.updateAccount(user.username, {'membership_reminder_sent': true}, function(err, result){
+									if (err) console.log('Error registering annual reminder email sent status ',err);
+									if (index === result.length - 1) {
+										done();
+									}
+								});
+							}
+						});
+					}
 				});
 			}
 		});
@@ -40,14 +48,24 @@ function testReminder(agenda){
 			}
 			else {
 				result.forEach(function(user, index){
-					messages.sendEmailRefactor(user, "annualSubscriptionReminder", function( error, data ) {
-						if( err ) {
-							console.log( "Error sending acknowledge email: " + error );
-						}
-						if (index === result.length - 1) {
-						done();
-						}
-					});
+					if (true) {
+						messages.sendEmailRefactor(user, "annualSubscriptionReminder", function( error, data ) {
+							if( err ) {
+								console.log( "Annual sub reminder email error: " + error );
+								if (index === result.length - 1) {
+									done();
+								}
+							}
+							else {
+								db.updateAccount(user.username, {'membership_reminder_sent': true}, function(err, result){
+									if (err) console.log('Error registering annual reminder email sent status ',err);
+									if (index === result.length - 1) {
+										done();
+									}
+								});
+							}
+						});
+					}
 				});
 			}
 		});
