@@ -90,8 +90,8 @@ module.exports = {
 
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {return reply(err);}
-				console.log(result[0]);
-				return reply.view('account.jade', {user: result[0]});
+				console.log(result);
+				return reply.view('account.jade', {user: result});
 			});
 		}
 	},
