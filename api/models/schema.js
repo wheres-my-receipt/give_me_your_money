@@ -4,7 +4,7 @@ var Schema 	= mongoose.Schema;
 var messageSchema = new Schema({
 	to: {type: String, required: true},
 	from: {type: String, required: true},
-	date: {type: Date, required: true},
+	date: {type: Object, required: true},
 	subject: {type: String, required: true},
 	contents: {type: String, required: true},
 });
@@ -24,6 +24,7 @@ var accountSchema = new Schema({
 	member_since: {type: Date, required: true},
 	phone_number: {type: Number, required: true},
 
+	admin_rights : {type: Boolean, required: true},
 	github_link: {type: String, required: true, unique: true},
 	github_avatar: {type: String, required: true},
 
