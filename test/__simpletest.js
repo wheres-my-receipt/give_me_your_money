@@ -26,19 +26,25 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 		});
 	});
 
-	lab.test("Sending a POST request to /accounts", function(done) {
+	lab.test("Sending a POST request to /messages/{member}", function(done) {
 
 		var options = {
-			url: "/accounts",
+			url: "/messages/sarahabimay",
 			method: "POST",
 			payload : {
-				firstname: "Sarah",
-      			email: "sarahabimay@gmail.com"
+				emailType : 'simpleMessage',
+				email : 'sarahabimay@gmail.com',
+				username : "sarahabimay",
+				first_name : "Sarah",
+				last_name : "Johnston",
+				subject : "TESTING THIS WORKS",
+				text : "IS THIS WORKING??",
+				firstname: "Sarah"
 			},
 			credentials: {
-				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
-				email 		: "timothyandthecrew@testing.com",
+				username 	: "Adrian Admin",
+				displayname	: "iamincontrol01",
+				email 		: "upstairsguys@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
 			}

@@ -1,5 +1,6 @@
 var Bell 	 = require("bell");
 var path 	 = require("path");
+var moment 	 = require("moment");
 var Joi 	 = require("joi");
 var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var config 	 = require('../config.js');
@@ -38,7 +39,7 @@ module.exports = {
 
 	login : {
 		auth: {
-			strategy: "twitter"
+			strategy: "github"
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
@@ -94,13 +95,23 @@ module.exports = {
 
 	messages: {
 		handler: function (request, reply) {
+			if(request.auth.isAuthenticated) {
+				var user = request.auth.credentials;
+				//var member = request.params.member;
+				console.log( 'In getMessages, member: ' + user );
+				accounts.getAccount( user, function (err, data ) {
+
+				});
+			}
+			// get all messages from mailgun or database
+			reply( 'All Messages');
 			return reply.file( "messages.html");
 		}
 	},
 
 	admin: {
 		handler: function (request, reply) {
-			return reply( "admin path");
+			return reply.file('admin.html');
 		}
 	},
 
@@ -197,9 +208,15 @@ module.exports = {
 					return reply(err);
 				}
 				// add to all members email group and send ack email
-				messages.addToMembersList(user);
-				messages.sendEmail("acknowledge", user);
-				return reply(result);
+				var emailDetails = accountToCreate;
+				emailDetails.emailType = "acknowledge";
+				messages.addToMembersList(accountToCreate);
+				messages.sendEmail(accountToCreate, function( error, data ) {
+					if( err ) {
+						console.log( "Error sending acknowledge email: " + error );
+					}
+					return reply( result );
+				});
 			});
 		}
 	},
@@ -243,22 +260,50 @@ module.exports = {
 		}
 	},
 
-	getMessages : {
-		handler : function (request, reply) {
-			var member = request.params.member;
-			console.log( 'In getMessages, member: ' + member );
-			// get all messages from mailgun or database
-			reply( 'All Messages');
-		}
-	},
 	createMessage : {
 		handler : function (request, reply) {
 			var member = request.params.member;
-			console.log( 'In createMessages, member: ' + member );
 			var message = request.payload;
+			console.log( 'In createMessages, member: ' + member );
 			console.log( 'Message to send: '+ message );
-			// send a message to 'member'
-			reply( 'Successfully Sent Message to ' + member );
+
+			//var recipient_user	= request.payload.recipient;
+			var emailDetails = {
+				emailType: request.payload.emailType,
+				email: request.payload.email,
+				username: request.payload.username,
+				first_name: request.payload.first_name,
+				last_name: request.payload.last_name,
+				subject: request.payload.subject,
+				content: request.payload.text
+			};
+
+			messages.sendEmail( emailDetails, function ( error, body ) {
+				if( error ){
+					console.log( "Error sending " + emailDetails.emailType + ": " + error );
+					return reply( error );
+				}
+				else {
+					// STICK IT IN THE DATABASE
+					console.log( "body: " + body);
+					var messageObject = {
+						to: emailDetails.email,
+						from: 'facmembershipadmin@gmail.com',
+						date: moment().format('MMMM Do YYYY'),
+						subject: emailDetails.subject ,
+						content: emailDetails.text
+					};
+					return accounts.newMessage(member, messageObject, function (err, result) {
+						if (err) {
+							console.log( "Error adding new message: " + err);
+							return reply(err);
+						}
+						console.log( "Successfully added: " + results );
+						return reply(result);
+					});
+				}
+			});
+
 		}
 	}
 };
