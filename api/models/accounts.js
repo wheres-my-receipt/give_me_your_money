@@ -1,5 +1,6 @@
 var mongoose 	= require("mongoose");
 var Account 	= require("./schema.js").Account;
+var moment 	 = require("moment");
 
 // Multiple account operations
 exports.getAccounts = function(onComplete) {
@@ -76,7 +77,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 
 };
 // Message operations
-exports.newMessage = function(username, message, onComplete) {
+exports.newMessage = function(username, emailDetails, onComplete) {
 	console.log( "new message : " +username);
 	Account.findOne({username: username}, function(err, result) {
 		console.log( "new message - findOne");
@@ -84,8 +85,14 @@ exports.newMessage = function(username, message, onComplete) {
 		if(err) {
 			return onComplete(err);
 		}
-
-		result.message_history.push(message);
+		var messageObject = {
+			to: emailDetails.email,
+			from: 'facmembershipadmin@gmail.com',
+			date: moment().format('MMMM Do YYYY'),
+			subject: emailDetails.subject ,
+			contents: emailDetails.contents
+		};
+		result.message_history.push(messageObject);
 
 		result.save(function(err, result) {
 			if(err) {

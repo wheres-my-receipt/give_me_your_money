@@ -1,0 +1,13 @@
+include ./mixins.jade
+
+doctype html
+html
+	include ./includes/head.jade
+	body
+		include ./includes/navbar.jade
+		div
+			h2 ALL YOUR MESSAGES
+			for msg in messages
+				ul
+					li #{msg.date} - #{msg.subject}
+	+foot()
