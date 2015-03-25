@@ -78,6 +78,7 @@ module.exports = {
 			});
 		});
 	},
+
 	addToDeskOccupantsList : function ( data ) {
 		// == ADD NEW ACCOUNT MEMBER TO "all_members" EMAIL LIST
 		var list = mailgun.lists( deskOccupantsList );

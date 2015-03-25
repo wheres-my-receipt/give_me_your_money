@@ -1,27 +1,24 @@
-var Bell 	= require("bell");
-var path 	= require("path");
-var stripe 	= require("stripe")(require("../config.js").stripe.sk);
-var config 	= require('../config.js');
-var Joi 	= require("joi");
-var joiSchema = Joi.object().keys({ /* to be defined */});
-
+var Bell 	 = require("bell");
+var path 	 = require("path");
+var Joi 	 = require("joi");
+var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
+var config 	 = require('../config.js');
 var accounts = require("../models/accounts.js");
-
 var messages = require("../messages/messages.js");
 
 var creationValidation = Joi.object({
-	email: Joi.string().email().required(),
-	first_name: Joi.string().required(),
-	last_name: Joi.string().required(),
-	phone_number: Joi.number().required()
-});
+		email: Joi.string().email().required(),
+		first_name: Joi.string().required(),
+		last_name: Joi.string().required(),
+		phone_number: Joi.number().required()
+	});
 
 var updateValidation = Joi.object({
-	email: Joi.string().email(),
-	first_name: Joi.string(),
-	last_name: Joi.string(),
-	phone_number: Joi.number()
-}).or("email", "first_name", "last_name", "phone_number");
+		email: Joi.string().email(),
+		first_name: Joi.string(),
+		last_name: Joi.string(),
+		phone_number: Joi.number()
+	}).or("email", "first_name", "last_name", "phone_number");
 
 module.exports = {
 
@@ -45,22 +42,22 @@ module.exports = {
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
-				// var g = request.auth.credentials;
-				// var profile ={
-				// 	username 	: g.profile.username,
-				// 	email 		: g.profile.email,
-				// 	avatar 		: g.profile.raw.avatar_url,
-				// 	url 		: g.profile.raw.url
-				// };
+				var g = request.auth.credentials;
+				var profile ={
+					username 	: g.profile.username,
+					email 		: g.profile.email,
+					avatar 		: g.profile.raw.avatar_url,
+					url 		: g.profile.raw.url
+				};
 
-				var t = request.auth.credentials;
-		        var profile = {
-		            token: t.token,
-		            secret: t.secret,
-		            twitterId: t.profile.id,
-		            twitterName: t.profile.username,
-		            fullName: t.profile.displayName,
-		        };
+				// var t = request.auth.credentials;
+		  //       var profile = {
+		  //           token: t.token,
+		  //           secret: t.secret,
+		  //           twitterId: t.profile.id,
+		  //           twitterName: t.profile.username,
+		  //           fullName: t.profile.displayName,
+		  //       };
 				request.auth.session.clear();
 		        request.auth.session.set(profile);
 
@@ -122,29 +119,27 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			var stripeToken = request.payload.stripeToken;
+
+			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
 
 			var membershipCharge = {
-			  amount: 1000, // amount in cents, again
+			  amount: 1000,
 			  currency: "gbp",
 			  source: stripeToken,
 			  description: "Membership Fee"
 			};
 
 			var charge = stripe.charges.create(membershipCharge, function(err, charge) {
-				if (err) {
-			    	return reply(err);
-				}
+				if (err) {return reply(err);}
+
 				var transactionObject = {
 					name: request.payload.stripeEmail,
 					date: charge.created + "000",
 					amount: charge.amount,
 				};
 				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
-					if (err) {
-						return reply(err);
-					}
+					if (err) {return reply(err);}
 					return reply(result);
 				});
 			});
@@ -164,18 +159,15 @@ module.exports = {
 		handler: function(request, reply) {
 
 			accounts.getAccounts(function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
 	},
 	createAccount: {
-
-        // validate:{
-        //         payload: creationValidation,
-        // },
+        validate:{
+                payload: creationValidation,
+        },
 		handler: function (request, reply) {
 			console.log('In createAccount');
 			var user = request.payload;
@@ -205,8 +197,8 @@ module.exports = {
 					return reply(err);
 				}
 				// add to all members email group and send ack email
-				messages.addToMembersList( user);
-				messages.sendEmail( "acknowledge", user );
+				messages.addToMembersList(user);
+				messages.sendEmail("acknowledge", user);
 				return reply(result);
 			});
 		}
@@ -216,9 +208,7 @@ module.exports = {
 		handler: function (request, reply) {
 			var userToFind = request.params.member;
 			accounts.getAccount(userToFind, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -235,9 +225,7 @@ module.exports = {
 			var updateTheseFields = request.payload;
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
@@ -249,9 +237,7 @@ module.exports = {
 			console.log(userToDelete);
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
-				if (err) {
-					return reply(err);
-				}
+				if (err) {return reply(err);}
 				return reply(result);
 			});
 		}
