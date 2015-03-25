@@ -28,35 +28,51 @@ module.exports = {
 	home: {
 		auth: false,
 		handler: function (request, reply ) {
+			console.log( 'in home handler');
+			if(request.auth.isAuthenticated) {
+				console.log( 'in home handler');
+				return reply.file('index.html');
+			}
+			console.log( 'Not Authenticated home handler');
+
 			return reply.file('login.html');
 		}
 	},
 
 	login : {
 		auth: {
-			strategy: "github"
+			strategy: "twitter"
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
-				var g = request.auth.credentials;
-				var profile ={
-					username 	: g.profile.username,
-					email 		: g.profile.email,
-					avatar 		: g.profile.raw.avatar_url,
-					url 		: g.profile.raw.url
-				};
+				// var g = request.auth.credentials;
+				// var profile ={
+				// 	username 	: g.profile.username,
+				// 	email 		: g.profile.email,
+				// 	avatar 		: g.profile.raw.avatar_url,
+				// 	url 		: g.profile.raw.url
+				// };
 
+				var t = request.auth.credentials;
+		        var profile = {
+		            token: t.token,
+		            secret: t.secret,
+		            twitterId: t.profile.id,
+		            twitterName: t.profile.username,
+		            fullName: t.profile.displayName,
+		        };
 				request.auth.session.clear();
 		        request.auth.session.set(profile);
 
 		    	return reply.redirect("/signup");
 		    }
-		    else reply('Not logged in...').code(401);
+		    else reply('Not logged in, should be forwarded to bell login...').code(401);
 		}
 	},
 
 	logout: {
 		handler: function (request, reply ){
+			console.log( 'in logout handler');
 			request.auth.session.clear();
 			// console.log( 'cleared session ' + request.auth );
 			return reply.redirect('/');
@@ -238,6 +254,25 @@ module.exports = {
 				}
 				return reply(result);
 			});
+		}
+	},
+
+	getMessages : {
+		handler : function (request, reply) {
+			var member = request.params.member;
+			console.log( 'In getMessages, member: ' + member );
+			// get all messages from mailgun or database
+			reply( 'All Messages');
+		}
+	},
+	createMessage : {
+		handler : function (request, reply) {
+			var member = request.params.member;
+			console.log( 'In createMessages, member: ' + member );
+			var message = request.payload;
+			console.log( 'Message to send: '+ message );
+			// send a message to 'member'
+			reply( 'Successfully Sent Message to ' + member );
 		}
 	}
 };
