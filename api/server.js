@@ -24,7 +24,7 @@ server.register([Bell, Cookie], function (err) {
 	server.auth.strategy('session', 'cookie', {
         password: config.cookie.password,
         cookie: 'sid',
-        // redirectTo: '/', //causes redirect
+        redirectTo: '/',
         redirectOnTry: false,
         isSecure: false
     });
