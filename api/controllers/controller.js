@@ -26,9 +26,7 @@ var updateValidation = Joi.object({
 module.exports = {
 
 	home: {
-		auth: {
-			mode: 'optional'
-		},
+		auth: false,
 		handler: function (request, reply ) {
 			console.log( 'in home handler');
 			if(request.auth.isAuthenticated) {
@@ -76,21 +74,16 @@ module.exports = {
 		handler: function (request, reply ){
 			console.log( 'in logout handler');
 			request.auth.session.clear();
-
 			// console.log( 'cleared session ' + request.auth );
 			return reply.redirect('/');
 		}
 	},
 
 	signup: {
-		auth: {
-			mode: 'optional'
-		},
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
 				return reply.file("signup.html");
 			}
-			else return reply.redirect('/');
 		}
 	},
 
@@ -99,7 +92,6 @@ module.exports = {
 			if(request.auth.isAuthenticated) {
 				return reply.file('account.html');
 			}
-			else return reply.redirect('/');
 		}
 	},
 
@@ -117,9 +109,9 @@ module.exports = {
 
 
 	serveFile: {
-		auth: {
-			mode: 'optional'
-		},
+		// set to false so that resources load when logged out
+		// but, security issue if a page is requested by path. Might need to need 'views' out of public
+		auth: false,
 		handler: {
 			directory: {
 				path: '../public'
