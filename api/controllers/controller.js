@@ -11,7 +11,7 @@ var creationValidation = Joi.object({
 		email: Joi.string().email().required(),
 		first_name: Joi.string().required(),
 		last_name: Joi.string().required(),
-		phone_number: Joi.number().required()
+		phone_number: Joi.string().required()
 	});
 
 var updateValidation = Joi.object({
@@ -134,23 +134,59 @@ module.exports = {
 	payment: {
 		handler: function (request, reply) {
 
+			var paymentFor 		= request.params.type;
 			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
+			var newCharge;
 
-			var membershipCharge = {
-			  amount: 1000,
-			  currency: "gbp",
-			  source: stripeToken,
-			  description: "Membership Fee"
+			// Change this all to do a DB query 'pon receipt, check their status here, then proceed
+			// Do the charge stuff
+			var paymentSchemes = {
+				membership: {
+					amount: 5000,
+					description: "Membership for 1 year",
+					type: "membership"
+				},
+				desk1: {
+					amount: 5000,
+					description: "Desk rental 1 month - tier 1",
+					type: "desk"
+				},
+				desk2: {
+					amount: 10000,
+					description: "Desk rental 1 month - tier 2",
+					type: "desk",
+				},
+				desk3: {
+					amount: 20000,
+					description: "Desk rental 1 month - tier 3",
+					type: "desk"
+				}
 			};
 
-			var charge = stripe.charges.create(membershipCharge, function(err, charge) {
+			var chargeMaker = function(paymentScheme, token) {
+				return {
+					amount: paymentScheme.amount,
+					currency: "gbp",
+					source: token,
+					description: paymentScheme.description,
+				};
+			};
+
+			if (paymentSchemes[paymentFor]) {
+				newCharge =	chargeMaker(paymentSchemes[paymentFor], stripeToken);
+			} else {
+				return reply("Naughty naughty!");
+			}
+
+			var charge = stripe.charges.create(newCharge, function(err, charge) {
 				if (err) {return reply(err);}
 
 				var transactionObject = {
 					name: request.payload.stripeEmail,
 					date: charge.created + "000",
 					amount: charge.amount,
+					type: paymentSchemes[paymentFor].type,
 				};
 				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
 					if (err) {return reply(err);}
@@ -202,7 +238,7 @@ module.exports = {
 
 				desk_authorization: false,
 
-				desk_rental_rate: 50,
+				desk_rental_rate: 5000,
 			};
 
 
@@ -260,7 +296,7 @@ module.exports = {
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
 				if (err) {return reply(err);}
-				return reply(result);
+				return reply(result).location("/logout");
 			});
 		}
 	},

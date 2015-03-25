@@ -18,7 +18,7 @@ module.exports 	= [
 	{path: "/account/messages", 			method: "GET", 		config: controller.messages},
 
 	// Payment
-	{path: "/payment", 						method: "POST", 	config: controller.payment},
+	{path: "/payment/{type}", 				method: "POST", 	config: controller.payment},
 
 	// JSON API
 	{path: "/api/accounts", 				method: "GET", 		config: controller.getAccounts},

@@ -13,6 +13,7 @@ var transactionSchema = new Schema({
 	name: {type: String, required: true},
 	date: {type: Date, required: true},
 	amount: {type: String, required: true},
+	type: {type: String, required: true}
 });
 
 var accountSchema = new Schema({
@@ -22,17 +23,18 @@ var accountSchema = new Schema({
 	first_name: {type: String, required: true},
 	last_name: {type: String, required: true},
 	member_since: {type: Date, required: true},
-	phone_number: {type: Number, required: true},
+	phone_number: {type: String, required: true},
 
 	github_link: {type: String, required: true, unique: true},
 	github_avatar: {type: String, required: true},
 
-	membership_active_status: {type: Boolean, required: true},
+	membership_active_status: {type: Boolean, required: true, default: false},
 	membership_paid: {type: Date}, // date paid
 
-	desk_authorization: {type: Boolean, required: true},
+	desk_authorization: {type: Boolean, required: true, default: false},
 
-	desk_rental_rate: {type: Number}, //rate of desk (e.g 50/100/200)
+	desk_rental_rate: {type: Number, required: true, default: 5000}, //rate of desk (e.g 50/100/200)
+	desk_rental_status: {type: Object, required: true, default: {}},
 
 	transaction_history:  [transactionSchema],
 	message_history: [messageSchema]
@@ -67,4 +69,15 @@ userMonths = {
 		jan: "paid"
 		...
 	}
+
+deskHistory = result.deskHistory
+currentYear = Date.now().getYear();
+currentMonth = Date.now().getMonth();
+
+if (!deskHistory.[currentYear]) {
+	deskHistory.[currentYear] = currentYear;
+}
+deskHistory.[currentYear][currentMonth] = "paid";
+
+}
 */
