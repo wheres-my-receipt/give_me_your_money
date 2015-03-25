@@ -1,8 +1,13 @@
-var Bell 	 = require("bell");
-var path 	 = require("path");
-var Joi 	 = require("joi");
-var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
+var Bell 	= require("bell");
+var path 	= require("path");
+var stripe 	= require("stripe")(require("../config.js").stripe.sk);
+var config 	= require('../config.js');
+var Joi 	= require("joi");
+var joiSchema = Joi.object().keys({ /* to be defined */});
+
 var accounts = require("../models/accounts.js");
+
+var messages = require("../messages/messages.js");
 
 var creationValidation = Joi.object({
 	email: Joi.string().email().required(),
@@ -54,10 +59,9 @@ module.exports = {
 
 	logout: {
 		handler: function (request, reply ){
-
 			request.auth.session.clear();
 
-			console.log( 'cleared session ' + request.auth );
+			// console.log( 'cleared session ' + request.auth );
 			return reply.redirect('/');
 		}
 	},
@@ -160,11 +164,12 @@ module.exports = {
 		}
 	},
 	createAccount: {
-        validate:{
-                payload: creationValidation,
-        },
-		handler: function (request, reply) {
 
+        // validate:{
+        //         payload: creationValidation,
+        // },
+		handler: function (request, reply) {
+			console.log('In createAccount');
 			var user = request.payload;
 			var accountToCreate = {
 
@@ -188,8 +193,12 @@ module.exports = {
 
 			accounts.createAccount(accountToCreate, function(err, result) {
 				if (err) {
+					console.log( "Error: " + err );
 					return reply(err);
 				}
+				// add to all members email group and send ack email
+				messages.addToMembersList( user);
+				messages.sendEmail( "acknowledge", user );
 				return reply(result);
 			});
 		}

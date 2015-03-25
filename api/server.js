@@ -21,7 +21,7 @@ server.connection(port);
 server.register([Bell, Cookie], function (err) {
     if (err) {throw err;}
 
-       server.auth.strategy('session', 'cookie', {
+	server.auth.strategy('session', 'cookie', {
         password: config.cookie.password,
         cookie: 'sid',
         // redirectTo: '/', //causes redirect
@@ -29,20 +29,20 @@ server.register([Bell, Cookie], function (err) {
         isSecure: false
     });
 
-    server.auth.strategy('github', 'bell', {
+	server.auth.strategy('github', 'bell', {
         provider: 'github',
         password: config.github.secret,
         isSecure: false,
         clientId: config.github.cKey,
         clientSecret: config.github.cSecret
     });
-// server.auth.strategy('twitter', 'bell', {
-//         provider: 'twitter',
-//         password: config.twitter.secret,
-//         isSecure: false,
-//         clientId: config.twitter.cKey,
-//         clientSecret: config.twitter.cSecret
-//     });
+	// server.auth.strategy('twitter', 'bell', {
+ //        provider: 'twitter',
+ //        password: config.twitter.secret,
+ //        isSecure: false,
+ //        clientId: config.twitter.cKey,
+ //        clientSecret: config.twitter.cSecret
+ //    });
 
 
     server.auth.default('session');

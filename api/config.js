@@ -22,6 +22,17 @@ module.exports = {
 	},
 	stripe : {
 				sk : process.env.STRIPESECRET || creds.stripe.secret
+	},
+	mailgunTest : {
+		apiKey : process.env.MGAPIKEY || creds.mailgunTest.mgApiKey,
+		domain : process.env.MGTESTDOMAIN || creds.mailgunTest.mgTestDomain,
+		password : process.env.MGTESTPASSWORD || creds.mailgunTest.mgTestPassword,
+		proxy 	: process.env.MGTESTPROXY || creds.mailgunTest.mgTestProxy,
+		mailLists : process.env.MAILLISTS || creds.mailgunTest.mailLists
+
+	},
+	mailgunProd: {
+
 	}
 };
 
