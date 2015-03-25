@@ -4,6 +4,7 @@ var schema 		= require("./schema.js");
 var Account 	= schema.Account;
 var DeskRental  = schema.DeskRental;
 
+
 // Multiple account operations
 exports.getAccounts = function(onComplete) {
 
@@ -65,7 +66,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 		if(err) {
 			return onComplete(err);
 		}
-// TBDONE
+		// rly messy dont hate me ill refactor tomoz
 		var now = new Date(+transaction.date);
 
 		if (transaction.type === "membership") {
@@ -81,24 +82,25 @@ exports.newTransaction = function(username, transaction, onComplete) {
 			if (!deskHistory[currentYear]) {
 				deskHistory[currentYear] = new DeskRental();
 			} else if (deskHistory[currentYear][currentMonth] === "paid") {
-				return onComplete(err);
+				return onComplete("already paid m8");
 			}
 			deskHistory[currentYear][currentMonth] = "paid";
 		}
 
 		result.transaction_history.push(transaction);
-		result.save(function(err, result) {
+		result.save(function(err, success) {
 			if(err) {
+				console.log("save err", err);
 				return onComplete(err);
 			}
-			return onComplete(null, result);
+			return onComplete(null, success);
 		});
 	});
 
 };
 
 // Message operations
-exports.newMessage = function(username, message, onComplete) {
+exports.newMessage = function(username, emailDetails, onComplete) {
 	console.log( "new message : " +username);
 	Account.findOne({username: username}, function(err, result) {
 		console.log( "new message - findOne");
@@ -106,8 +108,14 @@ exports.newMessage = function(username, message, onComplete) {
 		if(err) {
 			return onComplete(err);
 		}
-
-		result.message_history.push(message);
+		var messageObject = {
+			to: emailDetails.email,
+			from: 'facmembershipadmin@gmail.com',
+			date: moment().format('MMMM Do YYYY'),
+			subject: emailDetails.subject ,
+			contents: emailDetails.contents
+		};
+		result.message_history.push(messageObject);
 
 		result.save(function(err, result) {
 			if(err) {

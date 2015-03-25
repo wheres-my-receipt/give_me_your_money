@@ -107,6 +107,10 @@ module.exports = {
 		// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
 
 		var message = createMessage( data.emailType, data );
+		console.log( 'Message: ' + message.to);
+		console.log( 'Message: ' + message.from);
+		console.log( 'Message: ' + message.subject);
+		console.log( 'Message: ' + message.text);
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
 				console.log( "Error: " + error );

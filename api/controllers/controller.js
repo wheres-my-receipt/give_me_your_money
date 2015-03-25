@@ -1,6 +1,5 @@
 var Bell 	 = require("bell");
 var path 	 = require("path");
-var moment 	 = require("moment");
 var Joi 	 = require("joi");
 var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var config 	 = require('../config.js');
@@ -24,7 +23,7 @@ var updateValidation = Joi.object({
 
 module.exports = {
 
-	home: {
+	homeView: {
 		auth: false,
 		handler: function (request, reply ) {
 			console.log( 'in home handler');
@@ -32,8 +31,7 @@ module.exports = {
 				console.log( 'in home handler');
 				return reply.redirect("/account");
 			}
-			console.log( 'Not Authenticated home handler');
-
+			console.log( 'Not Authenticated -go to login');
 			return reply.view('login.jade');
 		}
 	},
@@ -77,7 +75,7 @@ module.exports = {
 		}
 	},
 
-	signup: {
+	signupView: {
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
 				return reply.view("signup.jade");
@@ -85,36 +83,58 @@ module.exports = {
 		}
 	},
 
-	account: {
+	accountView: {
 		handler: function (request, reply) {
 
 			var userToFind = request.auth.credentials.username;
 
 			accounts.getAccount(userToFind, function(err, result) {
-				if (err) {return reply(err);}
+				if (err) {
+					return reply(err);
+				}
+				console.log( "Account View: " + result );
 				return reply.view('account.jade', {user: result});
 			});
 		}
 	},
 
-	messages: {
+	messagesView: {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
-				var user = request.auth.credentials;
-				//var member = request.params.member;
-				console.log( 'In getMessages, member: ' + user );
-				accounts.getAccount( user, function (err, data ) {
-
+				var userToFind = request.auth.credentials.username;
+				accounts.getAccount( userToFind, function (err, data ) {
+					console.log( (err) ? "Error: " + err : "Messages: " + data.message_history );
+					return reply.view("messages.jade", { messages: data.message_history });
 				});
 			}
-			// get all messages from mailgun or database
-			return reply.file( "messages.html");
+			else{
+				return reply.file( "messages.html");
+			}
 		}
 	},
 
-	admin: {
+	adminView: {
 		handler: function (request, reply) {
-			return reply.file('admin.html');
+			if(request.auth.isAuthenticated) {
+				var userToFind = request.auth.credentials.username;
+				//var member = request.params.member;
+				accounts.getAccount( userToFind, function (err, data ) {
+					console.log( (err) ? "Error: " + err : "Member: " + data.username );
+					if( data.admin_rights){
+						// get all members for display on admin 'landing page'
+						accounts.getAccounts( function (err, members ) {
+							console.log( 'Found members numbering: ' + members.length );
+							return reply.view("admin", { user: data, members: members });
+						});
+					}
+					else {
+						return reply.view("admin_fail", { user: data });
+					}
+				});
+			}
+			else{
+				return reply.redirect("/account");
+			}
 		}
 	},
 
@@ -203,9 +223,19 @@ module.exports = {
 	},
 
 
-	getMember: {
+	memberView: {
 		handler: function (request, reply) {
-			return reply( "getMember path");
+			var userToFind = request.params.member;
+			console.log( 'memberView: ' + userToFind );
+
+			accounts.getAccount( userToFind, function( err, result ){
+				if (err) {
+					console.log( 'Error ' + err );
+					return reply(err);
+				}
+				console.log( 'Result: ' + result );
+				return reply.view( 'member.jade', {user :result });
+			});
 		}
 	},
 
@@ -236,7 +266,7 @@ module.exports = {
 				last_name: user.last_name,
 				member_since: new Date(),
 				phone_number: user.phone_number,
-
+				admin_rights: false,
 				github_link: request.auth.credentials.url,
 				github_avatar: request.auth.credentials.avatar,
 
@@ -316,15 +346,17 @@ module.exports = {
 
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
-				emailType: request.payload.emailType,
+				emailType: request.payload.emailtype,
 				email: request.payload.email,
 				username: request.payload.username,
-				first_name: request.payload.first_name,
-				last_name: request.payload.last_name,
+				first_name: request.payload.firstname,
+				last_name: request.payload.lastname,
 				subject: request.payload.subject,
-				content: request.payload.text
+				contents: request.payload.contents
 			};
 
+			console.log( 'Email details: ' + request.payload.emailtype );
+			console.log( 'Email details: ' + request.payload.email );
 			messages.sendEmail( emailDetails, function ( error, body ) {
 				if( error ){
 					console.log( "Error sending " + emailDetails.emailType + ": " + error );
@@ -332,20 +364,15 @@ module.exports = {
 				}
 				else {
 					// STICK IT IN THE DATABASE
-					console.log( "body: " + body);
-					var messageObject = {
-						to: emailDetails.email,
-						from: 'facmembershipadmin@gmail.com',
-						date: moment().format('MMMM Do YYYY'),
-						subject: emailDetails.subject ,
-						content: emailDetails.text
-					};
-					return accounts.newMessage(member, messageObject, function (err, result) {
+					// console.log( "body: " + body);
+		//			return reply(body);
+
+					return accounts.newMessage(member, emailDetails, function (err, result) {
 						if (err) {
 							console.log( "Error adding new message: " + err);
 							return reply(err);
 						}
-						console.log( "Successfully added: " + results );
+						console.log( "Successfully added: " + result );
 						return reply(result);
 					});
 				}

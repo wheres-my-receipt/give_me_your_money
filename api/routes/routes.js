@@ -3,19 +3,19 @@ var controller 	= require("../controllers/controller.js");
 module.exports 	= [
 
 	// STATIC FILES
-	{path: "/", 							method: "GET", 		config: controller.home},
+	{path: "/", 							method: "GET", 		config: controller.homeView},
 
 	{path: "/login", 						method: "GET", 		config: controller.login},
 	{path: "/logout", 						method: "GET",		config: controller.logout },
-	{path: "/signup", 						method: "GET", 		config: controller.signup},
+	{path: "/signup", 						method: "GET", 		config: controller.signupView},
 
-	{path: "/admin", 						method: "GET", 		config: controller.admin},
-	{path: "/admin/member/{memberid}", 		method: "GET",		config: controller.getMember},
+	{path: "/admin", 						method: "GET", 		config: controller.adminView},
+	{path: "/admin/member/{member}", 		method: "GET",		config: controller.memberView},
 
 	{path: "/public/{file*}",				method: "GET",		config: controller.serveFile},
 
-	{path: "/account", 						method: "GET", 		config: controller.account},
-	{path: "/account/messages", 			method: "GET", 		config: controller.messages},
+	{path: "/account", 						method: "GET", 		config: controller.accountView},
+	{path: "/account/messages", 			method: "GET", 		config: controller.messagesView},
 
 	// Payment
 	{path: "/payment/{type}", 				method: "POST", 	config: controller.payment},

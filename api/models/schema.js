@@ -2,10 +2,10 @@ var mongoose = require("mongoose");
 var Schema 	= mongoose.Schema;
 
 var messageSchema = new Schema({
-	to:       {type: String, required: true},
-	from:     {type: String, required: true},
-	date:     {type: Date, required: true},
-	subject:  {type: String, required: true},
+	to: {type: String, required: true},
+	from: {type: String, required: true},
+	date: {type: Object, required: true},
+	subject: {type: String, required: true},
 	contents: {type: String, required: true},
 });
 
@@ -40,7 +40,8 @@ var accountSchema = new Schema({
 	member_since: {type: Date, required: true},
 	phone_number: {type: String, required: true},
 
-	github_link:   {type: String, required: true, unique: true},
+	admin_rights : {type: Boolean, required: true, default: false},
+	github_link: {type: String, required: true, unique: true},
 	github_avatar: {type: String, required: true},
 
 	membership_active_status: {type: Boolean, required: true, default: false},
