@@ -1,0 +1,45 @@
+include ./mixins.jade
+
+doctype html
+html
+	include ./includes/head.jade
+	body
+		include ./includes/navbar.jade
+		div
+			h1 Hello #{user.first_name + " " + user.last_name}
+			form(action='/payment', method='POST')
+				h4 Your current desk rental rate is #{"£" + user.desk_rental_rate} per month.
+				script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', data-description="Desk rental T1: " + user.desk_rental_rate, data-image='/128x128.png')
+			h1  Edit your details
+			form#editform
+				span #{user.first_name}
+				input#first_name(type='text', name='first_name', placeholder='First name')
+				| *
+				br
+				span #{user.last_name}
+				input#last_name(type='text', name='last_name', placeholder='Last name')
+				| *
+				br
+				span #{user.phone_number}
+				input#phone_number(type='text', name='phone_number', placeholder='Phone number')
+				| *
+				br
+				span #{user.email}
+				input#email(type='text', name='email', placeholder='Email')
+				button(type='submit') Submit
+			h1  Delete your account
+			form#deleteform
+				input(type='text', name='delete')
+				button(type='submit') Submit
+			.historyHolder
+				h1 Transaction History
+				ul
+				each transaction in user.transaction_history
+					+transaction(transaction)
+
+			.historyHolder
+				h1 Message History
+				ul
+				each message in user.message_history
+					+message(message)
+			+foot("account")

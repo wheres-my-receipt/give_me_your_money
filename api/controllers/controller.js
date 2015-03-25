@@ -28,17 +28,17 @@ module.exports = {
 			console.log( 'in home handler');
 			if(request.auth.isAuthenticated) {
 				console.log( 'in home handler');
-				return reply.file('index.html');
+				return reply.redirect("/account");
 			}
 			console.log( 'Not Authenticated home handler');
 
-			return reply.file('login.html');
+			return reply.view('login.jade');
 		}
 	},
 
 	login : {
 		auth: {
-			strategy: "twitter"
+			strategy: "github"
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
@@ -71,7 +71,6 @@ module.exports = {
 		handler: function (request, reply ){
 			console.log( 'in logout handler');
 			request.auth.session.clear();
-			// console.log( 'cleared session ' + request.auth );
 			return reply.redirect('/');
 		}
 	},
@@ -79,16 +78,21 @@ module.exports = {
 	signup: {
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
-				return reply.file("signup.html");
+				return reply.view("signup.jade");
 			}
 		}
 	},
 
 	account: {
 		handler: function (request, reply) {
-			if(request.auth.isAuthenticated) {
-				return reply.file('account.html');
-			}
+
+			var userToFind = request.auth.credentials.username;
+
+			accounts.getAccount(userToFind, function(err, result) {
+				if (err) {return reply(err);}
+				console.log(result[0]);
+				return reply.view('account.jade', {user: result[0]});
+			});
 		}
 	},
 
@@ -164,6 +168,7 @@ module.exports = {
 			});
 		}
 	},
+
 	createAccount: {
         validate:{
                 payload: creationValidation,
@@ -197,8 +202,8 @@ module.exports = {
 					return reply(err);
 				}
 				// add to all members email group and send ack email
-				messages.addToMembersList(user);
-				messages.sendEmail("acknowledge", user);
+				messages.addToMembersList(result);
+				messages.sendEmail("acknowledge", result);
 				return reply(result);
 			});
 		}
