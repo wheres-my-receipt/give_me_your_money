@@ -10,17 +10,23 @@ var deskOccupantsList = config.mailgunTest.mailLists.deskOccupantsList;
 var messageTemplates = {
 	acknowledge : function (message, data) {
 		 message.subject = "Welcome to Founders & Coders!";
-		 message.text =  "Hello " + data.firstName + "! Thank you for joining Founders and Coders! We will be in touch to verify your account very shortly!";
+		 message.text =  "Hello " + data.first_name + "! Thank you for joining Founders and Coders! We will be in touch to verify your account very shortly!";
 		 return message;
 	},
 	verifyAccount: function (message, data) {
-
+		message.subject = "Account Verified";
+		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
 	},
 	annualSubscriptionReminder : function (message, data) {
 
 	},
 	deskRentalPaymentReminder : function (message, data) {
 
+	},
+	simpleMessage : function (message, data) {
+		message.subject = data.subject;
+		message.text = data.subject;
+		return message;
 	}
 	// etc..
 };
@@ -40,7 +46,8 @@ createMessage = function( emailType, data ){
 		case "deskRentalPaymentReminder" :
 			return messageTemplates.deskRentalPaymentReminder( message, data );
 		default:
-			console.log( "Email Type not found: " + emailType );
+			console.log( "Email Type not found so send default message: " + emailType );
+			return messageTemplates.simpleMessage( message, data );
 	}
 };
 
@@ -60,7 +67,7 @@ module.exports = {
 		var newMember = {
 				subscribed: true,
 				address: data.email,
-				name: data.firstname + ' ' + data.lastname
+				name: data.first_name + ' ' + data.last_name
 		};
 
 		list.members().create( newMember, function (err, data) {
@@ -74,18 +81,17 @@ module.exports = {
 				if( err )
 					console.log("Created Error: " + err);
 				else// `members` is the list of members
-					console.log("Members: " + members);
+					console.log("addToMembersList (" + members.length + ')');
 			});
 		});
 	},
-
 	addToDeskOccupantsList : function ( data ) {
 		// == ADD NEW ACCOUNT MEMBER TO "all_members" EMAIL LIST
 		var list = mailgun.lists( deskOccupantsList );
 		var newMember = {
 				subscribed: true,
 				address: data.email,
-				name: data.firstname + ' ' + data.lastname
+				name: data.first_name + ' ' + data.last_name
 		};
 
 		list.members().create( newMember, function (err, data) {
@@ -97,16 +103,18 @@ module.exports = {
 		});
 	},
 
-	sendEmail: function( emailType /*{ "type": "acknowledge"}*/, data ){
+	sendEmail: function( data, onComplete ){
 		// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
 
-		var message = createMessage( emailType, data );
+		var message = createMessage( data.emailType, data );
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
 				console.log( "Error: " + error );
+				onComplete( error );
 			}
 			else {
 				console.log( "Sent email: " + body);
+				onComplete( null, body );
 			}
 		});
 	}

@@ -60,9 +60,32 @@ exports.newTransaction = function(username, transaction, onComplete) {
 
 	Account.findOne({username: username}, function(err, result) {
 
-		if(err) {onComplete(err);}
+		if(err) {
+			return onComplete(err);
+		}
 
 		result.transaction_history.push(transaction);
+
+		result.save(function(err, result) {
+			if(err) {
+				return onComplete(err);
+			}
+			return onComplete(null, result);
+		});
+	});
+
+};
+// Message operations
+exports.newMessage = function(username, message, onComplete) {
+	console.log( "new message : " +username);
+	Account.findOne({username: username}, function(err, result) {
+		console.log( "new message - findOne");
+
+		if(err) {
+			return onComplete(err);
+		}
+
+		result.message_history.push(message);
 
 		result.save(function(err, result) {
 			if(err) {
