@@ -24,7 +24,7 @@ exports.getAccount = function(username, onComplete) {
 };
 
 exports.updateAccount = function(username, updateObject, onComplete) {
-
+	// QUERY: should be findOneAndUpdate? reasoning similar to above, plus returns updated doc to callback, could be handy to confirm changes made
 	Account.update({username : username}, updateObject, function(err, result) {
 		if (err) {
 			return onComplete(err);
@@ -46,7 +46,7 @@ exports.createAccount = function(accountToCreate, onComplete) {
 };
 
 exports.deleteAccount = function(username, onComplete) {
-
+	// QUERY: should be findOneAndRemove? reasoning similar to above, plus returns deleted doc to callback, could be handy to confirm what was deleted
 	Account.remove({username : username}, function(err, result) {
 
 		if (err) {
