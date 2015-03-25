@@ -14,7 +14,7 @@ exports.getAccounts = function(onComplete) {
 
 // Single account operations
 exports.getAccount = function(username, onComplete) {
-
+	// QUERY: should be findOne? find will return an array of 1, and username should be unique
 	Account.find({username : username}, function(err, result) {
 		if (err) {
 			return onComplete(err);
@@ -49,7 +49,6 @@ exports.createAccount = function(accountToCreate, onComplete) {
 exports.deleteAccount = function(username, onComplete) {
 
 	Account.findOneAndRemove({username : username}, function(err, result) {
-
 		if (err) {
 			return onComplete(err);
 		}

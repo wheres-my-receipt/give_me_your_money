@@ -47,6 +47,9 @@ module.exports = {
 	Message : Message
 };
 
+
+// Sounds good, but how to account for part months? Divide each month into 4 weeks and apply paid/unpaid.away as aprop?
+
 /* NOTE - After speaking to dan, he mentioned it might be easier and wiser to adopt a system along the lines
 of the following:
 Each member has 3 possible payment statuses for any given desk rental month - "Away", "Unpaid", or "Paid"
