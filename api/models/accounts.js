@@ -25,10 +25,11 @@ exports.getAccount = function(username, onComplete) {
 
 exports.updateAccount = function(username, updateObject, onComplete) {
 
-	Account.update({username : username}, updateObject, function(err, result) {
+	Account.findOneAndUpdate({username : username}, updateObject, function(err, result) {
 		if (err) {
 			return onComplete(err);
 		}
+		console.log(result);
 		return onComplete(null, result);
 	});
 };
@@ -47,7 +48,7 @@ exports.createAccount = function(accountToCreate, onComplete) {
 
 exports.deleteAccount = function(username, onComplete) {
 
-	Account.remove({username : username}, function(err, result) {
+	Account.findOneAndRemove({username : username}, function(err, result) {
 
 		if (err) {
 			return onComplete(err);
