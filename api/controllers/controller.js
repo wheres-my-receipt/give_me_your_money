@@ -87,13 +87,16 @@ module.exports = {
 		handler: function (request, reply) {
 
 			var userToFind = request.auth.credentials.username;
+			var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+			var today = new Date();
+			var thisMonth = today.getMonth();
 
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {
 					return reply(err);
 				}
 				console.log( "Account View: " + result );
-				return reply.view('account.jade', {user: result});
+				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth});
 			});
 		}
 	},

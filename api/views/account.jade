@@ -4,48 +4,106 @@ doctype html
 html
 	include ./includes/head.jade
 	body
-		include ./includes/navbar.jade
-		div
-			h1 Hello #{user.first_name + " " + user.last_name}
-			form(action='/payment/membership', method='POST')
-				h4 Pay your membership.
-				script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=5000, data-name='Membership 1Y', currency="gbp", data-description="Membership for 1 year", data-image='/128x128.png')
-			form(action='/payment/desk', method='POST')
-				h4 Your current desk rental rate is #{"£" + user.desk_rental_rate/100} per month.
-				script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
-			h1  Edit your details
-			form#editform
-				span #{user.first_name}
-				input#first_name(type='text', name='first_name', placeholder='First name')
-				| *
-				br
-				span #{user.last_name}
-				input#last_name(type='text', name='last_name', placeholder='Last name')
-				| *
-				br
-				span #{user.phone_number}
-				input#phone_number(type='text', name='phone_number', placeholder='Phone number')
-				| *
-				br
-				span #{user.email}
-				input#email(type='text', name='email', placeholder='Email')
-				select#checked(name='desk_authorization')
-					option(value='true') true
-					option(value='false') false
-				button(type='submit') Submit
-			h1  Delete your account
-			form#deleteform
-				input(type='text', name='delete')
-				button(type='submit') Submit
-			.historyHolder
-				h1 Transaction History
-				ul
-				each transaction in user.transaction_history
-					+transaction(transaction)
-
-			.historyHolder
-				h1 Message History
-				ul
-				each message in user.message_history
-					+message(message)
-			+foot("account")
+		#wrapper
+			include ./includes/navbar.jade
+			.tabbable.tabs-left.col-md-8.col-md-offset-2.contentwrapper
+				ul.nav.nav-tabs
+					li.active
+						a(href='#profile', data-toggle='tab') Profile
+					li
+						a(href='#messages', data-toggle='tab') Messages
+					li
+						a(href='#transactions', data-toggle='tab') Transactions
+					li
+						a(href='#membership', data-toggle='tab') Membership
+				.tab-content
+					#profile.tab-pane.active
+						div#profileheader
+							h2#name  Hello #{user.first_name} #{user.last_name}
+							img.profilePic.img-rounded(src=user.github_avatar href=user.github_link)
+						div#profilebody
+							p You have been a member since: #{user.member_since}
+							p Your membership status is: #{user.membership_active_status ? "Active" : "Inactive"}
+							p You have paid for your membership until: #{user.membership_paid}
+							form(action='/payment/membership', method='POST')
+								label Click here to #{user.membership_active_status ? "extend" : "pay for"} your membership fee
+								script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
+							p You are currently #{user.desk_authorization ? "able" : "not yet able"} to rent desks!
+							if user.desk_authorization
+								div.deskRental
+									p Your current desk rental rate is £#{user.desk_rental_rate/100}
+									- if(user.desk_rental_status[thisMonth] === "unpaid")
+									form(action='/payment/desk', method='POST')
+										label Pay for this month's desk rent:
+										script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
+									each year, index in user.desk_rental_status
+										.panel.panel-default
+											.panel-heading(role='tab', id='d-heading')
+												h4.panel-title
+													a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#d-collapse', aria-expanded='false', aria-controls='d-collapse')
+														| #{index}:
+											.panel-collapse.collapse(role='tabpanel', aria-labelledby='d-heading', id="d-collapse")
+												.list-group
+												- for(var i=0; i<12; i++)
+													p #{months[i]}: #{year[i]}
+					#messages.tab-pane
+						h2  Your Messages
+						#accordion.panel-group(role='tablist', aria-multiselectable='true')
+						each message, index in user.message_history
+							.panel.panel-default
+								.panel-heading(role='tab', id='m-heading' + index)
+									h4.panel-title
+										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#t-collapse' + index, aria-expanded='false', aria-controls='t-collapse' + index)
+											| #{message.subject + ", sent on " + message.date}
+								.panel-collapse.collapse(role='tabpanel', aria-labelledby='m-heading' + index, id="t-collapse" + index)
+									.panel-body
+										| #{message.text}
+					#transactions.tab-pane
+						h2  Your transaction history
+						#accordion.panel-group(role='tablist', aria-multiselectable='true')
+							each transaction, index in user.transaction_history
+								.panel.panel-default
+									.panel-heading(role='tab', id='t-heading' + index)
+										h4.panel-title
+											a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#m-collapse' + index, aria-expanded='false', aria-controls='m-collapse' + index)
+												| #{transaction.date}
+									.panel-collapse.collapse(role='tabpanel', aria-labelledby='t-heading' + index, id="m-collapse" + index)
+										.panel-body
+											| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "one month's desk rental" : "annual membership"}.
+											br
+											| Amount paid: £#{transaction.amount/100}
+					#membership.tab-pane
+						h2  Your membership information
+						div.col-xs-8.col-xs-offset-2.formwrapper
+							form#editform.form-horizontal
+								.form-group
+									label.control-label.col-xs-2(for='inputEmail') Username
+									.col-xs-8
+										p.form-control-static MIJOTHY
+								.form-group
+									label.control-label.col-xs-2(for='inputEmail') Email
+									.col-xs-8
+										input#inputEmail.form-control(type='email', name='email', placeholder=user.email)
+								.form-group
+									label.control-label.col-xs-2(for='inputName') Name
+									span.col-xs-4
+										input#inputFirst.form-control(type='text', name='first_name', placeholder=user.first_name)
+									span.col-xs-4
+										input#inputLast.form-control(type='text', name='last_name', placeholder=user.last_name)
+								.form-group
+									label.control-label.col-xs-2(for='inputEmail') Phone Number
+									.col-xs-8
+										input#inputNumber.form-control(type='tel', name='phone_number', placeholder=user.phone_number)
+								.form-group
+									.col-xs-offset-2.col-xs-10
+										button.btn.btn-primary(type='submit') Update
+							.panel.panel-default
+								.panel-heading(role='tab', id='del-heading')
+									h4.panel-title
+										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#del-collapse', aria-expanded='false', aria-controls='del-collapse')
+											| Delete your account (Warning, permanent!)
+								.panel-collapse.collapse(role='tabpanel', aria-labelledby='del-heading', id="del-collapse")
+									.panel-body
+										form#deleteform
+											button.btn.btn-danger#delete(type='submit') DELETE
+		+foot("account")
