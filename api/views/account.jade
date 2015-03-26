@@ -7,9 +7,12 @@ html
 		include ./includes/navbar.jade
 		div
 			h1 Hello #{user.first_name + " " + user.last_name}
-			form(action='/payment', method='POST')
-				h4 Your current desk rental rate is #{"£" + user.desk_rental_rate} per month.
-				script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', data-description="Desk rental T1: " + user.desk_rental_rate, data-image='/128x128.png')
+			form(action='/payment/membership', method='POST')
+				h4 Pay your membership.
+				script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=5000, data-name='Membership 1Y', currency="gbp", data-description="Membership for 1 year", data-image='/128x128.png')
+			form(action='/payment/desk', method='POST')
+				h4 Your current desk rental rate is #{"£" + user.desk_rental_rate/100} per month.
+				script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
 			h1  Edit your details
 			form#editform
 				span #{user.first_name}
@@ -26,6 +29,9 @@ html
 				br
 				span #{user.email}
 				input#email(type='text', name='email', placeholder='Email')
+				select#checked(name='desk_authorization')
+					option(value='true') true
+					option(value='false') false
 				button(type='submit') Submit
 			h1  Delete your account
 			form#deleteform
