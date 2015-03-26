@@ -24,7 +24,7 @@ $("#deleteform").on("submit", function(e) {
 		url: "http://localhost:3000/api/accounts/MIJOTHY",
 		method: "DELETE",
 		success: function(response) {
-			$("body").append("BOOM");
+			console.log(response);
 		}
 	});
 });

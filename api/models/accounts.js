@@ -62,7 +62,7 @@ exports.updateAccount = function(username, updateObject, onComplete) {
 exports.createAccount = function(accountToCreate, onComplete) {
 
 	var newAccount = new Account(accountToCreate);
-	var sinceYear = newAccount.member_since.getYear();
+	var sinceYear = newAccount.member_since.getFullYear();
 	var sinceMonth = newAccount.member_since.getMonth();
 	var i;
 
@@ -97,17 +97,22 @@ exports.newTransaction = function(username, transaction, onComplete) {
 		if(err) {
 			return onComplete(err);
 		}
-		// rly messy dont hate me ill refactor tomoz
 		var now = new Date(+transaction.date);
+		var currentYear = now.getFullYear();
+		var oldPaid 	= result.membership_paid;
 
 		if (transaction.type === "membership") {
 			result.membership_active_status = true;
-			result.membership_paid = now;
+			if (!oldPaid) {
+				result.membership_paid = now.setFullYear(currentYear + 1);
+			} else {
+				result.membership_paid = oldPaid.setFullYear((oldPaid.getFullYear()) + 1);
+			}
+			console.log(result.membership_paid);
 		}
 		else if (transaction.type === "desk") {
 
 			var deskHistory = result.desk_rental_status;
-			var currentYear = now.getYear();
 			var currentMonth = now.getMonth();
 
 			if (!deskHistory[currentYear]) {
@@ -116,10 +121,10 @@ exports.newTransaction = function(username, transaction, onComplete) {
 				return onComplete("already paid m8");
 			}
 			deskHistory[currentYear][currentMonth] = "paid";
-			console.log(deskHistory[currentYear]);
 		}
 
 		result.transaction_history.push(transaction);
+		console.log(result);
 		result.save(function(err, success) {
 			if(err) {
 				console.log("save err", err);
