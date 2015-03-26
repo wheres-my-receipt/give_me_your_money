@@ -5,8 +5,6 @@ var Account 	= schema.Account;
 var DeskRental  = schema.DeskRental;
 
 
-// Multiple account operations
-
 // sample params: 	{ 	query: {'username': 'foo'},
 // 		optional ----->	filter: {'email': 1, '_id': 0}
 // 					}

@@ -119,11 +119,10 @@ module.exports = {
 				console.log("Created: " + data);
 		});
 	},
-	// SUGGESTION: refactor so that email type is separate param, seems odd to have it as a property of the user object
-	sendEmail: function( data, onComplete ){
-		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
 
-		var message = createMessage( data.emailType, data );
+	sendEmail: function(data, emailtype, onComplete){
+		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
+		var message = createMessage(emailType, data );
 		console.log( 'Message: ' + message.to);
 		console.log( 'Message: ' + message.from);
 		console.log( 'Message: ' + message.subject);
@@ -139,20 +138,4 @@ module.exports = {
 			}
 		});
 	},
-
-	sendEmailRefactor: function(data, emailType, onComplete ){
-		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
-
-		var message = createMessage(emailType, data );
-		mailgun.messages().send(message, function (error, body) {
-			if( error ) {
-				console.log( "Error: " + error );
-				onComplete( error );
-			}
-			else {
-				console.log( "Sent email: " + body);
-				onComplete( null, body );
-			}
-		});
-	}
 };

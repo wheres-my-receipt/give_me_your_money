@@ -14,7 +14,7 @@ function annualReminder(agenda) {
 			else {
 				result.forEach(function(user, index){
 					if (!user.membership_reminder_sent) {
-						messages.sendEmailRefactor(user, "annualSubscriptionReminder", function( error, data ) {
+						messages.sendEmail(user, "annualSubscriptionReminder", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub reminder email error: " + error );
 								if (index === result.length - 1) {
@@ -49,7 +49,7 @@ function annualDemand(agenda) {
 			else {
 				result.forEach(function(user, index){
 					if (!user.membership_demand_sent) {
-						messages.sendEmailRefactor(user, "annualSubscriptionDemand", function( error, data ) {
+						messages.sendEmail(user, "annualSubscriptionDemand", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub demand email error: " + error );
 								if (index === result.length - 1) {
@@ -84,7 +84,7 @@ function annualOverdue(agenda) {
 			else {
 				result.forEach(function(user, index){
 					if (!user.membership_overdue_sent) {
-						messages.sendEmailRefactor(user, "annualSubscriptionOverdue", function( error, data ) {
+						messages.sendEmail(user, "annualSubscriptionOverdue", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub demand email error: " + error );
 								if (index === result.length - 1) {
@@ -118,7 +118,7 @@ function testReminder(agenda){
 			else {
 				result.forEach(function(user, index){
 					if (true) {
-						messages.sendEmailRefactor(user, "annualSubscriptionOverdue", function( error, data ) {
+						messages.sendEmail(user, "annualSubscriptionOverdue", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub reminder email error: " + error );
 								if (index === result.length - 1) {

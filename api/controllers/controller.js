@@ -283,10 +283,8 @@ module.exports = {
 					return reply(err);
 				}
 				// add to all members email group and send ack email
-				var emailDetails = accountToCreate;
-				emailDetails.emailType = "acknowledge";
 				messages.addToMembersList(accountToCreate);
-				messages.sendEmail(accountToCreate, function( error, data ) {
+				messages.sendEmail(accountToCreate, "acknowledge", function( error, data ) {
 					if( err ) {
 						console.log( "Error sending acknowledge email: " + error );
 					}
@@ -356,7 +354,7 @@ module.exports = {
 
 			console.log( 'Email details: ' + request.payload.emailtype );
 			console.log( 'Email details: ' + request.payload.email );
-			messages.sendEmail( emailDetails, function ( error, body ) {
+			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, body ) {
 				if( error ){
 					console.log( "Error sending " + emailDetails.emailType + ": " + error );
 					return reply( error );
