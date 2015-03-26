@@ -24,7 +24,7 @@ var accountSchema = new Schema({
 	member_since: {type: Date, required: true},
 	phone_number: {type: Number, required: true},
 
-	admin_rights : {type: Boolean, required: true},
+	admin_rights : {type: Boolean, required: true, default: false},
 	github_link: {type: String, required: true, unique: true},
 	github_avatar: {type: String, required: true},
 
