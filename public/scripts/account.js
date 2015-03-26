@@ -7,7 +7,7 @@ $("#editform").on("submit", function(e) {
 	if ($("#phone_number").val()) { updateData.phone_number = $("#phone_number").val();}
 	if ($("#email").val()) { updateData.email = $("#email").val();}
 	if ($("#checked").val()) { updateData.desk_authorization = $("#checked").val();}
-	console.log($('#checked').val());
+
 	$.ajax({
 		url: "http://localhost:3000/api/accounts/MIJOTHY",
 		method: "PUT",
