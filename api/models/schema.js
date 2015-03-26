@@ -33,9 +33,9 @@ var deskRentalSchema = new Schema({
 
 // TODO Make sure relevant email bools set to 'false' when payment received
 var automatedEmailSchema = new Schema({
-	membership_reminder_sent: {type: Boolean},
-	membership_demand_sent: {type: Boolean},
-	membership_overdue_sent: {type: Boolean}
+	membership_reminder_sent: {type: Boolean, default: false},
+	membership_demand_sent: {type: Boolean, default: false},
+	membership_overdue_sent: {type: Boolean, default: false}
 });
 
 var accountSchema = new Schema({
@@ -59,7 +59,7 @@ var accountSchema = new Schema({
 	desk_rental_rate:   {type: Number, required: true, default: 5000}, //rate of desk (e.g 50/100/200)
 	desk_rental_status: {type: Object, required: true, default: {}},
 
-	automated_emails: [automatedEmailSchema],
+	automated_emails: automatedEmailSchema,
 	transaction_history:  [transactionSchema],
 	message_history: [messageSchema]
 });
@@ -68,12 +68,14 @@ var Account 	= mongoose.model("account", accountSchema, "Accounts");
 var Transaction = mongoose.model("transaction", transactionSchema);
 var Message 	= mongoose.model("message", messageSchema);
 var DeskRental 	= mongoose.model("deskrental", deskRentalSchema);
+var automatedEmail = mongoose.model("automatedEmail", automatedEmailSchema);
 
 module.exports = {
-	Account 	: Account,
-	Transaction : Transaction,
-	Message 	: Message,
-	DeskRental  : DeskRental
+	Account 		: Account,
+	Transaction 	: Transaction,
+	Message 		: Message,
+	DeskRental  	: DeskRental,
+	automatedEmail 	: automatedEmail
 };
 
 // NB minimum billing period will be 1 month
