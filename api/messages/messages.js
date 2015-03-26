@@ -1,4 +1,5 @@
 var config 	= require('../config.js');
+var accounts = require("../models/accounts.js");
 var api_key = config.mailgunTest.apiKey;
 var domain 	= config.mailgunTest.domain;
 var port = {port: (process.env.port || 3000 ) };
@@ -77,13 +78,6 @@ module.exports = {
 		// == ADD NEW ACCOUNT MEMBER TO "all_members" EMAIL LIST
 		var list = mailgun.lists(allMembersList);
 
-		// list.info(function (err, data) {
-		//   // `data` is mailing list info
-		//   if( err )
-		//   	console.log( "Error: " + err );
-		//   else
-		//   	console.log(data);
-		// });
 		var newMember = {
 				subscribed: true,
 				address: data.email,
@@ -126,16 +120,24 @@ module.exports = {
 	sendEmail: function(data, emailtype, onComplete){
 		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
 		var message = createMessage(emailtype, data );
-		console.log( 'Message: ' + JSON.stringify( message ) );
-		mailgun.messages().send(message, function (error, body) {
-			if( error ) {
-				console.log( "Error from mailgun: " + error );
-				onComplete( error );
+		// console.log( 'Message: ' + JSON.stringify( message ) );
+
+		// STICK IT IN THE DATABASE
+		accounts.newMessage(data.username, message, function (err, result, messageId) {
+			if (err) {
+				return onComplete( err );
 			}
-			else {
-				console.log( "Sent email: " + body);
-				onComplete( null, message, body );
-			}
+			mailgun.messages().send(message, function ( senderror, body) {
+				if( senderror ) {
+					return accounts.deleteMessage( data.username, messageId, function( error, result ) {
+						if( error ) return onComplete( senderror + ": " + error );
+						return onComplete( senderror );
+					});
+				}
+				else {
+					return onComplete( null, message, body );
+				}
+			});
 		});
-	},
+	}
 };

@@ -108,7 +108,7 @@ module.exports = {
 				});
 			}
 			else{
-				return reply.file( "messages.html");
+				return reply.redirect( "/");
 			}
 		}
 	},
@@ -233,7 +233,7 @@ module.exports = {
 					return reply(err);
 				}
 				console.log( 'Result: ' + result );
-				return reply.view( 'member.jade', {user :result });
+				return reply.view( 'member', {user :result });
 			});
 		}
 	},
@@ -284,11 +284,11 @@ module.exports = {
 				}
 				// add to all members email group and send ack email
 				messages.addToMembersList(accountToCreate);
-				messages.sendEmail(accountToCreate, "acknowledge", function( error, data ) {
+				messages.sendEmail(accountToCreate, "Acknowledge", function( error, data ) {
 					if( err ) {
 						console.log( "Error sending acknowledge email: " + error );
 					}
-					return reply( result );
+					return reply.view('account', {user: result });
 				});
 
 			});
@@ -343,7 +343,7 @@ module.exports = {
 			var emailDetails = {
 				emailtype: request.payload.emailtype2,
 				email: request.payload.email,
-				username: request.payload.username,
+				username: request.params.member,
 				first_name: request.payload.firstname,
 				last_name: request.payload.lastname,
 				subject: request.payload.subject,
@@ -353,20 +353,11 @@ module.exports = {
 			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, body ) {
 				if( error ){
 					console.log( "Error sending " + emailDetails.emailType + ": " + error );
-					return reply( error );
+					return reply.view( 'member', {user:emailDetails, alert: { isError : true, alert: error } });
 				}
 				else {
-					// STICK IT IN THE DATABASE
-
-					return accounts.newMessage(member, message, function (err, result) {
-						console.log( 'Message: ' + JSON.stringify( message ));
-						if (err) {
-							console.log( "Error adding new message: " + err);
-							return reply(err);
-						}
-						console.log( "Successfully added: " + result );
-						return reply(result);
-					});
+					return reply.view( 'member', {user: emailDetails, alert: {isSuccess: true, alert: body.message}});
+					//return reply.redirect("/admin/member/"+emailDetails.member);
 				}
 			});
 
