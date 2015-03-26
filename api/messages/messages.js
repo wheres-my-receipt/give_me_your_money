@@ -126,7 +126,7 @@ module.exports = {
 
 	sendEmail: function(data, emailType, onComplete){
 		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
-		var message = createMessage(emailtype, data );
+		var message = createMessage(emailType, data );
 		console.log( 'Message: ' + JSON.stringify( message ) );
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
