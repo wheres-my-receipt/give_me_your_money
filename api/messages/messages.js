@@ -121,7 +121,7 @@ module.exports = {
 	},
 
 	sendEmail: function(data, emailtype, onComplete){
-		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
+		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) ==== //
 		var message = createMessage(emailType, data );
 		console.log( 'Message: ' + message.to);
 		console.log( 'Message: ' + message.from);

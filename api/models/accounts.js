@@ -8,7 +8,7 @@ var DeskRental  = schema.DeskRental;
 // sample params: 	{ 	query: {'username': 'foo'},
 // 		optional ----->	filter: {'email': 1, '_id': 0}
 // 					}
-exports.search  = function(params, onComplete) {
+exports.search = function(params, onComplete) {
 
 	if (params.filter) {
 		Account.find(params.query, params.filter, function(err, result){
@@ -122,6 +122,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 };
 
 // Message operations
+// EXPECTS: emaildetails.email/subject/contents
 exports.newMessage = function(username, emailDetails, onComplete) {
 	console.log( "new message : " +username);
 	Account.findOne({username: username}, function(err, result) {
