@@ -16,9 +16,22 @@ var messageTemplates = {
 	verifyAccount: function (message, data) {
 		message.subject = "Account Verified";
 		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
+		return message;
 	},
 	annualSubscriptionReminder : function (message, data) {
-
+		message.subject = "Annual Subscription nearly up!";
+		message.text = "Hello " + data.first_name + ". Your annual subscription expires in one week.";
+		return message;
+	},
+	annualSubscriptionDemand : function (message, data) {
+		message.subject = "Annual Subscription Expired";
+		message.text = "Hello " + data.first_name + ". Your annual subscription has expired. Please visit your account <URL> to renew.";
+		return message;
+	},
+	annualSubscriptionOverdue : function (message, data) {
+		message.subject = "Annual Subscription Overdue";
+		message.text = "Hello " + data.first_name + ". Your annual subscription expired a week ago. Please visit your account <URL> to renew. No further reminders will be sent!";
+		return message;
 	},
 	deskRentalPaymentReminder : function (message, data) {
 
@@ -43,6 +56,10 @@ createMessage = function( emailType, data ){
 			return messageTemplates.verifyAccount( message, data );
 		case "annualSubscriptionReminder" :
 			return messageTemplates.annualSubscriptionReminder( message, data );
+		case "annualSubscriptionDemand" :
+			return messageTemplates.annualSubscriptionDemand( message, data );
+		case "annualSubscriptionOverdue" :
+			return messageTemplates.annualSubscriptionOverdue( message, data );
 		case "deskRentalPaymentReminder" :
 			return messageTemplates.deskRentalPaymentReminder( message, data );
 		default:
@@ -103,10 +120,9 @@ module.exports = {
 		});
 	},
 
-	sendEmail: function( data, onComplete ){
-		// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
-
-		var message = createMessage( data.emailType, data );
+	sendEmail: function(data, emailtype, onComplete){
+		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
+		var message = createMessage(emailType, data );
 		console.log( 'Message: ' + message.to);
 		console.log( 'Message: ' + message.from);
 		console.log( 'Message: ' + message.subject);
@@ -121,5 +137,5 @@ module.exports = {
 				onComplete( null, body );
 			}
 		});
-	}
+	},
 };

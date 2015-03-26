@@ -46,6 +46,10 @@ var accountSchema = new Schema({
 
 	membership_active_status: {type: Boolean, required: true, default: false},
 	membership_paid: {type: Date}, // date paid
+	// TODO make an 'automated email' object.
+	membership_reminder_sent: {type: Boolean}, //these three booleans need to be set to false when payment received
+	membership_demand_sent: {type: Boolean},
+	membership_overdue_sent: {type: Boolean},
 
 	desk_authorization: {type: Boolean, required: true, default: false},
 
@@ -68,9 +72,7 @@ module.exports = {
 	DeskRental  : DeskRental
 };
 
-
-// Sounds good, but how to account for part months? Divide each month into 4 weeks and apply paid/unpaid.away as aprop?
-
+// NB minimum billing period will be 1 month
 /* NOTE - After speaking to dan, he mentioned it might be easier and wiser to adopt a system along the lines
 of the following:
 Each member has 3 possible payment statuses for any given desk rental month - "Away", "Unpaid", or "Paid"
