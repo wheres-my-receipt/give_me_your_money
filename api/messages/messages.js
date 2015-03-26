@@ -19,11 +19,20 @@ var messageTemplates = {
 		return message;
 	},
 	annualSubscriptionReminder : function (message, data) {
-		message.subject = "Annual Fee Reminder. " + data.subject;
+		message.subject = "Annual Fee Almost Due. " + data.subject;
 		message.text = "Hello" + data.first_name + ". ";
 		message.text += data.contents;
 		return message;
-
+	},
+	annualSubscriptionDemand : function (message, data) {
+		message.subject = "Annual Subscription Expired";
+		message.text = "Hello " + data.first_name + ". Your annual subscription has expired. Please visit your account <URL> to renew.";
+		return message;
+	},
+	annualSubscriptionOverdue : function (message, data) {
+		message.subject = "Annual Subscription Overdue";
+		message.text = "Hello " + data.first_name + ". Your annual subscription expired a week ago. Please visit your account <URL> to renew. No further reminders will be sent!";
+		return message;
 	},
 	deskRentalPaymentReminder : function (message, data) {
 		message.subject = "Desk Rental Reminder. " + data.subject;
@@ -52,6 +61,10 @@ createMessage = function( emailType, data ){
 			return messageTemplates.annualSubscriptionReminder( message, data );
 		case "DeskRentFeeReminder" :
 			return messageTemplates.deskRentalPaymentReminder( message, data );
+		case "annualSubscriptionDemand" :
+			return messageTemplates.annualSubscriptionDemand( message, data );
+		case "annualSubscriptionOverdue" :
+			return messageTemplates.annualSubscriptionOverdue( message, data );
 		default:
 			console.log( "Email Type not found so send custom message: " + emailType );
 			return messageTemplates.customMessage( message, data );
@@ -110,15 +123,10 @@ module.exports = {
 		});
 	},
 
-	sendEmail: function( data, onComplete ){
-		// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
-
-		var message = createMessage( data.emailType, data );
-		console.log( 'Message to: ' + message.to );
-		console.log( 'Message from: ' + message.from );
-		console.log( 'Message subject: ' + message.subject );
-		console.log( 'Message contents: ' + message.text );
-
+	sendEmail: function(data, emailtype, onComplete){
+		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
+		var message = createMessage(emailtype, data );
+		console.log( 'Message: ' + JSON.stringify( message ) );
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
 				console.log( "Error from mailgun: " + error );
@@ -129,5 +137,5 @@ module.exports = {
 				onComplete( null, message, body );
 			}
 		});
-	}
+	},
 };

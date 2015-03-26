@@ -141,7 +141,6 @@ module.exports = {
 
 	serveFile: {
 		// set to false so that resources load when logged out
-		// but, security issue if a page is requested by path. Might need to need 'views' out of public
 		auth: false,
 		handler: {
 			directory: {
@@ -284,10 +283,8 @@ module.exports = {
 					return reply(err);
 				}
 				// add to all members email group and send ack email
-				var emailDetails = accountToCreate;
-				emailDetails.emailType = "acknowledge";
 				messages.addToMembersList(accountToCreate);
-				messages.sendEmail(accountToCreate, function( error, data ) {
+				messages.sendEmail(accountToCreate, "acknowledge", function( error, data ) {
 					if( err ) {
 						console.log( "Error sending acknowledge email: " + error );
 					}
@@ -344,7 +341,7 @@ module.exports = {
 
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
-				emailType: request.payload.emailtype2,
+				emailtype: request.payload.emailtype2,
 				email: request.payload.email,
 				username: request.payload.username,
 				first_name: request.payload.firstname,
@@ -353,7 +350,7 @@ module.exports = {
 				contents: request.payload.contents
 			};
 
-			messages.sendEmail( emailDetails, function ( error, message, body ) {
+			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, body ) {
 				if( error ){
 					console.log( "Error sending " + emailDetails.emailType + ": " + error );
 					return reply( error );
