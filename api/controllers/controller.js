@@ -10,7 +10,7 @@ var creationValidation = Joi.object({
 		email: Joi.string().email().required(),
 		first_name: Joi.string().required(),
 		last_name: Joi.string().required(),
-		phone_number: Joi.number().required()
+		phone_number: Joi.string().required()
 	});
 
 var updateValidation = Joi.object({
@@ -18,7 +18,8 @@ var updateValidation = Joi.object({
 		first_name: Joi.string(),
 		last_name: Joi.string(),
 		phone_number: Joi.number()
-	}).or("email", "first_name", "last_name", "phone_number");
+	}).options({allowUnknown: true});
+// .or("email", "first_name", "last_name", "phone_number");
 
 module.exports = {
 
@@ -92,7 +93,6 @@ module.exports = {
 					return reply(err);
 				}
 				console.log( "Account View: " + result );
-
 				return reply.view('account.jade', {user: result});
 			});
 		}
@@ -153,28 +153,70 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
+			// First, check the type of payment
+			// If the type of payment is 'desk', check whether they are authorized
+			// And if they have already paid for this month's desk space, deny the request?
+			// If not, grab the rate from the DB and charge them for it
+			// And add the 'paid' status to the current month of the year in the db
 
+			// If the type of payment is 'membership', check their active status
+			// If active, deny the request?
+			// If not, charge them for 50 squid and set active_status to true
+			// If they paid for their membership less than a year from today,
+			// then extend membership_paid by 1 year.
+			// else set membership_paid to now.
+
+			var paymentFor 		= request.params.type;
 			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
+			var newCharge;
 
-			var membershipCharge = {
-			  amount: 1000,
-			  currency: "gbp",
-			  source: stripeToken,
-			  description: "Membership Fee"
-			};
-
-			var charge = stripe.charges.create(membershipCharge, function(err, charge) {
-				if (err) {return reply(err);}
-
-				var transactionObject = {
-					name: request.payload.stripeEmail,
-					date: charge.created + "000",
-					amount: charge.amount,
+			accounts.getAccount(accountToUpdate, function(err, result) {
+				var paymentSchemes = {
+					membership: {
+						amount: 5000,
+						description: "Membership for 1 year",
+					},
+					desk: {
+						amount: result.desk_rental_rate,
+						description: "Desk rental 1 month",
+					}
 				};
-				return accounts.newTransaction(accountToUpdate, transactionObject, function(err, result) {
+
+				var chargeMaker = function(paymentScheme, token) {
+					return {
+						amount: paymentScheme.amount,
+						currency: "gbp",
+						source: token,
+						description: paymentScheme.description,
+					};
+				};
+
+				if (paymentFor === "desk") {
+					if (!result.desk_authorization) {
+						return reply("You're not authorized to do that yet!");
+					} else {
+						newCharge = chargeMaker(paymentSchemes[paymentFor], stripeToken);
+					}
+				} else if (paymentFor === "membership") {
+					newCharge = chargeMaker(paymentSchemes[paymentFor], stripeToken);
+				} else {
+					return reply("Unknown payment scheme");
+				}
+				var charge = stripe.charges.create(newCharge, function(err, charge) {
 					if (err) {return reply(err);}
-					return reply(result);
+
+					var transactionObject = {
+						name: request.payload.stripeEmail,
+						date: charge.created + "000",
+						amount: charge.amount,
+						type: paymentFor
+					};
+
+					return accounts.newTransaction(accountToUpdate, transactionObject, function(err, success) {
+						if (err) {return reply(err);}
+						return reply(success);
+					});
 				});
 			});
 		}
@@ -232,7 +274,7 @@ module.exports = {
 
 				desk_authorization: false,
 
-				desk_rental_rate: 50,
+				desk_rental_rate: 5000,
 			};
 
 
@@ -290,7 +332,7 @@ module.exports = {
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
 				if (err) {return reply(err);}
-				return reply(result);
+				return reply(result).redirect("/logout");
 			});
 		}
 	},
