@@ -1,7 +1,10 @@
 var lab    		= exports.lab = require("lab").script();
 var assert 		= require("chai").assert;
 var Hapi   		= require("hapi");
+var mongoose 	= require("mongoose");
 var server		= require("../api/server.js");
+var Schema 		= require("../api/models/schema.js");
+var Mocks 		= require("./mocks/accounts.js");
 
 // User testing
 lab.experiment("When a user visits the home page, ", function() {
@@ -35,7 +38,6 @@ lab.experiment("When a user visits the home page, ", function() {
 
 		server.inject(options, function(response) {
 			assert.equal(response.statusCode, 302, " they should get a FOUND status code (302)");
-			assert.include(response.headers.location, "https://github.com/login/oauth", "they should be redirected to the login page");
 			done();
 		});
 	});
@@ -43,14 +45,26 @@ lab.experiment("When a user visits the home page, ", function() {
 
 lab.experiment("When a user visits the login page", function() {
 
-	lab.test("if already authenticated, they should be redirected to their account page, ", function(done) {
+	lab.test("without proper authentication, ", function(done) {
+
+		var options = {
+			method: "GET",
+			url: "/login"
+		};
+		server.inject(options, function(response) {
+			assert.equal(response.statusCode, 302, "they should get a FOUND status code (302)");
+			assert.include(response.headers.location, "https://github.com/login/oauth", "they should be redirected to the login page");
+			done();
+		});
+	});
+
+	lab.test("if already authenticated, ", function(done) {
 
 		var options = {
 			url 		: "/login",
 			method 		: "GET",
 			credentials : {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				profile: {
 					raw: {
@@ -64,7 +78,7 @@ lab.experiment("When a user visits the login page", function() {
 		server.inject(options, function(response) {
 			assert.equal(response.statusCode, 302, " they should get a FOUND status code (302)");
 			assert.ok(response.headers["set-cookie"], "their session should be set");
-			assert.equal(response.headers.location, "/signup", "they should be redirected to the signup page");
+			assert.equal(response.headers.location, "/account", "they should be redirected to the account page");
 			done();
 		});
 	});
@@ -80,7 +94,7 @@ lab.experiment("When a user visits the signup page, ", function() {
 		};
 		server.inject(options, function(response) {
 			assert.equal(response.statusCode, 302, "they should get a FOUND status code (302)");
-			assert.equal(response.headers.location, "/", "they should be redirected to the login page");
+			assert.equal(response.headers.location, "/", "they should be redirected to the home page");
 			done();
 		});
 	});
@@ -92,7 +106,6 @@ lab.experiment("When a user visits the signup page, ", function() {
 			url: "/signup",
 			credentials : {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -131,7 +144,6 @@ lab.experiment("When the user visits the logout page, ", function() {
 			url: "/logout",
 			credentials : {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -148,16 +160,47 @@ lab.experiment("When the user visits the logout page, ", function() {
 
 
 lab.experiment("When the user visits the account page, ", function() {
+	var database;
+
+	lab.before(function(done) {
+		mongoose.connect("mongodb://localhost:27017/test", function(err, db) {
+			if (err) throw err;
+			database = mongoose.connection;
+			done();
+		});
+	});
+
+	lab.after(function(done) {
+		database.close(function(err, db) {
+			if (err) throw err;
+			done();
+		});
+	});
+
 	lab.test("They should be able to change their active/inactive status", function(done) {
 		done();
 	});
+
+	lab.test("They should be able to see their account details", function(done) {
+		var options = {
+			method: "GET",
+			url: "/account/bigboy1101",
+			credentials : {
+				username 	: "Timmy Tester",
+				email 		: "timothyandthecrew@testing.com",
+				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
+				url 		: "https://github.com/MIJOTHY"
+			}
+		};
+		done();
+	});
+
 	lab.test("If they have just made a successful payment, a 'success' box should appear", function(done) {
 		var options = {
 			method: "GET",
 			url: "/account/bigboy1101?payment=success",
 			credentials : {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -170,13 +213,28 @@ lab.experiment("When the user visits the account page, ", function() {
 // Testing payment
 lab.experiment("When the user make a membership payment, ", function() {
 
+	lab.before(function(done) {
+		mongoose.connect("mongodb://localhost:27017/test", function(err, db) {
+			if (err) throw err;
+			database = mongoose.connection;
+			done();
+		});
+	});
+
+	lab.after(function(done) {
+		database.close(function(err, db) {
+			if (err) throw err;
+			done();
+		});
+	});
+
 	lab.test("on a card decline, the user should receive an error message", function(done) {
 
 		var options = {
 			url: 	"/payment",
 			method: "POST",
 			credentials: {
-				name: "blahblah"
+				username: "blahblah"
 			},
 			payload: {
 				stripeToken: "badtoken"
@@ -196,7 +254,7 @@ lab.experiment("When the user make a membership payment, ", function() {
 			url: 	"/payment",
 			method: "POST",
 			credentials: {
-				name: "blahblah"
+				username: "blahblah"
 			},
 			payload: {
 				stripeToken: "worsetoken"
@@ -216,7 +274,7 @@ lab.experiment("When the user make a membership payment, ", function() {
 			url: 	"/payment",
 			method: "POST",
 			credentials: {
-				name: "blahblah"
+				username: "blahblah"
 			},
 			payload: {
 				stripeToken: "goodtoken"
@@ -253,6 +311,26 @@ lab.experiment("When the admin visits the admin dashboard, ", function() {
 // Testing the endpoints
 lab.experiment("Testing the JSON API 1 - The User: ", function() {
 
+	lab.before(function(done) {
+		mongoose.connect("mongodb://localhost:27017/test", function(err, db) {
+			if (err) throw err;
+			database = mongoose.connection;
+			database.once("open", function() {
+		    	console.log("database connection succesful");
+			});
+
+			done();
+		});
+	});
+
+	lab.after(function(done) {
+		database.close(function(err, db) {
+			if (err) throw err;
+			console.log("done");
+			done();
+		});
+	});
+
 
 	lab.test("Sending a GET request to /accounts", function(done) {
 
@@ -261,7 +339,6 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 			method: "GET",
 			credentials: {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -284,7 +361,6 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 			},
 			credentials: {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -304,7 +380,6 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 			method: "GET",
 			credentials: {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -323,7 +398,6 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 			method: "PUT",
 			credentials: {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -341,7 +415,6 @@ lab.experiment("Testing the JSON API 1 - The User: ", function() {
 			method: "DELETE",
 			credentials: {
 				username 	: "Timmy Tester",
-				displayname	: "bigboy1101",
 				email 		: "timothyandthecrew@testing.com",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -364,7 +437,6 @@ lab.experiment("Testing the JSON API 2 - The Admin: ", function() {
 			method: "GET",
 			credentials: {
 				username 	: "Alice Admin",
-				displayname	: "AliceTheUnaccountable202",
 				email 		: "rollerblading12@pesto.net",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -383,7 +455,6 @@ lab.experiment("Testing the JSON API 2 - The Admin: ", function() {
 			method: "POST",
 			credentials: {
 				username 	: "Alice Admin",
-				displayname	: "AliceTheUnaccountable202",
 				email 		: "rollerblading12@pesto.net",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -402,7 +473,6 @@ lab.experiment("Testing the JSON API 2 - The Admin: ", function() {
 			method: "GET",
 			credentials: {
 				username 	: "Alice Admin",
-				displayname	: "AliceTheUnaccountable202",
 				email 		: "rollerblading12@pesto.net",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -421,7 +491,6 @@ lab.experiment("Testing the JSON API 2 - The Admin: ", function() {
 			method: "PUT",
 			credentials: {
 				username 	: "Alice Admin",
-				displayname	: "AliceTheUnaccountable202",
 				email 		: "rollerblading12@pesto.net",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
@@ -439,7 +508,6 @@ lab.experiment("Testing the JSON API 2 - The Admin: ", function() {
 			method: "DELETE",
 			credentials: {
 				username 	: "Alice Admin",
-				displayname	: "AliceTheUnaccountable202",
 				email 		: "rollerblading12@pesto.net",
 				avatar 		: "https://avatars1.githubusercontent.com/u/10106320?v=3&s=40",
 				url 		: "https://github.com/MIJOTHY"
