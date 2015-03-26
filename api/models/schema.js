@@ -29,6 +29,7 @@ var accountSchema = new Schema({
 
 	membership_active_status: {type: Boolean, required: true},
 	membership_paid: {type: Date}, // date paid
+	// TODO make an 'automated email' object.
 	membership_reminder_sent: {type: Boolean}, //these three booleans need to be set to false when payment received
 	membership_demand_sent: {type: Boolean},
 	membership_overdue_sent: {type: Boolean},

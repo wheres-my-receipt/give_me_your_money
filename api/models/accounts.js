@@ -3,10 +3,13 @@ var Account 	= require("./schema.js").Account;
 
 // Multiple account operations
 
-exports.search  = function(queryObj, filterObj, onComplete) {
+// sample params: 	{ 	query: {'username': 'foo'},
+// 		optional ----->	filter: {'email': 1, '_id': 0}
+// 					}
+exports.search  = function(params, onComplete) {
 
-	if (filterObj) {
-		Account.find(queryObj, filterObj, function(err, result){
+	if (params.filter) {
+		Account.find(params.query, params.filter, function(err, result){
 			if (err) {
 				return onComplete(err);
 			}
@@ -14,7 +17,7 @@ exports.search  = function(queryObj, filterObj, onComplete) {
 		});
 	}
 	else {
-		Account.find(queryObj, function(err, result){
+		Account.find(params.query, function(err, result){
 			if (err) {
 				return onComplete(err);
 			}

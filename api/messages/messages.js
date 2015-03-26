@@ -23,6 +23,16 @@ var messageTemplates = {
 		message.text = "Hello " + data.first_name + ". Your annual subscription expires in one week.";
 		return message;
 	},
+	annualSubscriptionDemand : function (message, data) {
+		message.subject = "Annual Subscription Expired";
+		message.text = "Hello " + data.first_name + ". Your annual subscription has expired. Please visit your account <URL> to renew.";
+		return message;
+	},
+	annualSubscriptionOverdue : function (message, data) {
+		message.subject = "Annual Subscription Overdue";
+		message.text = "Hello " + data.first_name + ". Your annual subscription expired a week ago. Please visit your account <URL> to renew. No further reminders will be sent!";
+		return message;
+	},
 	deskRentalPaymentReminder : function (message, data) {
 
 	},
@@ -46,6 +56,10 @@ createMessage = function( emailType, data ){
 			return messageTemplates.verifyAccount( message, data );
 		case "annualSubscriptionReminder" :
 			return messageTemplates.annualSubscriptionReminder( message, data );
+		case "annualSubscriptionDemand" :
+			return messageTemplates.annualSubscriptionDemand( message, data );
+		case "annualSubscriptionOverdue" :
+			return messageTemplates.annualSubscriptionOverdue( message, data );
 		case "deskRentalPaymentReminder" :
 			return messageTemplates.deskRentalPaymentReminder( message, data );
 		default:
