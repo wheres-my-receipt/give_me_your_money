@@ -12,7 +12,7 @@ module.exports 	= [
 	{path: "/admin", 						method: "GET", 		config: controller.adminView},
 	{path: "/admin/member/{member}", 		method: "GET",		config: controller.memberView},
 
-	{path: "/public/{file*}",				method: "GET",		config: controller.serveFile},
+	{path: "/{file*}",						method: "GET",		config: controller.serveFile},
 
 	{path: "/account", 						method: "GET", 		config: controller.accountView},
 	{path: "/account/messages", 			method: "GET", 		config: controller.messagesView},

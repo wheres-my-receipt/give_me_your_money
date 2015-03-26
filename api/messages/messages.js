@@ -20,7 +20,7 @@ var messageTemplates = {
 	},
 	annualSubscriptionReminder : function (message, data) {
 		message.subject = "Annual Fee Almost Due. " + data.subject;
-		message.text = "Hello" + data.first_name + ". ";
+		message.text = "Hello" + data.first_name + ". Yout annual sbscription will expire in one week. ";
 		message.text += data.contents;
 		return message;
 	},
@@ -38,6 +38,7 @@ var messageTemplates = {
 		message.subject = "Desk Rental Reminder. " + data.subject;
 		message.text = "Hello" + data.first_name + ". ";
 		message.text += data.contents;
+		return message;
 	},
 	customMessage : function (message, data) {
 		message.subject = data.subject;
