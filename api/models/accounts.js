@@ -5,7 +5,29 @@ var Account 	= schema.Account;
 var DeskRental  = schema.DeskRental;
 
 
-// Multiple account operations
+// sample params: 	{ 	query: {'username': 'foo'},
+// 		optional ----->	filter: {'email': 1, '_id': 0}
+// 					}
+exports.search  = function(params, onComplete) {
+
+	if (params.filter) {
+		Account.find(params.query, params.filter, function(err, result){
+			if (err) {
+				return onComplete(err);
+			}
+			return onComplete(null, result);
+		});
+	}
+	else {
+		Account.find(params.query, function(err, result){
+			if (err) {
+				return onComplete(err);
+			}
+			return onComplete(null, result);
+		});
+	}
+};
+
 exports.getAccounts = function(onComplete) {
 
 	Account.find({}, function(err, result) {
