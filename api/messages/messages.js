@@ -120,7 +120,7 @@ module.exports = {
 		});
 	},
 
-	sendEmail: function(data, emailtype, onComplete){
+	sendEmail: function(data, emailType, onComplete){
 		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
 		var message = createMessage(emailType, data );
 		console.log( 'Message: ' + message.to);

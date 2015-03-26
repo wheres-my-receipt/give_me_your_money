@@ -62,6 +62,15 @@ exports.updateAccount = function(username, updateObject, onComplete) {
 exports.createAccount = function(accountToCreate, onComplete) {
 
 	var newAccount = new Account(accountToCreate);
+	var sinceYear = newAccount.member_since.getYear();
+	var sinceMonth = newAccount.member_since.getMonth();
+	var i;
+
+	newAccount.desk_rental_status[sinceYear] = new DeskRental();
+
+	for (i = 0; i < sinceMonth; i++) {
+		newAccount.desk_rental_status[sinceYear][i] = "away";
+	}
 
 	newAccount.save(function(err, result) {
 		if (err) {
@@ -107,6 +116,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 				return onComplete("already paid m8");
 			}
 			deskHistory[currentYear][currentMonth] = "paid";
+			console.log(deskHistory[currentYear]);
 		}
 
 		result.transaction_history.push(transaction);
