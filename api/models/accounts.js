@@ -97,20 +97,20 @@ exports.newTransaction = function(username, transaction, onComplete) {
 		if(err) {
 			return onComplete(err);
 		}
-		var now = new Date(+transaction.date);
-		var currentYear = now.getFullYear();
-		var oldPaid 	= result.membership_paid;
+		var now 		 = new Date(+transaction.date);
+		var currentYear  = now.getFullYear();
+		var oldPaidUntil = result.membership_paid;
 
 		if (transaction.type === "membership") {
 			result.membership_active_status = true;
-			if (!oldPaid) {
+			if (!oldPaidUntil) {
+				result.membership_paid = now.setFullYear(currentYear + 1);
+			} else if (oldPaidUntil < now) {
 				result.membership_paid = now.setFullYear(currentYear + 1);
 			} else {
-				result.membership_paid = oldPaid.setFullYear((oldPaid.getFullYear()) + 1);
+				result.membership_paid = oldPaidUntil.setFullYear((oldPaidUntil.getFullYear()) + 1);
 			}
-			console.log(result.membership_paid);
-		}
-		else if (transaction.type === "desk") {
+		} else if (transaction.type === "desk") {
 
 			var deskHistory = result.desk_rental_status;
 			var currentMonth = now.getMonth();
