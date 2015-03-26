@@ -6,7 +6,7 @@ var messageSchema = new Schema({
 	from: {type: String, required: true},
 	date: {type: Object, required: true},
 	subject: {type: String, required: true},
-	contents: {type: String, required: true},
+	text: {type: String, required: true},
 });
 
 var transactionSchema = new Schema({

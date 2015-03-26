@@ -19,8 +19,9 @@ var messageTemplates = {
 		return message;
 	},
 	annualSubscriptionReminder : function (message, data) {
-		message.subject = "Annual Subscription nearly up!";
-		message.text = "Hello " + data.first_name + ". Your annual subscription expires in one week.";
+		message.subject = "Annual Fee Almost Due. " + data.subject;
+		message.text = "Hello" + data.first_name + ". ";
+		message.text += data.contents;
 		return message;
 	},
 	annualSubscriptionDemand : function (message, data) {
@@ -34,9 +35,11 @@ var messageTemplates = {
 		return message;
 	},
 	deskRentalPaymentReminder : function (message, data) {
-
+		message.subject = "Desk Rental Reminder. " + data.subject;
+		message.text = "Hello" + data.first_name + ". ";
+		message.text += data.contents;
 	},
-	simpleMessage : function (message, data) {
+	customMessage : function (message, data) {
 		message.subject = data.subject;
 		message.text = data.subject;
 		return message;
@@ -50,21 +53,21 @@ createMessage = function( emailType, data ){
 					to: data.email
 				};
 	switch( emailType ){
-		case "acknowledge" :
+		case "Acknowledge" :
 			return messageTemplates.acknowledge( message, data );
-		case "verifyAccount" :
+		case "VerifyAccount" :
 			return messageTemplates.verifyAccount( message, data );
-		case "annualSubscriptionReminder" :
+		case "AnnualFeeReminder" :
 			return messageTemplates.annualSubscriptionReminder( message, data );
+		case "DeskRentFeeReminder" :
+			return messageTemplates.deskRentalPaymentReminder( message, data );
 		case "annualSubscriptionDemand" :
 			return messageTemplates.annualSubscriptionDemand( message, data );
 		case "annualSubscriptionOverdue" :
 			return messageTemplates.annualSubscriptionOverdue( message, data );
-		case "deskRentalPaymentReminder" :
-			return messageTemplates.deskRentalPaymentReminder( message, data );
 		default:
-			console.log( "Email Type not found so send default message: " + emailType );
-			return messageTemplates.simpleMessage( message, data );
+			console.log( "Email Type not found so send custom message: " + emailType );
+			return messageTemplates.customMessage( message, data );
 	}
 };
 
@@ -122,19 +125,16 @@ module.exports = {
 
 	sendEmail: function(data, emailtype, onComplete){
 		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
-		var message = createMessage(emailType, data );
-		console.log( 'Message: ' + message.to);
-		console.log( 'Message: ' + message.from);
-		console.log( 'Message: ' + message.subject);
-		console.log( 'Message: ' + message.text);
+		var message = createMessage(emailtype, data );
+		console.log( 'Message: ' + JSON.stringify( message ) );
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
-				console.log( "Error: " + error );
+				console.log( "Error from mailgun: " + error );
 				onComplete( error );
 			}
 			else {
 				console.log( "Sent email: " + body);
-				onComplete( null, body );
+				onComplete( null, message, body );
 			}
 		});
 	},

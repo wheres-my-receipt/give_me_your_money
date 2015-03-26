@@ -130,12 +130,13 @@ exports.newMessage = function(username, emailDetails, onComplete) {
 		if(err) {
 			return onComplete(err);
 		}
+		console.log( 'Email Text: ' + emailDetails.text);
 		var messageObject = {
-			to: emailDetails.email,
+			to: emailDetails.to,
 			from: 'facmembershipadmin@gmail.com',
 			date: moment().format('MMMM Do YYYY'),
 			subject: emailDetails.subject ,
-			contents: emailDetails.contents
+			text: emailDetails.text
 		};
 		result.message_history.push(messageObject);
 
