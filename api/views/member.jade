@@ -13,11 +13,13 @@ html
 					input#email(type='text', name='emailtype', value="customMessage")
 					select(name="emailtype2")
 						label Verify
-							option(value="1") Verify
+							option(value="VerifyAccount") Verify
 						label Annual Fees
-							option(value="2") Annual Fees Reminder
+							option(value="AnnualFeeReminder") Annual Fees Reminder
+						label Desk Rent Fee Reminder
+							option(value="DeskRentFeeReminder") Desk Rent Fee Reminder
 						label Custom
-							option(value="3") Custom
+							option(value="Custom") Custom
 				label First Name
 					input#firstname(type='text', name='firstname', value=user.first_name)
 				label Last Name

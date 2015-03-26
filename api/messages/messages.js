@@ -16,12 +16,19 @@ var messageTemplates = {
 	verifyAccount: function (message, data) {
 		message.subject = "Account Verified";
 		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
+		return message;
 	},
 	annualSubscriptionReminder : function (message, data) {
+		message.subject = "Annual Fee Reminder. " + data.subject;
+		message.text = "Hello" + data.first_name + ". ";
+		message.text += data.contents;
+		return message;
 
 	},
 	deskRentalPaymentReminder : function (message, data) {
-
+		message.subject = "Desk Rental Reminder. " + data.subject;
+		message.text = "Hello" + data.first_name + ". ";
+		message.text += data.contents;
 	},
 	customMessage : function (message, data) {
 		message.subject = data.subject;
@@ -37,13 +44,13 @@ createMessage = function( emailType, data ){
 					to: data.email
 				};
 	switch( emailType ){
-		case "acknowledge" :
+		case "Acknowledge" :
 			return messageTemplates.acknowledge( message, data );
-		case "verifyAccount" :
+		case "VerifyAccount" :
 			return messageTemplates.verifyAccount( message, data );
-		case "annualSubscriptionReminder" :
+		case "AnnualFeeReminder" :
 			return messageTemplates.annualSubscriptionReminder( message, data );
-		case "deskRentalPaymentReminder" :
+		case "DeskRentFeeReminder" :
 			return messageTemplates.deskRentalPaymentReminder( message, data );
 		default:
 			console.log( "Email Type not found so send custom message: " + emailType );
@@ -107,14 +114,19 @@ module.exports = {
 		// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
 
 		var message = createMessage( data.emailType, data );
+		console.log( 'Message to: ' + message.to );
+		console.log( 'Message from: ' + message.from );
+		console.log( 'Message subject: ' + message.subject );
+		console.log( 'Message contents: ' + message.text );
+
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
-				console.log( "Error: " + error );
+				console.log( "Error from mailgun: " + error );
 				onComplete( error );
 			}
 			else {
 				console.log( "Sent email: " + body);
-				onComplete( null, body );
+				onComplete( null, message, body );
 			}
 		});
 	}

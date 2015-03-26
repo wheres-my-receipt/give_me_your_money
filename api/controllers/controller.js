@@ -344,7 +344,7 @@ module.exports = {
 
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
-				emailType: request.payload.emailtype,
+				emailType: request.payload.emailtype2,
 				email: request.payload.email,
 				username: request.payload.username,
 				first_name: request.payload.firstname,
@@ -353,7 +353,7 @@ module.exports = {
 				contents: request.payload.contents
 			};
 
-			messages.sendEmail( emailDetails, function ( error, body ) {
+			messages.sendEmail( emailDetails, function ( error, message, body ) {
 				if( error ){
 					console.log( "Error sending " + emailDetails.emailType + ": " + error );
 					return reply( error );
@@ -361,7 +361,8 @@ module.exports = {
 				else {
 					// STICK IT IN THE DATABASE
 
-					return accounts.newMessage(member, emailDetails, function (err, result) {
+					return accounts.newMessage(member, message, function (err, result) {
+						console.log( 'Message: ' + JSON.stringify( message ));
 						if (err) {
 							console.log( "Error adding new message: " + err);
 							return reply(err);
