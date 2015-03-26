@@ -51,6 +51,7 @@ module.exports = {
 		desk_rental_rate:   {type: Number, required: true, default: 5000}, //rate of desk (e.g 50/100/200)
 		desk_rental_status: {type: Object, required: true, default: {}},
 
+		automated_emails: [automatedEmailSchema],
 		transaction_history:  [transactionSchema],
 		message_history: [messageSchema]
 	}

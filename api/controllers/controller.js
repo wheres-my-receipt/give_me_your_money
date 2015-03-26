@@ -284,7 +284,7 @@ module.exports = {
 				}
 				// add to all members email group and send ack email
 				messages.addToMembersList(accountToCreate);
-				messages.sendEmail(accountToCreate, "acknowledge", function( error, data ) {
+				messages.sendEmail(accountToCreate, "Acknowledge", function( error, data ) {
 					if( err ) {
 						console.log( "Error sending acknowledge email: " + error );
 					}

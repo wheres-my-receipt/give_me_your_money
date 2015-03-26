@@ -1,3 +1,5 @@
+var moment = require('moment');
+
 exports.agendaStart = function() {
 
 	var config = require('../config');
@@ -10,8 +12,8 @@ exports.agendaStart = function() {
 
 	var annual = require('./annual');
 
-	// annual.testReminder(agenda);
-	// agenda.now('testReminder');
+	annual.testReminder(agenda);
+	agenda.now('testReminder');
 
 	// annual.annualReminder(agenda);
 	// agenda.every('one day', 'annualReminder');
@@ -21,6 +23,12 @@ exports.agendaStart = function() {
 
 	// annual.annualOverdue(agenda);
 	// agenda.every('one day', 'annualOverdue');
+
+	var desk = require('./desk');
+
+	// desk.deskReminder(agenda);
+	// agenda.every('one day', 'deskReminder');
+
 
 
 	agenda.start();
