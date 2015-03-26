@@ -10,7 +10,14 @@ html
 				label Email
 					input#email(type='text', name='email', value=user.email)
 				label Email Type
-					input#email(type='text', name='emailtype', value="simpleMessage")
+					input#email(type='text', name='emailtype', value="customMessage")
+					select(name="emailtype2")
+						label Verify
+							option(value="1") Verify
+						label Annual Fees
+							option(value="2") Annual Fees Reminder
+						label Custom
+							option(value="3") Custom
 				label First Name
 					input#firstname(type='text', name='firstname', value=user.first_name)
 				label Last Name

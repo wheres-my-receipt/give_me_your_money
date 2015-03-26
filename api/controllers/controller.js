@@ -298,9 +298,7 @@ module.exports = {
 	createMessage : {
 		handler : function (request, reply) {
 			var member = request.params.member;
-			var message = request.payload;
 			console.log( 'In createMessages, member: ' + member );
-			console.log( 'Message to send: '+ message );
 
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
@@ -313,8 +311,6 @@ module.exports = {
 				contents: request.payload.contents
 			};
 
-			console.log( 'Email details: ' + request.payload.emailtype );
-			console.log( 'Email details: ' + request.payload.email );
 			messages.sendEmail( emailDetails, function ( error, body ) {
 				if( error ){
 					console.log( "Error sending " + emailDetails.emailType + ": " + error );
@@ -322,8 +318,6 @@ module.exports = {
 				}
 				else {
 					// STICK IT IN THE DATABASE
-					// console.log( "body: " + body);
-		//			return reply(body);
 
 					return accounts.newMessage(member, emailDetails, function (err, result) {
 						if (err) {

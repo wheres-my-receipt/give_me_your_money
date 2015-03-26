@@ -23,7 +23,7 @@ var messageTemplates = {
 	deskRentalPaymentReminder : function (message, data) {
 
 	},
-	simpleMessage : function (message, data) {
+	customMessage : function (message, data) {
 		message.subject = data.subject;
 		message.text = data.subject;
 		return message;
@@ -46,8 +46,8 @@ createMessage = function( emailType, data ){
 		case "deskRentalPaymentReminder" :
 			return messageTemplates.deskRentalPaymentReminder( message, data );
 		default:
-			console.log( "Email Type not found so send default message: " + emailType );
-			return messageTemplates.simpleMessage( message, data );
+			console.log( "Email Type not found so send custom message: " + emailType );
+			return messageTemplates.customMessage( message, data );
 	}
 };
 
@@ -107,10 +107,6 @@ module.exports = {
 		// ==== SEND AN EMAIL ACKNOWLEDGEMENT TO NEW MEMBER == //
 
 		var message = createMessage( data.emailType, data );
-		console.log( 'Message: ' + message.to);
-		console.log( 'Message: ' + message.from);
-		console.log( 'Message: ' + message.subject);
-		console.log( 'Message: ' + message.text);
 		mailgun.messages().send(message, function (error, body) {
 			if( error ) {
 				console.log( "Error: " + error );
