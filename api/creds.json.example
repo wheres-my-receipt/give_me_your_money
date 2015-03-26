@@ -18,5 +18,15 @@
 	"stripe" : {
 		"secret"	: "<stripe secret key>"
 	},
-	"cookieSecret"	: "<arbitrary string>"
+	"cookieSecret"	: "<arbitrary string>",
+	"mailgunTest"	: {
+        "mgApiKey"       : "<mailgun api key>",
+        "mgTestDomain"   : "<mailgun domian>",
+        "mgTestPassword" : "<mailgun password>",
+        "mgTestProxy"    : "http://localhost:",
+        "mailLists"      : {
+                                "allMembersList" 	: "all_members@<mailgin domain>",
+                                "deskOccupantsList" : "desk_occupants@<mailgin domain>"
+                            }
+    }
 }

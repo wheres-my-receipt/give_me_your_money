@@ -325,11 +325,10 @@ module.exports = {
 	deleteAccount: {
 		handler: function (request, reply) {
 			var userToDelete = request.params.member;
-			console.log(userToDelete);
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
-				if (err) {return reply(err);}
-				return reply(result).redirect("/logout");
+				if (err) {console.log(err);return reply(err);}
+				return reply.redirect("/logout");
 			});
 		}
 	},
