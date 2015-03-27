@@ -72,7 +72,8 @@ var messageTemplates = {
 
 createMessage = function( emailType, data ){
 	var message = {
-					from: 'facmembershipadmin@gmail.com',
+					// from: 'facmembershipadmin@gmail.com',
+					from: 'mail@sandbox987b404359ae4e0ab6199bd4e6ad6d2f.mailgun.org',
 					to: data.email
 				};
 	switch( emailType ){
