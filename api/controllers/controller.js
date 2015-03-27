@@ -247,6 +247,19 @@ module.exports = {
 		}
 	},
 
+	messageView: {
+		handler: function (request, reply) {
+			var userToFind = request.params.member;
+			console.log( 'In messageView: ' + userToFind );
+			accounts.getAccount( userToFind, function( err, result ){
+				if (err) {
+					console.log( 'Error ' + err );
+					return reply(err);
+				}
+				return reply.view( 'message', {user :result });
+			});
+		}
+	},
 
 	// DB Operations
 	getAccounts: {
