@@ -395,8 +395,7 @@ module.exports = {
 				}
 				else {
 					return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{isSuccess: true, alert: body.message}]});
-					//return reply.redirect("/admin/member/"+emailDetails.member);
-					//, messages: data.message_history
+					// return reply.redirect("/admin");
 				}
 			});
 
