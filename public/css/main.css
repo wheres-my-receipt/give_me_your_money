@@ -1,3 +1,134 @@
 .hidden {
 	display: none;
 }
+
+/* custom inclusion of right, left and below tabs */
+
+.tab-content {
+	display: inline-block;
+	padding:19px;
+	width: inherit;
+	-webkit-box-shadow: 0px 1px 8px 2px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 1px 8px 2px rgba(0,0,0,0.75);
+	box-shadow: 0px 1px 8px 2px rgba(0,0,0,0.75);
+	min-height: 500px;
+}
+
+.tabs-below > .nav-tabs,
+.tabs-right > .nav-tabs,
+.tabs-left > .nav-tabs {
+  border-bottom: 0;
+}
+
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+  display: none;
+}
+
+.tab-content > .active,
+.pill-content > .active {
+  display: block;
+}
+
+.tabs-left > .nav-tabs > li,
+.tabs-right > .nav-tabs > li {
+  float: none;
+}
+
+.tabs-left > .nav-tabs > li > a,
+.tabs-right > .nav-tabs > li > a {
+  min-width: 74px;
+  margin-right: 0;
+  margin-bottom: 3px;
+}
+
+ul.nav-tabs>li.active>a, {
+	background-color: none;
+	border: none;
+	box-shadow: -3px 1px 2px 2px black;
+}
+
+
+.tabs-left > .nav-tabs {
+  float: left;
+}
+
+.tabs-left > .nav-tabs > li > a {
+  margin-right: -1px;
+  -webkit-border-radius: 4px 0 0 4px;
+     -moz-border-radius: 4px 0 0 4px;
+          border-radius: 4px 0 0 4px;
+}
+
+.profilePic {
+	max-height: 200px;
+	max-width: 200px;
+}
+
+.contentwrapper {
+	padding: 5px;
+	padding-top: 50px;
+	padding-bottom: 100px;
+}
+
+html, body
+{
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#wrapper {
+    height: 100%;
+    min-height: 100%;
+}
+
+body {
+	color: #999;
+	background-color: #222;
+}
+
+ul.navbar {
+	 background-image: none;
+	background-image: none;
+	 background-image: none;
+	 background-image: none;
+	background-repeat: no-repeat;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff484e55', endColorstr='#ff313539', GradientType=0);
+	-webkit-filter: none;
+	filter: none;
+	 border: none;
+}
+
+ul>li>a#profile {
+	border: none;
+	background-color: none;
+	border-color: none;
+}
+ul>li>a#profile {
+	box-shadow: -4px 4px 4px -3px black;
+	border: none;
+	border-color: none;
+	background-color: none;
+}
+
+.formwrapper {
+	margin-top: 100px;
+}
+
+.tabs-left>ul.nav-tabs.nav>li.active>a,
+.tabs-left>ul.nav-tabs.nav>li.active>a:hover,
+.tabs-left>ul.nav-tabs.nav>li.active>a:focus {
+	background-color: inherit;
+	border: none;
+	border-color: none;
+}
+
+.tabpanel {
+	padding: 10px;
+}
+
+#del-heading {
+	border-color: red;
+}

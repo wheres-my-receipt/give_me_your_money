@@ -1,17 +1,18 @@
 .masthead
-	.container
-		nav.navbar.navbar-default
-			#bs-example-navbar-collapse-1.collapse.navbar-collapse
-				ul.nav.navbar-nav
-					li
-						a(href='http://localhost:3000/account')  My Account
-					li
-						a(href='http://localhost:3000/account/messages')  My Messages
-					li
-						a(href='http://localhost:3000/admin')  Admin
-					li
-						a(href='http://localhost:3000/login')  Login
-					li
-						a(href='http://localhost:3000/logout')  Logout
-					li
-						a(href='http://foundersandcoders.org/')  Founders&amp;Coders
+	#nav.navwrap(style='height: 50px;')
+		.logo-wrapper
+			p
+		#spin-wrapper
+			img#spin-img(src='/img/sun1-bw.png', alt='', style='transform: rotate(0deg);')
+			img#bulb(src='/img/logobw.png', alt='founders')
+		ul#collapse.navbar(style='display: block;')
+			li
+				a(href='/account') Account
+			li
+				a(href='/account/messages') Messages
+			li
+				a(href='/admin') Admin
+			li
+				a(href='/login') Login
+			li
+				a(href='/logout') Logout
