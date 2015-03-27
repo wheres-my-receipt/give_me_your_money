@@ -1,0 +1,13 @@
+include ./mixins.jade
+
+doctype html
+html
+	include ./includes/head.jade
+	body
+		include ./includes/navbar.jade
+		div
+			h2 Member Administration Pages
+			for member in members
+				li
+					a(href='/admin/member/'+member.username) #{member.first_name} #{member.last_name}
+	+foot()
