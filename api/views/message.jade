@@ -1,0 +1,53 @@
+include ./mixins.jade
+
+doctype html
+html
+	include ./includes/head.jade
+	body
+		include ./includes/navbar.jade
+		.jumbotron
+			.container
+				.row
+					.col-xs-12
+						include ./includes/alert_head.jade
+			.container
+				.row
+					.col-xs-6.col-sm-offset-3
+						if user
+							form.contact.well(name="contact" action='/api/messages/'+ user.username , method='POST')
+								h3 Send #{user.first_name} #{user.last_name} a message
+								.control-group
+									.controls
+										label.label(for="email") Email Address
+											input.form-control(type="text" name="email" value=user.email)
+								.control-group
+									.controls
+										label.label(for="emailtype") Type Of Message
+											br
+											select.form-control(name="emailtype2")
+												label.label(for="custom") Custom
+													option(value="Custom") Custom
+												label.label(for="verify") Verify
+													option(value="VerifyAccount") Verify
+												label.label(for="annfeerem") Annual Fees Reminder
+													option(value="AnnualFeeReminder") Annual Fees Reminder
+												label.label(for="deskfeerem") Desk Rent Fee Reminder
+													option(value="DeskRentFeeReminder") Desk Rent Fee Reminder
+												label.label(for="annsubsdemand") Annual Subscription Demand
+													option(value="annualSubscriptionDemand") Annual Subscription Demand
+												label.label(for="annsubsoverdue") Annual Subscription Overdue
+													option(value="annualSubscriptionOverdue") Annual Subscription Overdue
+								.control-group
+									.controls
+										label.label(for="subject") Subject
+											br
+											//- input(type="text" name="subject" placeholder="subject")
+											input.form-control(type="text" name="subject" placeholder="subject")
+								.control-group
+									.controls
+										label.label(for="message") Enter a Message
+											br
+											textarea.form-control(name="message")
+								.control-group
+									button.btn.btn-primary(type='submit') Submit
+	+foot()

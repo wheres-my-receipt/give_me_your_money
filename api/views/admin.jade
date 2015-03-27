@@ -14,7 +14,13 @@ html
 				.row
 					div.admintitle.col-xs-12
 						h2 Member Administration Pages
-						for member in members
-							li
-								a(href='/admin/member/'+member.username) #{member.first_name} #{member.last_name}
+						div
+							for member in members
+								.panel.panel-default
+									.panel-heading(role="tab")
+										h3.panel-title
+											a(href='/admin/member/'+member.username) #{member.first_name} #{member.last_name}
+												span.sendicon
+													a(href='/admin/message/'+member.username)
+														span.glyphicon.glyphicon-envelope
 	+foot()
