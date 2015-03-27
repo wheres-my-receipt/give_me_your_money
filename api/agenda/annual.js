@@ -12,26 +12,28 @@ function annualReminder(agenda) {
 				done();
 			}
 			else {
-				result.forEach(function(user, index){
-					if (!user.automated_emails.membership_reminder_sent) {
-						messages.sendEmail(user, "AnnualSubscriptionReminder", function( error, data ) {
-							if( err ) {
-								console.log( "Annual sub reminder email error: " + error );
-								if (index === result.length - 1) {
-									done();
-								}
-							}
-							else {
-								db.updateAccount(user.username, {'automated_emails.membership_reminder_sent': true}, function(err2, result2){
-									if (err) console.log('Error registering annual reminder email sent status ', err2);
+				if (result) {
+					result.forEach(function(user, index){
+						if (!user.automated_emails.membership_reminder_sent) {
+							messages.sendEmail(user, "AnnualSubscriptionReminder", function( error, data ) {
+								if( err ) {
+									console.log( "Annual sub reminder email error: " + error );
 									if (index === result.length - 1) {
 										done();
 									}
-								});
-							}
-						});
-					}
-				});
+								}
+								else {
+									db.updateAccount(user.username, {'automated_emails.membership_reminder_sent': true}, function(err2, result2){
+										if (err) console.log('Error registering annual reminder email sent status ', err2);
+										if (index === result.length - 1) {
+											done();
+										}
+									});
+								}
+							});
+						}
+					});
+				}
 			}
 		});
 	});
@@ -47,30 +49,32 @@ function annualDemand(agenda) {
 				done();
 			}
 			else {
-				result.forEach(function(user, index){
-					// set user membership status to false
-					db.updateAccount(user.username, {'membership_active_status': true}, function(err1, result1) {
-						if (err1) console.log('Error setting members active status to false', err1);
-						if (!user.automated_emails.membership_demand_sent) {
-							messages.sendEmail(user, "AnnualSubscriptionDemand", function( error, data ) {
-								if( err ) {
-									console.log( "Annual sub demand email error: " + error );
-									if (index === result.length - 1) {
-										done();
-									}
-								}
-								else {
-									db.updateAccount(user.username, {'automated_emails.membership_demand_sent': true}, function(err2, result2){
-										if (err) console.log('Error registering annual demand email sent status ', err2);
+				if (result) {
+					result.forEach(function(user, index){
+						// set user membership status to false
+						db.updateAccount(user.username, {'membership_active_status': true}, function(err1, result1) {
+							if (err1) console.log('Error setting members active status to false', err1);
+							if (!user.automated_emails.membership_demand_sent) {
+								messages.sendEmail(user, "AnnualSubscriptionDemand", function( error, data ) {
+									if( err ) {
+										console.log( "Annual sub demand email error: " + error );
 										if (index === result.length - 1) {
 											done();
 										}
-									});
-								}
-							});
-						}
+									}
+									else {
+										db.updateAccount(user.username, {'automated_emails.membership_demand_sent': true}, function(err2, result2){
+											if (err) console.log('Error registering annual demand email sent status ', err2);
+											if (index === result.length - 1) {
+												done();
+											}
+										});
+									}
+								});
+							}
+						});
 					});
-				});
+				}
 			}
 		});
 	});
@@ -86,26 +90,28 @@ function annualOverdue(agenda) {
 				done();
 			}
 			else {
-				result.forEach(function(user, index){
-					if (!user.automated_emails.membership_overdue_sent) {
-						messages.sendEmail(user, "AnnualSubscriptionOverdue", function( error, data ) {
-							if( err ) {
-								console.log( "Annual sub demand email error: " + error );
-								if (result.length - 1) {
-									done();
-								}
-							}
-							else {
-								db.updateAccount(user.username, {'automated_emails.membership_overdue_sent': true}, function(err2, result2){
-									if (err) console.log('Error registering annual demand email sent status ', err2);
-									if (index === result.length - 1) {
+				if (result) {
+					result.forEach(function(user, index){
+						if (!user.automated_emails.membership_overdue_sent) {
+							messages.sendEmail(user, "AnnualSubscriptionOverdue", function( error, data ) {
+								if( err ) {
+									console.log( "Annual sub demand email error: " + error );
+									if (result.length - 1) {
 										done();
 									}
-								});
-							}
-						});
-					}
-				});
+								}
+								else {
+									db.updateAccount(user.username, {'automated_emails.membership_overdue_sent': true}, function(err2, result2){
+										if (err) console.log('Error registering annual demand email sent status ', err2);
+										if (index === result.length - 1) {
+											done();
+										}
+									});
+								}
+							});
+						}
+					});
+				}
 			}
 		});
 	});
@@ -120,26 +126,28 @@ function testReminder(agenda){
 				done();
 			}
 			else {
-				result.forEach(function(user, index){
-					if (!user.automated_emails.test_sent) {
-						messages.sendEmail(user, "AnnualSubscriptionReminder", function( error, data ) {
-							if( err ) {
-								console.log( "Annual sub reminder email error: " + error );
-								if (index === result.length - 1) {
-									done();
-								}
-							}
-							else {
-								db.updateAccount(user.username, { 'automated_emails.test_sent': true}, function(err2, result2){
-									if (err) console.log('Error registering annual reminder email sent status ', err2);
+				if (result) {
+					result.forEach(function(user, index){
+						if (!user.automated_emails.test_sent) {
+							messages.sendEmail(user, "AnnualSubscriptionReminder", function( error, data ) {
+								if( err ) {
+									console.log( "Annual sub reminder email error: " + error );
 									if (index === result.length - 1) {
 										done();
 									}
-								});
-							}
-						});
-					}
-				});
+								}
+								else {
+									db.updateAccount(user.username, { 'automated_emails.test_sent': true}, function(err2, result2){
+										if (err) console.log('Error registering annual reminder email sent status ', err2);
+										if (index === result.length - 1) {
+											done();
+										}
+									});
+								}
+							});
+						}
+					});
+				}
 			}
 		});
 	});
