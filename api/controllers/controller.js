@@ -80,18 +80,11 @@ module.exports = {
 				var foundAccount;
 				return accounts.getAccount( username, function( err, result ){
 								console.log( "In getAccount callback");
-								if (err) {
+								if (result) {
 									console.log( 'User already signed up ' + err );
+									return reply.redirect('/account');
 								}
-								else {
-									console.log( 'Have found user so forward to member page');
-								}
-
-								console.log( 'Results: ' + JSON.stringify( result ));
-								if( result ) {
-									return reply.view( 'member', {user :result });
-								}
-								console.log( 'Forward to signup page');
+								console.log( 'Have not found user so forward to member page');
 								return reply.view("signup");
 							});
 			}
