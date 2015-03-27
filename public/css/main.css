@@ -179,3 +179,10 @@ ul>li>a#profile {
 	right: 0;
 	top: 60px;
 }
+
+#d-collapse{
+	padding: 10px;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: black;
+}

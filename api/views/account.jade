@@ -41,7 +41,7 @@ html
 								if user.desk_authorization
 									div.deskRental
 										p Your current desk rental rate is £#{user.desk_rental_rate/100}
-									- if(user.desk_rental_status[thisMonth] === "unpaid")
+									- if(user.desk_rental_status[thisMonth] !== "paid")
 										span.payment.col-xs-6
 											form(action='/payment/desk', method='POST')
 												label.paymentlabel Pay for this month's desk rent:
@@ -60,7 +60,7 @@ html
 															| #{index}:
 												.panel-collapse.collapse(role='tabpanel', aria-labelledby='d-heading', id="d-collapse")
 													.list-group
-													- for(var i=0; i<thisMonth; i++)
+													- for(var i=0; i<thisMonth+1; i++)
 														div.monthlist
 															span.month #{months[i]}:
 															if (year[i] === "unpaid")
@@ -77,7 +77,7 @@ html
 								.panel-heading(role='tab', id='m-heading' + index)
 									h4.panel-title
 										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#t-collapse' + index, aria-expanded='false', aria-controls='t-collapse' + index)
-											| #{moment(message.date).format("Do, DD-MM-YY, h:mm"): message.subject}
+											| #{moment(message.date).format("Do, DD-MM-YY, h:mm") + ": " + message.subject}
 								.panel-collapse.collapse(role='tabpanel', aria-labelledby='m-heading' + index, id="t-collapse" + index)
 									.panel-body
 										| #{message.text}

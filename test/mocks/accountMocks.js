@@ -16,11 +16,7 @@ module.exports = {
 		desk_authorization: false,
 
 		desk_rental_rate:   5000,
-		desk_rental_status: {},
-
-		automated_emails: [automatedEmailSchema],
-		transaction_history:  [transactionSchema],
-		message_history: [messageSchema]
+		desk_rental_status: {}
 	},
 	adminUser: {
 		email:        'McTESTERTESTEBERGERADMIN@googlemail.com',
@@ -39,11 +35,7 @@ module.exports = {
 		desk_authorization: false,
 
 		desk_rental_rate:   5000,
-		desk_rental_status: {},
-
-		automated_emails: [automatedEmailSchema],
-		transaction_history:  [transactionSchema],
-		message_history: [messageSchema]
+		desk_rental_status: {}
 	},
 	memberUser: {
 		email:        'McTESTERTESTEBERGERMEMBER@googlemail.com',
@@ -63,11 +55,7 @@ module.exports = {
 		desk_authorization: false,
 
 		desk_rental_rate:   5000,
-		desk_rental_status: {},
-
-		automated_emails: [automatedEmailSchema],
-		transaction_history:  [transactionSchema],
-		message_history: [messageSchema]
+		desk_rental_status: {}
 	},
 	desk5000User: {
 		email:        'McTESTERTESTEBERGERDESK5000@googlemail.com',
@@ -103,10 +91,6 @@ module.exports = {
 				11: {type: String, required: true, default: "unpaid"},
 			}
 		},
-
-		automated_emails: [automatedEmailSchema],
-		transaction_history:  [],
-		message_history: [messageSchema]
 	},
 	desk10000User: {
 		email:        'McTESTERTESTEBERGERDESK10000@googlemail.com',
@@ -126,11 +110,7 @@ module.exports = {
 		desk_authorization: true,
 
 		desk_rental_rate:   10000,
-		desk_rental_status: {},
-
-		automated_emails: [automatedEmailSchema],
-		transaction_history:  [transactionSchema],
-		message_history: [messageSchema]
+		desk_rental_status: {}
 	},
 	desk20000User: {
 		email:        'McTESTERTESTEBERGERDESK20000@googlemail.com',
@@ -150,11 +130,7 @@ module.exports = {
 		desk_authorization: true,
 
 		desk_rental_rate:   20000,
-		desk_rental_status: {},
-
-		automated_emails: [automatedEmailSchema],
-		transaction_history:  [transactionSchema],
-		message_history: [messageSchema]
+		desk_rental_status: {}
 	},
 	deskPaidUser: {
 		email:        'McTESTERTESTEBERGERDESKPaid@googlemail.com',
@@ -195,5 +171,67 @@ module.exports = {
 		transaction_history:  [],
 		message_history: [messageSchema]
 	},
+	thuggish_ruggish : {
+	    "email": "McTESTERTESTEBERGER@googlemail.com",
+	    "username": "MIJOTHY",
+	    "first_name": "jogn",
+	    "last_name": "Stark",
+	    "member_since": "2015-03-27T00:41:31.339Z",
+	    "phone_number": "07958424331",
+	    "github_link": "https://api.github.com/users/MIJOTHY",
+	    "github_avatar": "https://avatars.githubusercontent.com/u/10106320?v=3",
+	    "membership_paid": "2016-03-27T08:02:10.000Z",
+	    "message_history": [
+	        {
+	            "to": "McTESTERTESTEBERGER@googlemail.com",
+	            "from": "facmembershipadmin@gmail.com",
+	            "date": "March 27th 2015",
+	            "subject": "Thank you for your payment!",
+	            "text": "Hello jogn! Thank you for your payment!",
+	        },
+	        {
+	            "to": "McTESTERTESTEBERGER@googlemail.com",
+	            "from": "facmembershipadmin@gmail.com",
+	            "date": "March 27th 2015",
+	            "subject": "Thank you for your payment!",
+	            "text": "Hello jogn! Thank you for your payment!",
+	        }
+	    ],
+	    "transaction_history": [
+	        {
+	            "name": "mctestertesteberger@googlemail.com",
+	            "date": "2015-03-27T09:02:10.000Z",
+	            "amount": "5000",
+	            "type": "membership",
+	        },
+	        {
+	            "name": "mctestertesteberger@googlemail.com",
+	            "date": "2015-03-27T09:04:29.000Z",
+	            "amount": "5000",
+	            "type": "membership",
+	        }
+	    ],
+	    "automated_emails": [],
+	    "desk_rental_status": {
+	        "2015": {
+	            "0": "away",
+	            "1": "away",
+	            "2": "unpaid",
+	            "3": "unpaid",
+	            "4": "unpaid",
+	            "5": "unpaid",
+	            "6": "unpaid",
+	            "7": "unpaid",
+	            "8": "unpaid",
+	            "9": "unpaid",
+	            "10": "unpaid",
+	            "11": "unpaid",
+	        }
+	    },
+	    "desk_rental_rate": 5000,
+	    "desk_authorization": true,
+	    "membership_active_status": true,
+	    "admin_rights": true
+	}
 };
 

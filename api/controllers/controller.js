@@ -94,7 +94,7 @@ module.exports = {
 
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {
-					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
+					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }], moment: moment});
 				}
 				console.log( "Account View: " + result );
 
@@ -237,7 +237,7 @@ module.exports = {
 						if (err) {return reply(err);}
 						alerts.push( {isSuccess: true, alert: "Successfully Added To Transaction History" });
 						console.log( 'Alerts: ' + alerts);
-						return reply.view('account', {user: result, alerts: alerts });
+						return reply.view('account', {user: result, alerts: alerts, moment: moment });
 						// return reply(success);
 					});
 				});
@@ -309,7 +309,7 @@ module.exports = {
 					if( err ) {
 						return reply.view( 'account', {user: result, alerts: [{isError:true, alert: "Error sending sign up confirmation"}]});
 					}
-					return reply.view('account', {user: result });
+					return reply.redirect("/account");
 				});
 
 			});
