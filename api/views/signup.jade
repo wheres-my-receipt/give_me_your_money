@@ -5,17 +5,28 @@ html
 	include ./includes/head.jade
 	body
 		include ./includes/navbar.jade
-	form(action='/api/accounts', method='POST')
-		input(type='text', name='first_name', placeholder='First name' required)
-		| *
-		br
-		input(type='text', name='last_name', placeholder='Last name' required)
-		| *
-		br
-		input(type='text', name='phone_number', placeholder='Phone number' required)
-		| *
-		br
-		input(type='text', name='email', placeholder='Email' required)
-		|*
-		button(type='submit')
-	+foot()
+		include ./includes/alert_head.jade
+		div.col-xs-6.col-xs-offset-3.formwrapper
+			form.form-horizontal(action='/api/accounts', method='POST')
+				.form-group
+					label.control-label.col-xs-2(for='inputEmail') Username
+					.col-xs-8
+						p.form-control-static PLACEHOLDER M8
+				.form-group
+					label.control-label.col-xs-2(for='inputEmail') Email
+					.col-xs-8
+						input#inputEmail.form-control(type='email', name='email', placeholder='Email', required)
+				.form-group
+					label.control-label.col-xs-2(for='inputName') Name
+					span.col-xs-4
+						input#inputFirst.form-control(type='text', name='first_name', placeholder='First Name', required)
+					span.col-xs-4
+						input#inputLast.form-control(type='text', name='last_name', placeholder='Last Name', required)
+				.form-group
+					label.control-label.col-xs-2(for='inputEmail') Phone Number
+					.col-xs-8
+						input#inputNumber.form-control(type='tel', name='phone_number', placeholder='00001111000', required)
+				.form-group
+					.col-xs-offset-2.col-xs-10
+						button.btn.btn-primary(type='submit') Create
+		+foot()

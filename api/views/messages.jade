@@ -5,9 +5,14 @@ html
 	include ./includes/head.jade
 	body
 		include ./includes/navbar.jade
+		include ./includes/alert_head.jade
 		div
-			h2 ALL YOUR MESSAGES
-			for msg in messages
-				ul
-					li #{msg.date} - #{msg.subject}
+			if !user
+				h1 Hello!  You don't appear to be a member yet! Please sign up
+					a(href="/signup") here!
+			else
+				h2 ALL YOUR MESSAGES
+				for msg in messages
+					ul
+						li #{msg.date} - #{msg.subject}
 	+foot()

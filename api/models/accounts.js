@@ -144,14 +144,11 @@ exports.newTransaction = function(username, transaction, onComplete) {
 // Message operations
 // EXPECTS: emaildetails.email/subject/contents
 exports.newMessage = function(username, emailDetails, onComplete) {
-	console.log( "new message : " +username);
 	Account.findOne({username: username}, function(err, result) {
-		console.log( "new message - findOne");
 
 		if(err) {
 			return onComplete(err);
 		}
-		console.log( 'Email Text: ' + emailDetails.text);
 		var messageObject = {
 			to: emailDetails.to,
 			from: 'facmembershipadmin@gmail.com',
@@ -159,14 +156,54 @@ exports.newMessage = function(username, emailDetails, onComplete) {
 			subject: emailDetails.subject ,
 			text: emailDetails.text
 		};
+		var index = result.message_history.length;
 		result.message_history.push(messageObject);
 
-		result.save(function(err, result) {
+		result.save(function(err, saveresult) {
 			if(err) {
+				console.log( 'error in save:' + err);
 				return onComplete(err);
 			}
-			return onComplete(null, result);
+
+			console.log( 'Message added to message_history: ' + result.message_history[ index ]);
+
+			return onComplete(null, result, result.message_history[ index ].id);
 		});
 	});
-
 };
+
+exports.deleteMessage = function(username, messageId, onComplete ) {
+	console.log( "Delete Message: " + messageId + " for " + username);
+	Account.findOne({username: username}, function(err, result) {
+
+		if(err) {
+			return onComplete(err);
+		}
+		var count_before_delete = result.message_history.length;
+		var foundMessage=false;
+		var messages_minus_deleted = result.message_history.filter( function( elem, index ) {
+			// console.log( "element id: " + elem.id );
+			// console.log( "messageId: " + messageId);
+			// console.log( "type of element id: " + typeof(elem.id) );
+			// console.log( "type of messageId: " + typeof( messageId));
+			if( elem.id===messageId ) {
+				console.log( 'Message found to delete!');
+				foundMessage = true;
+			}
+			return( !elem._id.equals(messageId ));
+		});
+		if( foundMessage && count_before_delete === messages_minus_deleted.length ) {
+			// If these two arrays are the same length then we failed to remove the message
+			return onComplete( "Message delete failed on ID: " + messageId );
+		}
+		result.message_history = messages_minus_deleted;
+		result.save( function( error, result ) {
+			if (error) {
+				return onComplete( error );
+			}
+
+			return onComplete( null, result );
+		});
+	});
+};
+
