@@ -96,14 +96,8 @@ html
 								.form-group
 									label.control-label.col-xs-2(for='inputUserName') User
 									.col-xs-10
-										p.form-control-static MIJOTHY
 							.panel.panel-default
 								.panel-heading(role='tab', id='del-heading')
 									h4.panel-title
 										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#del-collapse', aria-expanded='false', aria-controls='del-collapse')
-											| Delete your account (Warning, permanent!)
-								.panel-collapse.collapse(role='tabpanel', aria-labelledby='del-heading', id="del-collapse")
-									.panel-body
-										form#deleteform
-											button.btn.btn-danger#delete(type='submit') DELETE
 		+foot("account")
