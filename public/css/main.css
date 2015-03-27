@@ -63,6 +63,7 @@ ul.nav-tabs>li.active>a, {
 .profilePic {
 	max-height: 200px;
 	max-width: 200px;
+	box-shadow: 0px 0px 16px 10px gold;
 }
 
 .contentwrapper {
@@ -131,4 +132,44 @@ ul>li>a#profile {
 
 #del-heading {
 	border-color: red;
+}
+
+.stripe-button-el {
+	float: center;
+}
+
+.section {
+	margin-bottom: 10px;
+	box-shadow: 0px 2px 2px 0px black;
+	padding: 5px;
+	margin-top: 10px;
+}
+
+.payment {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.paymentlabel {
+	display: block;
+}
+
+.tabheader {
+	text-align: center;
+}
+
+#profileheader {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.away {
+	width: 134px;
+}
+
+#away {
+	font-size: 14px;
+	color: #fff;
+	font-weight: bold;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
