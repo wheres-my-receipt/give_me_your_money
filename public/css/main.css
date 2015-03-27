@@ -186,3 +186,7 @@ ul>li>a#profile {
 	border-top-style: solid;
 	border-top-color: black;
 }
+
+.admintitle {
+	text-align:center
+}

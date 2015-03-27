@@ -85,12 +85,10 @@ module.exports = {
 			var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 			var today = new Date();
 			var thisMonth = today.getMonth();
-
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {
 					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }], moment: moment});
 				}
-
 				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth, moment: moment});
 			});
 		}
