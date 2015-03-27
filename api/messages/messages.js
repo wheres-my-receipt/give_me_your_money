@@ -24,6 +24,11 @@ var messageTemplates = {
 		message.text = "Hello " + data.first_name + ".\n\n Your account has now been verified and you can now rent a desk!";
 		return message;
 	},
+	adminRights: function (message, data) {
+		message.subject = "Admin rights granted";
+		message.text = "Hello " + data.first_name + ". You have been granted administrator rights!";
+		return message;
+	},
 	annualSubscriptionCustomReminder : function (message, data) {
 		message.subject = "Annual Subscription Reminder. " + data.subject;
 		message.text = "Hello " + data.first_name + ".\n\n ";
@@ -83,6 +88,8 @@ createMessage = function( emailType, data ){
 			return messageTemplates.paymentReceipt( message, data );
 		case "VerifyAccount" :
 			return messageTemplates.verifyAccount( message, data );
+		case "AdminRights" :
+			return messageTemplates.adminRights( message, data );
 		case "AnnualSubscriptionFeeReminder" :
 			return messageTemplates.annualSubscriptionCustomReminder( message, data );
 		case "DeskRentFeeReminder" :
