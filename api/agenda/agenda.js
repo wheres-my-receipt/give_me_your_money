@@ -3,6 +3,7 @@ var moment = require('moment');
 function agendaStop(agenda) {
 	function graceful() {
 	  agenda.stop(function() {
+	    console.log('Gracefully terminating agenda');
 	    process.exit(0);
 	  });
 	}
@@ -17,35 +18,34 @@ function agendaStart(){
 	var Agenda = require('agenda');
 	var agenda = new Agenda({db: { address: 'mongodb://' +config.mongo.dbuser + ':' + config.mongo.dbpwd + "@" + config.mongo.dburl}});
 
-	// var test = require('./test');
-	// test.test(agenda);
-	// agenda.every('10 seconds', 'helloWorld');
-
+	// Schedule subscription tasks
 	var annual = require('./annual');
 
 	// annual.testReminder(agenda);
 	// agenda.now('testReminder');
 
-	// annual.annualReminder(agenda);
-	// agenda.every('one day', 'annualReminder');
+	annual.annualReminder(agenda);
+	agenda.every('one day', 'annualReminder');
 
-	// annual.annualDemand(agenda);
-	// agenda.every('one day', 'annualDemand');
+	annual.annualDemand(agenda);
+	agenda.every('one day', 'annualDemand');
 
-	// annual.annualOverdue(agenda);
-	// agenda.every('one day', 'annualOverdue');
+	annual.annualOverdue(agenda);
+	agenda.every('one day', 'annualOverdue');
 
+	// Schedule desk rental tasks
 	var desk = require('./desk');
 
-	// desk.deskUnpaid(agenda);
-	// agenda.every('one day', 'deskUnpaid');
+	desk.deskUnpaid(agenda);
+	agenda.every('one day', 'deskUnpaid');
 
-	// desk.deskOverdue(agenda);
-	// agenda.every('one day', 'deskOverdue');
+	desk.deskOverdue(agenda);
+	agenda.every('one day', 'deskOverdue');
 
-	// desk.deskClearBools(agenda);
-	// agenda.eery('one day', 'deskClearBools');
+	desk.deskClearBools(agenda);
+	agenda.every('one day', 'deskClearBools');
 
+	// Set up agenda task
 	agendaStop(agenda);
 
 	agenda.start();

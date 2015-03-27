@@ -41,10 +41,8 @@ var messageTemplates = {
 		message.text = data.subject;
 		return message;
 	},
-	// etc..
 
 	// AUTOMATED MAILS. please DO NOT ADD subject/content editing.
-	// or, if you do, make sure that it won't break if data.subject/text is missing
 	annualSubscriptionReminder : function (message, data) {
 		message.subject = "Annual Fee Almost Due.";
 		message.text = "Hello " + data.first_name + ".\n\n Your annual subscription will expire in one week.";
