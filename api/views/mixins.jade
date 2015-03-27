@@ -1,0 +1,19 @@
+mixin transaction(deets)
+	li.transaction
+		p From: #{deets.name}
+		p Date: #{deets.date}
+		p Amount: #{deets.amount}
+
+mixin message(deets)
+	li.message
+		h2 Subject: #{deets.subject}
+		h3 Date: #{deets.date}
+		h4 To: #{deets.to}
+		h4 From: #{deets.from}
+		p #{deets.contents}
+
+mixin foot(filename)
+	script(src='/lib/jquery-2.1.3.min.js')
+	script(src='/lib/bootstrap.min.js')
+	if filename
+		script(src='/scripts/' + filename + '.js')
