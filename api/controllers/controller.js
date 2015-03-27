@@ -79,16 +79,15 @@ module.exports = {
 				var username = request.auth.credentials.username;
 				var foundAccount;
 				return accounts.getAccount( username, function( err, result ){
-								console.log( "In getAccount callback");
-								if (result) {
-									console.log( 'User already signed up ' + err );
-									return reply.redirect('/account');
-								}
-								console.log( 'Have not found user so forward to member page');
-								return reply.view("signup");
-							});
+					console.log( "In getAccount callback");
+					if (result) {
+						console.log( 'User already signed up ' + err );
+						return reply.redirect('/account');
+					}
+					console.log( 'Have not found user so forward to member page');
+					return reply.view("signup");
+				});
 			}
-			//return reply.view('login.jade');
 		}
 	},
 
@@ -99,14 +98,12 @@ module.exports = {
 			var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 			var today = new Date();
 			var thisMonth = today.getMonth();
-
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {
 					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
 				}
 				console.log( "Account View: " + result );
-
-				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth});
+				return reply.view('account', {user: result, months: months, thisMonth: thisMonth});
 			});
 		}
 	},
