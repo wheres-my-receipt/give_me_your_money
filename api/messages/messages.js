@@ -24,8 +24,12 @@ var messageTemplates = {
 		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
 		return message;
 	},
-	annualSubscriptionCustomReminder
-
+	annualSubscriptionCustomReminder : function (message, data) {
+		message.subject = "Annual Subscription Reminder. " + data.subject;
+		message.text = "Hello " + data.first_name + ". ";
+		message.text += data.contents;
+		return message;
+	},
 	deskRentalCustomReminder : function (message, data) {
 		message.subject = "Desk Rental Reminder. " + data.subject;
 		message.text = "Hello " + data.first_name + ". ";
