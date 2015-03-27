@@ -26,12 +26,10 @@ module.exports = {
 	homeView: {
 		auth: false,
 		handler: function (request, reply ) {
-			console.log( 'in home handler');
 			if(request.auth.isAuthenticated) {
-				console.log( 'in home handler');
 				return reply.redirect("/account");
 			}
-			console.log( 'Not Authenticated -go to login');
+			console.log( 'Not Authenticated - Go to login page');
 			return reply.view('login.jade');
 		}
 	},
@@ -69,7 +67,7 @@ module.exports = {
 
 	logout: {
 		handler: function (request, reply ){
-			console.log( 'in logout handler');
+			console.log( 'In logout handler');
 			request.auth.session.clear();
 			return reply.redirect('/');
 		}
@@ -78,8 +76,26 @@ module.exports = {
 	signupView: {
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
-				return reply.view("signup");
+				var username = request.auth.credentials.username;
+				var foundAccount;
+				return accounts.getAccount( username, function( err, result ){
+								console.log( "In getAccount callback");
+								if (err) {
+									console.log( 'User already signed up ' + err );
+								}
+								else {
+									console.log( 'Have found user so forward to member page');
+								}
+
+								console.log( 'Results: ' + JSON.stringify( result ));
+								if( result ) {
+									return reply.view( 'member', {user :result });
+								}
+								console.log( 'Forward to signup page');
+								return reply.view("signup");
+							});
 			}
+			//return reply.view('login.jade');
 		}
 	},
 
@@ -277,6 +293,8 @@ module.exports = {
 		handler: function (request, reply) {
 			console.log('In createAccount');
 			var user = request.payload;
+			var username = request.auth.credentials.username;
+
 			var accountToCreate = {
 
 				email: user.email || request.auth.credentials.email,
