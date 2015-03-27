@@ -173,3 +173,13 @@ ul>li>a#profile {
 	font-weight: bold;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
+
+.alert-wrapper {
+	position: fixed;
+	right: 0;
+	top: 60px;
+}
+
+.admintitle{
+	text-align:center
+}
