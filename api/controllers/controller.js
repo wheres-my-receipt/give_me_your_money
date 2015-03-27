@@ -1,6 +1,7 @@
 var Bell 	 = require("bell");
 var path 	 = require("path");
 var Joi 	 = require("joi");
+var moment 	 = require("moment");
 var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var config 	 = require('../config.js');
 var accounts = require("../models/accounts.js");
@@ -10,16 +11,15 @@ var creationValidation = Joi.object({
 		email: Joi.string().email().required(),
 		first_name: Joi.string().required(),
 		last_name: Joi.string().required(),
-		phone_number: Joi.string().required()
+		phone_number: Joi.string().required().min(11).max(13)
 	});
 
 var updateValidation = Joi.object({
 		email: Joi.string().email(),
 		first_name: Joi.string(),
 		last_name: Joi.string(),
-		phone_number: Joi.number()
-	}).options({allowUnknown: true});
-// .or("email", "first_name", "last_name", "phone_number");
+		phone_number: Joi.string().min(11).max(13)
+	}).or("email", "first_name", "last_name", "phone_number");
 
 module.exports = {
 
@@ -27,9 +27,8 @@ module.exports = {
 		auth: false,
 		handler: function (request, reply ) {
 			if(request.auth.isAuthenticated) {
-				return reply.redirect("/account");
+				return request.auth.credentials.account ? reply.redirect("/account") : reply.redirect("/signup");
 			}
-			console.log( 'Not Authenticated - Go to login page');
 			return reply.view('login.jade');
 		}
 	},
@@ -40,26 +39,25 @@ module.exports = {
 		},
 		handler: function (request, reply) {
 			if (request.auth.isAuthenticated) {
+
 				var g = request.auth.credentials;
 				var profile ={
 					username 	: g.profile.username,
 					email 		: g.profile.email,
 					avatar 		: g.profile.raw.avatar_url,
-					url 		: g.profile.raw.url
+					url 		: g.profile.raw.url,
+					account 	: false
 				};
 
-				// var t = request.auth.credentials;
-		  //       var profile = {
-		  //           token: t.token,
-		  //           secret: t.secret,
-		  //           twitterId: t.profile.id,
-		  //           twitterName: t.profile.username,
-		  //           fullName: t.profile.displayName,
-		  //       };
-				request.auth.session.clear();
-		        request.auth.session.set(profile);
+				 accounts.getAccount( profile.username, function( err, result ){
+				 	if (err) console.log(err);
+				 	if (result) profile.account = true;
 
-		    	return reply.redirect("/signup");
+					request.auth.session.clear();
+			        request.auth.session.set(profile);
+
+			    	return profile.account ? reply.redirect("/account") : reply.redirect("/signup");
+				 });
 		    }
 		    else reply('Not logged in, should be forwarded to bell login...').code(401);
 		}
@@ -67,7 +65,6 @@ module.exports = {
 
 	logout: {
 		handler: function (request, reply ){
-			console.log( 'In logout handler');
 			request.auth.session.clear();
 			return reply.redirect('/');
 		}
@@ -75,35 +72,24 @@ module.exports = {
 
 	signupView: {
 		handler: function (request, reply){
-			if(request.auth.isAuthenticated) {
-				var username = request.auth.credentials.username;
-				var foundAccount;
-				return accounts.getAccount( username, function( err, result ){
-					console.log( "In getAccount callback");
-					if (result) {
-						console.log( 'User already signed up ' + err );
-						return reply.redirect('/account');
-					}
-					console.log( 'Have not found user so forward to member page');
-					return reply.view("signup");
-				});
-			}
+			return request.auth.credentials.account ? reply.redirect("/account") : reply.view("signup", {user : request.auth.credentials});
 		}
 	},
 
 	accountView: {
 		handler: function (request, reply) {
-
+			if (!request.auth.credentials.account) {
+				return reply.redirect("/signup");
+			}
 			var userToFind = request.auth.credentials.username;
 			var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 			var today = new Date();
 			var thisMonth = today.getMonth();
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {
-					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
+					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }], moment: moment});
 				}
-				console.log( "Account View: " + result );
-				return reply.view('account', {user: result, months: months, thisMonth: thisMonth});
+				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth, moment: moment});
 			});
 		}
 	},
@@ -111,8 +97,10 @@ module.exports = {
 	messagesView: {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
+				if (!request.auth.credentials.account) {
+					return reply.redirect("/signup");
+				}
 				var userToFind = request.auth.credentials.username;
-				console.log( 'MessagesView user: ' + userToFind);
 				accounts.getAccount( userToFind, function (err, data ) {
 					if(err) {
 						return reply.view("messages", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
@@ -133,7 +121,6 @@ module.exports = {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
 				var userToFind = request.auth.credentials.username;
-				console.log( 'Admin View, user: ' + userToFind );
 				accounts.getAccount( userToFind, function (err, data ) {
 					if(err) {
 						return reply.view("admin_fail", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
@@ -144,7 +131,6 @@ module.exports = {
 					if( data.admin_rights){
 						// get all members for display on admin 'landing page'
 						accounts.getAccounts( function (err, members ) {
-							console.log( 'Found members numbering: ' + members.length );
 							return reply.view("admin", { user: data, members: members });
 						});
 					}
@@ -241,9 +227,7 @@ module.exports = {
 					return accounts.newTransaction(accountToUpdate, transactionObject, function(err, success) {
 						if (err) {return reply(err);}
 						alerts.push( {isSuccess: true, alert: "Successfully Added To Transaction History" });
-						console.log( 'Alerts: ' + alerts);
-						return reply.view('account', {user: result, alerts: alerts });
-						// return reply(success);
+						return reply.view('account', {user: success, alerts: alerts, moment: moment });
 					});
 				});
 			});
@@ -256,7 +240,6 @@ module.exports = {
 			var userToFind = request.params.member;
 			accounts.getAccount( userToFind, function( err, result ){
 				if (err) {
-					console.log( 'Error ' + err );
 					return reply(err);
 				}
 				return reply.view( 'member', {user :result });
@@ -294,7 +277,6 @@ module.exports = {
                 payload: creationValidation,
         },
 		handler: function (request, reply) {
-			console.log('In createAccount');
 			var user = request.payload;
 			var username = request.auth.credentials.username;
 
@@ -302,8 +284,8 @@ module.exports = {
 
 				email: user.email || request.auth.credentials.email,
 				username: request.auth.credentials.username,
-				first_name: user.first_name,
-				last_name: user.last_name,
+				first_name: user.first_name.split(" ").map(function(x) {return x[0].toUpperCase() + x.slice(1);}).join(" "),
+				last_name: user.last_name.split(" ").map(function(x) {return x[0].toUpperCase() + x.slice(1);}).join(" "),
 				member_since: new Date(),
 				phone_number: user.phone_number,
 				admin_rights: false,
@@ -320,16 +302,16 @@ module.exports = {
 
 			accounts.createAccount(accountToCreate, function(err, result) {
 				if (err) {
-					console.log( "Error: " + err );
 					return reply.view( 'signup', {user: undefined, alerts: [{isError: true, alert: err }]});
 				}
 				// add to all members email group and send ack email
+				request.auth.session.set("account", true);
 				messages.addToMembersList(accountToCreate);
 				messages.sendEmail(accountToCreate, "Acknowledge", function( error, data ) {
 					if( err ) {
 						return reply.view( 'account', {user: result, alerts: [{isError:true, alert: "Error sending sign up confirmation"}]});
 					}
-					return reply.view('account', {user: result });
+					return reply.redirect("/account");
 				});
 
 			});
@@ -358,7 +340,7 @@ module.exports = {
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
 				if (err) {return reply(err);}
-				return reply(result);
+				return reply.redirect("/account");
 			});
 		}
 	},
@@ -368,7 +350,7 @@ module.exports = {
 			var userToDelete = request.params.member;
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
-				if (err) {console.log(err);return reply(err);}
+				request.auth.session.set("account", false);
 				return reply.redirect("/logout");
 			});
 		}
@@ -377,7 +359,6 @@ module.exports = {
 	createMessage : {
 		handler : function (request, reply) {
 			var member = request.params.member;
-			console.log( 'In createMessages, member: ' + member );
 
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
@@ -392,7 +373,6 @@ module.exports = {
 
 			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, body ) {
 				if( error ){
-					console.log( "Error sending " + emailDetails.subject + ": " + error );
 					return reply.view( 'member', {user:emailDetails, alerts: [{ isError : true, alert: error }] });
 				}
 				else {
