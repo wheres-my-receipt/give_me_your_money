@@ -392,6 +392,7 @@ module.exports = {
 				else {
 					// return reply.view( 'member', {user: emailDetails, alerts: [{isSuccess: true, alert: body.message}]});
 					return reply.redirect("/admin");
+
 				}
 			});
 
