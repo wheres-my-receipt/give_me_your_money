@@ -24,6 +24,7 @@ var messageTemplates = {
 		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
 		return message;
 	},
+	annualSubscriptionCustomReminder
 
 	deskRentalCustomReminder : function (message, data) {
 		message.subject = "Desk Rental Reminder. " + data.subject;
@@ -42,19 +43,29 @@ var messageTemplates = {
 	// or, if you do, make sure that it won't break if data.subject/text is missing
 	annualSubscriptionReminder : function (message, data) {
 		message.subject = "Annual Fee Almost Due.";
-		message.text = "Hello " + data.first_name + ". Yout annual subscription will expire in one week.";
+		message.text = "Hello " + data.first_name + ".\n\n Your annual subscription will expire in one week.";
 		return message;
 	},
 	annualSubscriptionDemand : function (message, data) {
 		message.subject = "Annual Subscription Expired";
-		message.text = "Hello " + data.first_name + ". Your annual subscription has expired. Please visit your account <URL> to renew.";
+		message.text = "Hello " + data.first_name + ".\n\n Your annual subscription has expired. Please visit your account <URL> to renew.";
 		return message;
 	},
 	annualSubscriptionOverdue : function (message, data) {
 		message.subject = "Annual Subscription Overdue";
-		message.text = "Hello " + data.first_name + ". Your annual subscription expired a week ago. Please visit your account <URL> to renew. No further reminders will be sent!";
+		message.text = "Hello " + data.first_name + ".\n\n Your annual subscription expired a week ago. Please visit your account <URL> to renew. No further reminders will be sent!";
 		return message;
 	},
+	deskRentalUnpaid : function (message, data) {
+		message.subject = "Desk Rental Unpaid";
+		message.text = "Hello " + data.first_name + ".\n\n Your desk rental for this month has not yet been paid. Please visit your account <URL> to pay.";
+		return message;
+	},
+	deskRentalOverdue : function (message, data) {
+		message.subject = "Desk Rental Overdue";
+		message.text = "Hello " + data.first_name + ".\n\n Your desk rental for this month has not yet been paid. Please visit your account <URL> to pay.";
+		return message;
+	}
 };
 
 createMessage = function( emailType, data ){
@@ -69,6 +80,8 @@ createMessage = function( emailType, data ){
 			return messageTemplates.paymentReceipt( message, data );
 		case "VerifyAccount" :
 			return messageTemplates.verifyAccount( message, data );
+		case "AnnualSubscriptionFeeReminder" :
+			return messageTemplates.annualSubscriptionCustomReminder( message, data );
 		case "DeskRentFeeReminder" :
 			return messageTemplates.deskRentalCustomReminder( message, data );
 		// AUTOMATED EMAILS START HERE
@@ -78,6 +91,10 @@ createMessage = function( emailType, data ){
 			return messageTemplates.annualSubscriptionDemand( message, data );
 		case "AnnualSubscriptionOverdue" :
 			return messageTemplates.annualSubscriptionOverdue( message, data );
+		case "DeskRentalUnpaid" :
+			return messageTemplates.deskRentalUnpaid( message, data );
+		case "DeskRentalOverdue" :
+			return messageTemplates.deskRentalOverdue( message, data );
 		default:
 			console.log( "Email Type not found so send custom message: " + emailType );
 			return messageTemplates.customMessage( message, data );

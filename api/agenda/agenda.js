@@ -26,8 +26,11 @@ exports.agendaStart = function() {
 
 	var desk = require('./desk');
 
-	// desk.deskReminder(agenda);
-	// agenda.every('one day', 'deskReminder');
+	// desk.deskUnpaid(agenda);
+	// agenda.every('one day', 'deskUnpaid');
+
+	// desk.deskOverdue(agenda);
+	// agenda.every('one day', 'deskOverdue');
 
 
 

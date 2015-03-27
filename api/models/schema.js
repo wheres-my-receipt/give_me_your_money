@@ -60,6 +60,8 @@ var accountSchema = new Schema({
 	automated_emails: {	membership_reminder_sent: {type: Boolean, default: false},
 						membership_demand_sent: {type: Boolean, default: false},
 						membership_overdue_sent: {type: Boolean, default: false},
+						desk_unpaid_sent: {type: Boolean, default: false},
+						desk_overdue_sent: {type: Boolean, default: false},
 						test_sent: {type: Boolean, default: false},
 					},
 
