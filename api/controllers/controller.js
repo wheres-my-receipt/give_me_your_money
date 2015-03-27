@@ -89,7 +89,7 @@ module.exports = {
 
 								console.log( 'Results: ' + JSON.stringify( result ));
 								if( result ) {
-									return reply.view( 'member', {user :result });
+									return reply.redirect('/account');
 								}
 								console.log( 'Forward to signup page');
 								return reply.view("signup");

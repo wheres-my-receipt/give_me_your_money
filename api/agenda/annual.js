@@ -5,7 +5,7 @@ var messages = require('../messages/messages');
 function annualReminder(agenda) {
 	// sends reminder 1 week before expiration of annual membership
 	agenda.define('annualReminder', function(job, done){
-		var reminderTime = moment().subtract(1,'years').add(1,'weeks').toDate();
+		var reminderTime = moment().add(1,'weeks').toDate();
 		db.search({query: {'membership_paid': {'$lt': reminderTime }} }, function(err, result){
 			if (err) {
 				console.log(err);
@@ -13,8 +13,8 @@ function annualReminder(agenda) {
 			}
 			else {
 				result.forEach(function(user, index){
-					if (!user.membership_reminder_sent) {
-						messages.sendEmail(user, "annualSubscriptionReminder", function( error, data ) {
+					if (!user.automated_emails.membership_reminder_sent) {
+						messages.sendEmail(user, "AnnualSubscriptionReminder", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub reminder email error: " + error );
 								if (index === result.length - 1) {
@@ -22,7 +22,7 @@ function annualReminder(agenda) {
 								}
 							}
 							else {
-								db.updateAccount(user.username, {'membership_reminder_sent': true}, function(err2, result){
+								db.updateAccount(user.username, {'automated_emails.membership_reminder_sent': true}, function(err2, result2){
 									if (err) console.log('Error registering annual reminder email sent status ', err2);
 									if (index === result.length - 1) {
 										done();
@@ -38,9 +38,9 @@ function annualReminder(agenda) {
 }
 
 function annualDemand(agenda) {
-	// sends request for payment one year after last paying annual membership
+	// sends request for payment when annual membership expires
 	agenda.define('annualDemand', function(job, done){
-		var reminderTime = moment().subtract(1,'years').toDate();
+		var reminderTime = moment().toDate();
 		db.search({query: {'membership_paid': {'$lt': reminderTime }} }, function(err, result){
 			if (err) {
 				console.log(err);
@@ -48,24 +48,28 @@ function annualDemand(agenda) {
 			}
 			else {
 				result.forEach(function(user, index){
-					if (!user.membership_demand_sent) {
-						messages.sendEmail(user, "annualSubscriptionDemand", function( error, data ) {
-							if( err ) {
-								console.log( "Annual sub demand email error: " + error );
-								if (index === result.length - 1) {
-									done();
-								}
-							}
-							else {
-								db.updateAccount(user.username, {'membership_demand_sent': true}, function(err2, result){
-									if (err) console.log('Error registering annual demand email sent status ', err2);
+					// set user membership status to false
+					db.updateAccount(user.username, {'membership_active_status': true}, function(err1, result1) {
+						if (err1) console.log('Error setting members active status to false', err1);
+						if (!user.automated_emails.membership_demand_sent) {
+							messages.sendEmail(user, "AnnualSubscriptionDemand", function( error, data ) {
+								if( err ) {
+									console.log( "Annual sub demand email error: " + error );
 									if (index === result.length - 1) {
 										done();
 									}
-								});
-							}
-						});
-					}
+								}
+								else {
+									db.updateAccount(user.username, {'automated_emails.membership_demand_sent': true}, function(err2, result2){
+										if (err) console.log('Error registering annual demand email sent status ', err2);
+										if (index === result.length - 1) {
+											done();
+										}
+									});
+								}
+							});
+						}
+					});
 				});
 			}
 		});
@@ -73,9 +77,9 @@ function annualDemand(agenda) {
 }
 
 function annualOverdue(agenda) {
-	// sends request for payment one year after last paying annual membership
+	// sends reminder one weeek after membership expires
 	agenda.define('annualOverdue', function(job, done){
-		var reminderTime = moment().subtract(1,'years').subtract(1, 'weeks').toDate();
+		var reminderTime = moment().subtract(1, 'weeks').toDate();
 		db.search({query: {'membership_paid': {'$lt': reminderTime }} }, function(err, result){
 			if (err) {
 				console.log(err);
@@ -83,16 +87,16 @@ function annualOverdue(agenda) {
 			}
 			else {
 				result.forEach(function(user, index){
-					if (!user.membership_overdue_sent) {
-						messages.sendEmail(user, "annualSubscriptionOverdue", function( error, data ) {
+					if (!user.automated_emails.membership_overdue_sent) {
+						messages.sendEmail(user, "AnnualSubscriptionOverdue", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub demand email error: " + error );
-								if (index === result.length - 1) {
+								if (result.length - 1) {
 									done();
 								}
 							}
 							else {
-								db.updateAccount(user.username, {'membership_overdue_sent': true}, function(err2, result){
+								db.updateAccount(user.username, {'automated_emails.membership_overdue_sent': true}, function(err2, result2){
 									if (err) console.log('Error registering annual demand email sent status ', err2);
 									if (index === result.length - 1) {
 										done();
@@ -117,8 +121,8 @@ function testReminder(agenda){
 			}
 			else {
 				result.forEach(function(user, index){
-					if (true) {
-						messages.sendEmail(user, "annualSubscriptionOverdue", function( error, data ) {
+					if (!user.automated_emails.test_sent) {
+						messages.sendEmail(user, "AnnualSubscriptionReminder", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub reminder email error: " + error );
 								if (index === result.length - 1) {
@@ -126,7 +130,7 @@ function testReminder(agenda){
 								}
 							}
 							else {
-								db.updateAccount(user.username, {'membership_reminder_sent': true}, function(err2, result){
+								db.updateAccount(user.username, { 'automated_emails.test_sent': true}, function(err2, result2){
 									if (err) console.log('Error registering annual reminder email sent status ', err2);
 									if (index === result.length - 1) {
 										done();
