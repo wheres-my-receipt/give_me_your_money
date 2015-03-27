@@ -253,7 +253,6 @@ module.exports = {
 						alerts.push( {isSuccess: true, alert: "Successfully Added To Transaction History" });
 						console.log( 'Alerts: ' + alerts);
 						return reply.view('account', {user: result, alerts: alerts });
-						// return reply(success);
 					});
 				});
 			});
