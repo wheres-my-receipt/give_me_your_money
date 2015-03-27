@@ -327,7 +327,21 @@ module.exports = {
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
 				if (err) {return reply(err);}
-				return reply.redirect("/account");
+				if (updateTheseFields.desk_authorization) {
+					messages.sendEmail(result, 'VerifyAccount', function(err){
+						if (err) console.log(err);
+						return reply.redirect("/account");
+					});
+				}
+				if (updateTheseFields.admin_rights) {
+					messages.sendEmail(result, 'AdminRights', function(err){
+						if (err) console.log(err);
+						return reply.redirect("/account");
+					});
+				}
+				else {
+					return reply.redirect("/account");
+				}
 			});
 		}
 	},
