@@ -15,6 +15,7 @@ $(document).ready(function() {
 			method: "PUT",
 			data: updateData,
 			success: function(response) {
+				console.log(response);
 				var url = "/account";
 				$(location).attr('href',url);
 			}

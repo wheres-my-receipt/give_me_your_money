@@ -229,8 +229,7 @@ module.exports = {
 					return accounts.newTransaction(accountToUpdate, transactionObject, function(err, success) {
 						if (err) {return reply(err);}
 						alerts.push( {isSuccess: true, alert: "Successfully Added To Transaction History" });
-						return reply.view('account', {user: result, alerts: alerts, moment: moment });
-						// return reply(success);
+						return reply.view('account', {user: success, alerts: alerts, moment: moment });
 					});
 				});
 			});
@@ -330,7 +329,7 @@ module.exports = {
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
 				if (err) {return reply(err);}
-				return reply().redirect("/account");
+				return reply.redirect("/account");
 			});
 		}
 	},

@@ -131,11 +131,11 @@ exports.newTransaction = function(username, transaction, onComplete) {
 		}
 
 		result.transaction_history.push(transaction);
-		result.save(function(err, success) {
+		Account.findOneAndUpdate({username : username}, {membership_active_status: true, membership_paid: result.membership_paid}, function(err, success) {
+			console.log("success membership paid", success.membership_paid);
 			if(err) {
 				return onComplete(err);
 			}
-			console.log(success);
 			return onComplete(null, success);
 		});
 	});

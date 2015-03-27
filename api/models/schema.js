@@ -31,11 +31,6 @@ var deskRentalSchema = new Schema({
 	11: {type: String, required: true, default: "unpaid"},
 });
 
-// TODO Make sure relevant email bools set to 'false' when payment received
-// var automatedEmailSchema = new Schema({
-
-// });
-
 var accountSchema = new Schema({
 
 	email:        {type: String, required: true, unique: true},
