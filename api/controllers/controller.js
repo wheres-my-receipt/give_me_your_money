@@ -78,7 +78,7 @@ module.exports = {
 	signupView: {
 		handler: function (request, reply){
 			if(request.auth.isAuthenticated) {
-				return reply.view("signup.jade");
+				return reply.view("signup");
 			}
 		}
 	},
@@ -93,9 +93,10 @@ module.exports = {
 
 			accounts.getAccount(userToFind, function(err, result) {
 				if (err) {
-					return reply(err);
+					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
 				}
 				console.log( "Account View: " + result );
+
 				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth});
 			});
 		}
@@ -105,13 +106,19 @@ module.exports = {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
 				var userToFind = request.auth.credentials.username;
+				console.log( 'MessagesView user: ' + userToFind);
 				accounts.getAccount( userToFind, function (err, data ) {
-					console.log( (err) ? "Error: " + err : "Messages: " + data.message_history );
-					return reply.view("messages.jade", { messages: data.message_history });
+					if(err) {
+						return reply.view("messages", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
+					}
+					if( !data ){
+						return reply.view("messages", { user: undefined });
+					}
+					return reply.view("messages", { user: userToFind, messages: data.message_history });
 				});
 			}
 			else{
-				return reply.file( "messages.html");
+				return reply.redirect( "/");
 			}
 		}
 	},
@@ -120,9 +127,14 @@ module.exports = {
 		handler: function (request, reply) {
 			if(request.auth.isAuthenticated) {
 				var userToFind = request.auth.credentials.username;
-				//var member = request.params.member;
+				console.log( 'Admin View, user: ' + userToFind );
 				accounts.getAccount( userToFind, function (err, data ) {
-					console.log( (err) ? "Error: " + err : "Member: " + data.username );
+					if(err) {
+						return reply.view("admin_fail", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
+					}
+					if( !data ){
+						return reply.view("admin_fail", { user: undefined });
+					}
 					if( data.admin_rights){
 						// get all members for display on admin 'landing page'
 						accounts.getAccounts( function (err, members ) {
@@ -172,7 +184,7 @@ module.exports = {
 			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
 			var newCharge;
-
+			var alerts = [];
 			accounts.getAccount(accountToUpdate, function(err, result) {
 				var paymentSchemes = {
 					membership: {
@@ -207,7 +219,12 @@ module.exports = {
 				}
 				var charge = stripe.charges.create(newCharge, function(err, charge) {
 					if (err) {return reply(err);}
-
+					alerts.push( {isSuccess: true, alert: "Thank you, your payment has been taken."});
+					messages.sendEmail(result, "PaymentReceipt", function( error, data ) {
+						if( error ) {
+							alerts.push({isError:true, alert: "Error sending payment receipt."});
+						}
+					});
 					var transactionObject = {
 						name: request.payload.stripeEmail,
 						date: charge.created + "000",
@@ -217,7 +234,10 @@ module.exports = {
 
 					return accounts.newTransaction(accountToUpdate, transactionObject, function(err, success) {
 						if (err) {return reply(err);}
-						return reply(success);
+						alerts.push( {isSuccess: true, alert: "Successfully Added To Transaction History" });
+						console.log( 'Alerts: ' + alerts);
+						return reply.view('account', {user: result, alerts: alerts });
+						// return reply(success);
 					});
 				});
 			});
@@ -228,15 +248,12 @@ module.exports = {
 	memberView: {
 		handler: function (request, reply) {
 			var userToFind = request.params.member;
-			console.log( 'memberView: ' + userToFind );
-
 			accounts.getAccount( userToFind, function( err, result ){
 				if (err) {
 					console.log( 'Error ' + err );
 					return reply(err);
 				}
-				console.log( 'Result: ' + result );
-				return reply.view( 'member.jade', {user :result });
+				return reply.view( 'member', {user :result });
 			});
 		}
 	},
@@ -283,15 +300,15 @@ module.exports = {
 			accounts.createAccount(accountToCreate, function(err, result) {
 				if (err) {
 					console.log( "Error: " + err );
-					return reply(err);
+					return reply.view( 'signup', {user: undefined, alerts: [{isError: true, alert: err }]});
 				}
 				// add to all members email group and send ack email
 				messages.addToMembersList(accountToCreate);
-				messages.sendEmail(accountToCreate, "acknowledge", function( error, data ) {
+				messages.sendEmail(accountToCreate, "Acknowledge", function( error, data ) {
 					if( err ) {
-						console.log( "Error sending acknowledge email: " + error );
+						return reply.view( 'account', {user: result, alerts: [{isError:true, alert: "Error sending sign up confirmation"}]});
 					}
-					return reply( result );
+					return reply.view('account', {user: result });
 				});
 
 			});
@@ -345,7 +362,7 @@ module.exports = {
 			var emailDetails = {
 				emailtype: request.payload.emailtype2,
 				email: request.payload.email,
-				username: request.payload.username,
+				username: request.params.member,
 				first_name: request.payload.firstname,
 				last_name: request.payload.lastname,
 				subject: request.payload.subject,
@@ -354,21 +371,12 @@ module.exports = {
 
 			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, body ) {
 				if( error ){
-					console.log( "Error sending " + emailDetails.emailType + ": " + error );
-					return reply( error );
+					console.log( "Error sending " + emailDetails.subject + ": " + error );
+					return reply.view( 'member', {user:emailDetails, alerts: [{ isError : true, alert: error }] });
 				}
 				else {
-					// STICK IT IN THE DATABASE
-
-					return accounts.newMessage(member, message, function (err, result) {
-						console.log( 'Message: ' + JSON.stringify( message ));
-						if (err) {
-							console.log( "Error adding new message: " + err);
-							return reply(err);
-						}
-						console.log( "Successfully added: " + result );
-						return reply(result);
-					});
+					return reply.view( 'member', {user: emailDetails, alerts: [{isSuccess: true, alert: body.message}]});
+					//return reply.redirect("/admin/member/"+emailDetails.member);
 				}
 			});
 

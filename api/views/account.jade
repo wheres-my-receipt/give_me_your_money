@@ -4,8 +4,14 @@ doctype html
 html
 	include ./includes/head.jade
 	body
+		//- div
+		//- 	if !user
+		//- 		h1 Hello!  You don't appear to be a member yet! Please sign up
+		//- 			a(href="/signup") here!
+		//- 	else
 		#wrapper
 			include ./includes/navbar.jade
+			include ./includes/alert_head.jade
 			.tabbable.tabs-left.col-md-8.col-md-offset-2.contentwrapper
 				ul.nav.nav-tabs
 					li.active
@@ -107,3 +113,4 @@ html
 										form#deleteform
 											button.btn.btn-danger#delete(type='submit') DELETE
 		+foot("account")
+>>>>>>> development
