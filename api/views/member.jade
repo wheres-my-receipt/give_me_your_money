@@ -62,29 +62,31 @@ html
 					#messages.tab-pane
 						h2.tabheader  Your Messages
 						#accordion.panel-group(role='tablist', aria-multiselectable='true')
-						each message, index in user.message_history
-							.panel.panel-default
-								.panel-heading(role='tab', id='m-heading' + index)
-									h4.panel-title
-										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#t-collapse' + index, aria-expanded='false', aria-controls='t-collapse' + index)
-											| #{message.subject + ", sent on " + message.date}
-								.panel-collapse.collapse(role='tabpanel', aria-labelledby='m-heading' + index, id="t-collapse" + index)
-									.panel-body
-										| #{message.text}
+						if user.message_history
+							each message, index in user.message_history
+								.panel.panel-default
+									.panel-heading(role='tab', id='m-heading' + index)
+										h4.panel-title
+											a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#t-collapse' + index, aria-expanded='false', aria-controls='t-collapse' + index)
+												| #{message.subject + ", sent on " + message.date}
+									.panel-collapse.collapse(role='tabpanel', aria-labelledby='m-heading' + index, id="t-collapse" + index)
+										.panel-body
+											| #{message.text}
 					#transactions.tab-pane
 						h2.tabheader  Your transaction history
 						#accordion.panel-group(role='tablist', aria-multiselectable='true')
-							each transaction, index in user.transaction_history
-								.panel.panel-default
-									.panel-heading(role='tab', id='t-heading' + index)
-										h4.panel-title
-											a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#m-collapse' + index, aria-expanded='false', aria-controls='m-collapse' + index)
-												| #{transaction.date}
-									.panel-collapse.collapse(role='tabpanel', aria-labelledby='t-heading' + index, id="m-collapse" + index)
-										.panel-body
-											| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "one month's desk rental" : "annual membership"}.
-											br
-											| Amount paid: £#{transaction.amount/100}
+							if user.transaction_history
+								each transaction, index in user.transaction_history
+									.panel.panel-default
+										.panel-heading(role='tab', id='t-heading' + index)
+											h4.panel-title
+												a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#m-collapse' + index, aria-expanded='false', aria-controls='m-collapse' + index)
+													| #{transaction.date}
+										.panel-collapse.collapse(role='tabpanel', aria-labelledby='t-heading' + index, id="m-collapse" + index)
+											.panel-body
+												| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "one month's desk rental" : "annual membership"}.
+												br
+												| Amount paid: £#{transaction.amount/100}
 					#permissions.tab-pane
 						h2.tabheader  Edit Member Permissions
 						div.col-xs-12.formwrapper

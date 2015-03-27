@@ -390,8 +390,8 @@ module.exports = {
 					return reply.view( 'member', {user:emailDetails, alerts: [{ isError : true, alert: error }] });
 				}
 				else {
-					return reply.view( 'member', {user: emailDetails, alerts: [{isSuccess: true, alert: body.message}]});
-					//return reply.redirect("/admin/member/"+emailDetails.member);
+					// return reply.view( 'member', {user: emailDetails, alerts: [{isSuccess: true, alert: body.message}]});
+					return reply.redirect("/admin");
 				}
 			});
 
