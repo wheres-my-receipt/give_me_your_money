@@ -175,9 +175,9 @@ ul>li>a#profile {
 }
 
 .alert-wrapper {
-	position: fixed;
+	/*position: fixed;
 	right: 0;
-	top: 60px;
+	top: 60px;*/
 }
 
 #d-collapse{

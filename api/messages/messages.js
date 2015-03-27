@@ -162,7 +162,7 @@ module.exports = {
 		console.log( 'Message: ' + JSON.stringify( message ) );
 
 		// STICK IT IN THE DATABASE
-		accounts.newMessage(data.username, message, function (err, result, messageId) {
+		accounts.newMessage(data.username, message, function (err, memberDocument, messageId) {
 			if (err) {
 				return onComplete( err );
 			}
@@ -174,7 +174,7 @@ module.exports = {
 					});
 				}
 				else {
-					return onComplete( null, message, body );
+					return onComplete( null, message, memberDocument, body );
 				}
 			});
 		});
