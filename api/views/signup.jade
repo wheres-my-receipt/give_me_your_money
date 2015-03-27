@@ -5,17 +5,18 @@ html
 	include ./includes/head.jade
 	body
 		include ./includes/navbar.jade
-	form(action='/api/accounts', method='POST')
-		input(type='text', name='first_name', placeholder='First name' required)
-		| *
-		br
-		input(type='text', name='last_name', placeholder='Last name' required)
-		| *
-		br
-		input(type='text', name='phone_number', placeholder='Phone number' required)
-		| *
-		br
-		input(type='text', name='email', placeholder='Email' required)
-		|*
-		button(type='submit')
+		include ./includes/alert_head.jade
+		form(action='/api/accounts', method='POST')
+			input(type='text', name='first_name', placeholder='First name' required)
+			| *
+			br
+			input(type='text', name='last_name', placeholder='Last name' required)
+			| *
+			br
+			input(type='text', name='phone_number', placeholder='Phone number' required)
+			| *
+			br
+			input(type='text', name='email', placeholder='Email' required)
+			|*
+			button(type='submit')
 	+foot()

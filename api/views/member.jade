@@ -5,29 +5,25 @@ html
 	include ./includes/head.jade
 	body
 		include ./includes/navbar.jade
-		if alert && alert.isError
-			div(class="alert alert-warning alert-dismissible" role="alert")
-				button.close(type="button" data-dismiss="alert" aria-label="Close") &times;
-				strong #{alert.alert}
-		if alert && alert.isSuccess
-			div(class="alert alert-success alert-dismissible" role="alert")
-				button.close(type="button" data-dismiss="alert" aria-label="Close") &times;
-				strong #{alert.alert}
+		include ./includes/alert_head.jade
 		div
 			form(action='/api/messages/'+ user.username , method='POST')
 				label Email
 					input#email(type='text', name='email', value=user.email)
 				label Email Type
-					input#email(type='text', name='emailtype', value="customMessage")
 					select(name="emailtype2")
+						label Custom
+							option(value="Custom") Custom
 						label Verify
 							option(value="VerifyAccount") Verify
-						label Annual Fees
+						label Annual Fees Reminder
 							option(value="AnnualFeeReminder") Annual Fees Reminder
 						label Desk Rent Fee Reminder
 							option(value="DeskRentFeeReminder") Desk Rent Fee Reminder
-						label Custom
-							option(value="Custom") Custom
+						label Annual Subscription Demand
+							option(value="annualSubscriptionDemand") Annual Subscription Demand
+						label Annual Subscription Overdue
+							option(value="annualSubscriptionOverdue") Annual Subscription Overdue
 				label First Name
 					input#firstname(type='text', name='firstname', value=user.first_name)
 				label Last Name

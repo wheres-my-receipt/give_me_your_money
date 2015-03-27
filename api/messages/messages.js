@@ -14,6 +14,11 @@ var messageTemplates = {
 		 message.text =  "Hello " + data.first_name + "! Thank you for joining Founders and Coders! We will be in touch to verify your account very shortly!";
 		 return message;
 	},
+	paymentReceipt : function (message, data) {
+		 message.subject = "Thank you for your payment!";
+		 message.text =  "Hello " + data.first_name + "! Thank you for your payment!";
+		 return message;
+	},
 	verifyAccount: function (message, data) {
 		message.subject = "Account Verified";
 		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
@@ -57,6 +62,8 @@ createMessage = function( emailType, data ){
 	switch( emailType ){
 		case "Acknowledge" :
 			return messageTemplates.acknowledge( message, data );
+		case "PaymentReceipt" :
+			return messageTemplates.paymentReceipt( message, data );
 		case "VerifyAccount" :
 			return messageTemplates.verifyAccount( message, data );
 		case "AnnualFeeReminder" :
@@ -118,10 +125,10 @@ module.exports = {
 		});
 	},
 
-	sendEmail: function(data, emailType, onComplete){
+	sendEmail: function(data, emailtype, onComplete){
 		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
 		var message = createMessage(emailtype, data );
-		// console.log( 'Message: ' + JSON.stringify( message ) );
+		console.log( 'Message: ' + JSON.stringify( message ) );
 
 		// STICK IT IN THE DATABASE
 		accounts.newMessage(data.username, message, function (err, result, messageId) {
