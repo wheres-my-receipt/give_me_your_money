@@ -41,7 +41,7 @@ html
 								//- if user.desk_authorization
 								div.deskRental
 									p Your current desk rental rate is £#{user.desk_rental_rate/100}
-									- if(user.desk_rental_status[thisMonth] === "unpaid")
+								- if(user.desk_rental_status[thisMonth] === "unpaid")
 									span.payment.col-xs-6
 										form(action='/payment/desk', method='POST')
 											label.paymentlabel Pay for this month's desk rent:
@@ -51,17 +51,17 @@ html
 											label.paymentlabel Mark yourself as away:
 											button.btn.btn-warning.away
 												span#away I'm away!
-									div
-										each year, index in user.desk_rental_status
-											.panel.panel-default
-												a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#d-collapse', aria-expanded='false', aria-controls='d-collapse')
-													.panel-heading(role='tab', id='d-heading')
-														h4.panel-title
-															| #{index}:
-												.panel-collapse.collapse(role='tabpanel', aria-labelledby='d-heading', id="d-collapse")
-													.list-group
-													- for(var i=0; i<thisMonth; i++)
-														p #{months[i]}: #{year[i]}
+								div
+									each year, index in user.desk_rental_status
+										.panel.panel-default
+											a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#d-collapse', aria-expanded='false', aria-controls='d-collapse')
+												.panel-heading(role='tab', id='d-heading')
+													h4.panel-title
+														| #{index}:
+											.panel-collapse.collapse(role='tabpanel', aria-labelledby='d-heading', id="d-collapse")
+												.list-group
+												- for(var i=0; i<thisMonth; i++)
+													p #{months[i]}: #{year[i]}
 					#messages.tab-pane
 						h2.tabheader  Your Messages
 						#accordion.panel-group(role='tablist', aria-multiselectable='true')
@@ -123,4 +123,3 @@ html
 										form#deleteform
 											button.btn.btn-danger#delete(type='submit') DELETE
 		+foot("account")
->>>>>>> development
