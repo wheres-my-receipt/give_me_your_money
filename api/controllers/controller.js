@@ -1,6 +1,7 @@
 var Bell 	 = require("bell");
 var path 	 = require("path");
 var Joi 	 = require("joi");
+var moment 	 = require("moment");
 var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var config 	 = require('../config.js');
 var accounts = require("../models/accounts.js");
@@ -97,7 +98,7 @@ module.exports = {
 				}
 				console.log( "Account View: " + result );
 
-				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth});
+				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth, moment: moment});
 			});
 		}
 	},

@@ -15,7 +15,7 @@ module.exports = {
 
 		desk_authorization: false,
 
-		desk_rental_rate:   5000, //rate of desk (e.g 50/100/200)
+		desk_rental_rate:   5000,
 		desk_rental_status: {},
 
 		automated_emails: [automatedEmailSchema],
@@ -38,7 +38,7 @@ module.exports = {
 
 		desk_authorization: false,
 
-		desk_rental_rate:   5000, //rate of desk (e.g 50/100/200)
+		desk_rental_rate:   5000,
 		desk_rental_status: {},
 
 		automated_emails: [automatedEmailSchema],
@@ -58,11 +58,11 @@ module.exports = {
 		github_avatar: 'https://avatars.githubusercontent.com/u/10106321?v=3',
 
 		membership_active_status: true,
-		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)", // date paid
+		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)",
 
 		desk_authorization: false,
 
-		desk_rental_rate:   5000, //rate of desk (e.g 50/100/200)
+		desk_rental_rate:   5000,
 		desk_rental_status: {},
 
 		automated_emails: [automatedEmailSchema],
@@ -82,11 +82,11 @@ module.exports = {
 		github_avatar: 'https://avatars.githubusercontent.com/u/10106321?v=3',
 
 		membership_active_status: true,
-		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)", // date paid
+		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)",
 
 		desk_authorization: true,
 
-		desk_rental_rate:   5000, //rate of desk (e.g 50/100/200)
+		desk_rental_rate:   5000,
 		desk_rental_status: {
 			2015: {
 				0:  {type: String, required: true, default: "unpaid"},
@@ -121,11 +121,11 @@ module.exports = {
 		github_avatar: 'https://avatars.githubusercontent.com/u/10106321?v=3',
 
 		membership_active_status: true,
-		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)", // date paid
+		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)",
 
 		desk_authorization: true,
 
-		desk_rental_rate:   10000, //rate of desk (e.g 50/100/200)
+		desk_rental_rate:   10000,
 		desk_rental_status: {},
 
 		automated_emails: [automatedEmailSchema],
@@ -145,15 +145,54 @@ module.exports = {
 		github_avatar: 'https://avatars.githubusercontent.com/u/10106321?v=3',
 
 		membership_active_status: true,
-		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)", // date paid
+		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)",
 
 		desk_authorization: true,
 
-		desk_rental_rate:   20000, //rate of desk (e.g 50/100/200)
+		desk_rental_rate:   20000,
 		desk_rental_status: {},
 
 		automated_emails: [automatedEmailSchema],
 		transaction_history:  [transactionSchema],
+		message_history: [messageSchema]
+	},
+	deskPaidUser: {
+		email:        'McTESTERTESTEBERGERDESKPaid@googlemail.com',
+		username:     'TIMOTHYDESK5000',
+		first_name:   'MIT',
+		last_name:    'TIM',
+		member_since: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)",
+		phone_number: '07958454331',
+
+		admin_rights : true,
+		github_link: 'https://api.github.com/users/TIMOTHYDESKPaid',
+		github_avatar: 'https://avatars.githubusercontent.com/u/10106321?v=3',
+
+		membership_active_status: true,
+		membership_paid: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)",
+
+		desk_authorization: true,
+
+		desk_rental_rate:   5000,
+		desk_rental_status: {
+			2015: {
+				0:  "away",
+				1:  "away",
+				2:  "paid",
+				3:  "unpaid",
+				4:  "unpaid",
+				5:  "unpaid",
+				6:  "unpaid",
+				7:  "unpaid",
+				8:  "unpaid",
+				9:  "unpaid",
+				10: "unpaid",
+				11: "unpaid",
+			}
+		},
+
+		automated_emails: [automatedEmailSchema],
+		transaction_history:  [],
 		message_history: [messageSchema]
 	},
 };
