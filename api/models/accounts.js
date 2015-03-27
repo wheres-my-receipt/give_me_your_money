@@ -112,7 +112,9 @@ exports.newTransaction = function(username, transaction, onComplete) {
 			} else if (oldPaidUntil < now) {
 				result.membership_paid = now.setFullYear(currentYear + 1);
 			} else {
-				result.membership_paid = oldPaidUntil.setFullYear((oldPaidUntil.getFullYear()) + 1);
+				// set the new 'paid until' to the old
+				var oldYear = oldPaidUntil.getFullYear();
+				result.membership_paid = oldPaidUntil.setFullYear(oldYear + 1);
 			}
 
 		} else if (transaction.type === "desk") {
@@ -129,10 +131,9 @@ exports.newTransaction = function(username, transaction, onComplete) {
 		}
 
 		result.transaction_history.push(transaction);
-		console.log(result);
-		result.save(function(err, success) {
+		Account.findOneAndUpdate({username : username}, {membership_active_status: true, membership_paid: result.membership_paid}, function(err, success) {
+			console.log("success membership paid", success.membership_paid);
 			if(err) {
-				console.log("save err", err);
 				return onComplete(err);
 			}
 			return onComplete(null, success);
@@ -152,7 +153,7 @@ exports.newMessage = function(username, emailDetails, onComplete) {
 		var messageObject = {
 			to: emailDetails.to,
 			from: 'facmembershipadmin@gmail.com',
-			date: moment().format('MMMM Do YYYY'),
+			date: new Date(),
 			subject: emailDetails.subject ,
 			text: emailDetails.text
 		};

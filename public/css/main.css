@@ -180,6 +180,13 @@ ul>li>a#profile {
 	top: 60px;
 }
 
-.admintitle{
+#d-collapse{
+	padding: 10px;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: black;
+}
+
+.admintitle {
 	text-align:center
 }
