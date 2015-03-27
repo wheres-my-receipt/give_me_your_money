@@ -78,7 +78,7 @@ lab.experiment("When a user visits the login page", function() {
 		server.inject(options, function(response) {
 			assert.equal(response.statusCode, 302, " they should get a FOUND status code (302)");
 			assert.ok(response.headers["set-cookie"], "their session should be set");
-			assert.equal(response.headers.location, "/account", "they should be redirected to the account page");
+			assert.equal(response.headers.location, "/signup", "they should be redirected to the account page");
 			done();
 		});
 	});
