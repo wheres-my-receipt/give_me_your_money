@@ -11,6 +11,7 @@ module.exports 	= [
 
 	{path: "/admin", 						method: "GET", 		config: controller.adminView},
 	{path: "/admin/member/{member}", 		method: "GET",		config: controller.memberView},
+	{path: "/admin/message/{member}", 		method: "GET",		config: controller.messageView},
 
 	{path: "/{file*}",						method: "GET",		config: controller.serveFile},
 
