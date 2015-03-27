@@ -29,13 +29,13 @@ html
 							img.profilePic.img-rounded(src=user.github_avatar href=user.github_link)
 						div#profilebody
 							div.section#member-wrapper
-								p You have been a member since: #{user.member_since}
-								p Your membership status is: #{user.membership_active_status ? "Active" : "Inactive"}
-								p You have paid for your membership until: #{user.membership_paid}
+								p You have been a member since #{user.member_since}.
+								p You are a currently #{user.membership_active_status ? "active" : "inactive"} member!
+								p You have paid for your membership until #{user.membership_paid}.
 								div.payment
 									form(action='/payment/membership', method='POST')
 										label.paymentlabel #{user.membership_active_status ? "Extend" : "Pay for"} your membership
-										script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
+										script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=5000, data-name='Membership 1Y', currency="gbp", data-description="Membership for 1 year", data-image='/128x128.png')
 							div.section#desk-wrapper
 								p You are currently #{user.desk_authorization ? "able" : "not yet able"} to rent desks!
 								if user.desk_authorization
