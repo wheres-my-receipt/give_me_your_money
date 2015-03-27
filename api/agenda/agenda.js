@@ -43,6 +43,9 @@ function agendaStart(){
 	// desk.deskOverdue(agenda);
 	// agenda.every('one day', 'deskOverdue');
 
+	// desk.deskClearBools(agenda);
+	// agenda.eery('one day', 'deskClearBools');
+
 	agendaStop(agenda);
 
 	agenda.start();

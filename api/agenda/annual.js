@@ -48,24 +48,28 @@ function annualDemand(agenda) {
 			}
 			else {
 				result.forEach(function(user, index){
-					if (!user.automated_emails.membership_demand_sent) {
-						messages.sendEmail(user, "AnnualSubscriptionDemand", function( error, data ) {
-							if( err ) {
-								console.log( "Annual sub demand email error: " + error );
-								if (index === result.length - 1) {
-									done();
-								}
-							}
-							else {
-								db.updateAccount(user.username, {'automated_emails.membership_demand_sent': true}, function(err2, result2){
-									if (err) console.log('Error registering annual demand email sent status ', err2);
+					// set user membership status to false
+					db.updateAccount(user.username, {'membership_active_status': true}, function(err1, result1) {
+						if (err1) console.log('Error setting members active status to false', err1);
+						if (!user.automated_emails.membership_demand_sent) {
+							messages.sendEmail(user, "AnnualSubscriptionDemand", function( error, data ) {
+								if( err ) {
+									console.log( "Annual sub demand email error: " + error );
 									if (index === result.length - 1) {
 										done();
 									}
-								});
-							}
-						});
-					}
+								}
+								else {
+									db.updateAccount(user.username, {'automated_emails.membership_demand_sent': true}, function(err2, result2){
+										if (err) console.log('Error registering annual demand email sent status ', err2);
+										if (index === result.length - 1) {
+											done();
+										}
+									});
+								}
+							});
+						}
+					});
 				});
 			}
 		});

@@ -1,12 +1,11 @@
 var db = require('../models/accounts');
 var moment = require('moment');
 var messages = require('../messages/messages');
+
 // TODO:
-// how to handle mail sent bools? schedule a function to clear at end of month?
 // run these functions on e.g.1st/2nd/3rd, in case of of error? bool should prevent resend
 
 function deskUnpaid(agenda) {
-
 	// checks for unpaid status on the first of the month
 	agenda.define('deskUnpaid', function(job, done){
 		if (moment().date() === 1) {
@@ -55,7 +54,7 @@ function deskUnpaid(agenda) {
 
 function deskOverdue(agenda) {
 
-	// checks for unpaid status on the first of the month
+	// checks for unpaid status on the 15th of the month
 	agenda.define('deskOverdue', function(job, done){
 		if (moment().date() === 15) {
 			var month = moment().month();
@@ -101,9 +100,36 @@ function deskOverdue(agenda) {
 	});
 }
 
+function deskClearBools(agenda) {
+	// clears the desk reminder bools in advance of next months email cycle
+	agenda.define('deskClearBools', function(job, done){
+		if (moment().date() === 25) {
+			db.search({query: {} }, function(err, result){
+				if (err) {
+					console.log(err);
+					done();
+				}
+				else {
+					result.forEach(function(user, index){
+						user.automated_emails.desk_unpaid_sent = false;
+						user.automated_emails.desk_overdue_sent = false;
+						user.save(function(err2, success){
+							if(err2) console.log('Error resetting desk rental bools', err2);
+							if(index === result.length - 1) {
+								done();
+							}
+						});
+					});
+				}
+			});
+		}
+	});
+}
+
 module.exports = {
 	deskUnpaid: deskUnpaid,
-	deskOverdue: deskOverdue
+	deskOverdue: deskOverdue,
+	deskClearBools: deskClearBools
 };
 
 
