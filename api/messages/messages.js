@@ -11,28 +11,28 @@ var deskOccupantsList = config.mailgunTest.mailLists.deskOccupantsList;
 var messageTemplates = {
 	acknowledge : function (message, data) {
 		 message.subject = "Welcome to Founders & Coders!";
-		 message.text =  "Hello " + data.first_name + "! Thank you for joining Founders and Coders! We will be in touch to verify your account very shortly!";
+		 message.text =  "Hello " + data.first_name + "!\n\n Thank you for joining Founders and Coders! We will be in touch to verify your account very shortly!";
 		 return message;
 	},
 	paymentReceipt : function (message, data) {
 		 message.subject = "Thank you for your payment!";
-		 message.text =  "Hello " + data.first_name + "! Thank you for your payment!";
+		 message.text =  "Hello " + data.first_name + "!\n\n Thank you for your payment!";
 		 return message;
 	},
 	verifyAccount: function (message, data) {
 		message.subject = "Account Verified";
-		message.text = "Hello " + data.first_name + ". Your account has now been verified and you can now rent a desk!";
+		message.text = "Hello " + data.first_name + ".\n\n Your account has now been verified and you can now rent a desk!";
 		return message;
 	},
 	annualSubscriptionCustomReminder : function (message, data) {
 		message.subject = "Annual Subscription Reminder. " + data.subject;
-		message.text = "Hello " + data.first_name + ". ";
+		message.text = "Hello " + data.first_name + ".\n\n ";
 		message.text += data.contents;
 		return message;
 	},
 	deskRentalCustomReminder : function (message, data) {
 		message.subject = "Desk Rental Reminder. " + data.subject;
-		message.text = "Hello " + data.first_name + ". ";
+		message.text = "Hello " + data.first_name + ".\n\n ";
 		message.text += data.contents;
 		return message;
 	},
