@@ -103,6 +103,10 @@ exports.newTransaction = function(username, transaction, onComplete) {
 
 		if (transaction.type === "membership") {
 			result.membership_active_status = true;
+			result.automated_emails.membership_reminder_sent = false;
+			result.automated_emails.membership_demand_sent = false;
+			result.automated_emails.membership_overdue_sent = false;
+
 			if (!oldPaidUntil) {
 				result.membership_paid = now.setFullYear(currentYear + 1);
 			} else if (oldPaidUntil < now) {
@@ -110,6 +114,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 			} else {
 				result.membership_paid = oldPaidUntil.setFullYear((oldPaidUntil.getFullYear()) + 1);
 			}
+
 		} else if (transaction.type === "desk") {
 
 			var deskHistory = result.desk_rental_status;
