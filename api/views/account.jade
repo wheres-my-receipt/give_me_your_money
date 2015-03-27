@@ -95,21 +95,21 @@ html
 								.form-group
 									label.control-label.col-xs-2(for='inputUserName') User
 									.col-xs-10
-										p.form-control-static MIJOTHY
+										p.form-control-static#username #{user.username}
 								.form-group
 									label.control-label.col-xs-2(for='inputEmail') Email
 									.col-xs-10
-										input#inputEmail.form-control(type='email', name='email', placeholder=user.email)
+										input#email.form-control(type='email', name='email', placeholder=user.email)
 								.form-group
 									label.control-label.col-xs-2(for='inputName') Name
 									span.col-xs-5
-										input#inputFirst.form-control(type='text', name='first_name', placeholder=user.first_name)
+										input#first_name.form-control(type='text', name='first_name', placeholder=user.first_name)
 									span.col-xs-5
-										input#inputLast.form-control(type='text', name='last_name', placeholder=user.last_name)
+										input#last_name.form-control(type='text', name='last_name', placeholder=user.last_name)
 								.form-group
 									label.control-label.col-xs-2(for='inputEmail') Phone
 									.col-xs-10
-										input#inputNumber.form-control(type='tel', name='phone_number', placeholder=user.phone_number)
+										input#phone_number.form-control(type='tel', name='phone_number', placeholder=user.phone_number)
 								.form-group
 									.col-xs-offset-2.col-xs-10
 										button.btn.btn-primary(type='submit') Update
@@ -122,4 +122,4 @@ html
 									.panel-body
 										form#deleteform
 											button.btn.btn-danger#delete(type='submit') DELETE
-		+foot("account")
+		+foot(["account"])
