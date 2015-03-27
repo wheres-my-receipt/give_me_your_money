@@ -1,4 +1,17 @@
-exports.agendaStart = function() {
+var moment = require('moment');
+
+function agendaStop(agenda) {
+	function graceful() {
+	  agenda.stop(function() {
+	    process.exit(0);
+	  });
+	}
+
+	process.on('SIGTERM', graceful);
+	process.on('SIGINT' , graceful);
+}
+
+function agendaStart(){
 
 	var config = require('../config');
 	var Agenda = require('agenda');
@@ -22,7 +35,24 @@ exports.agendaStart = function() {
 	// annual.annualOverdue(agenda);
 	// agenda.every('one day', 'annualOverdue');
 
+	var desk = require('./desk');
+
+	// desk.deskUnpaid(agenda);
+	// agenda.every('one day', 'deskUnpaid');
+
+	// desk.deskOverdue(agenda);
+	// agenda.every('one day', 'deskOverdue');
+
+	// desk.deskClearBools(agenda);
+	// agenda.eery('one day', 'deskClearBools');
+
+	agendaStop(agenda);
 
 	agenda.start();
 	console.log('Agenda tasks running');
+}
+
+module.exports = {
+	agendaStart: agendaStart,
+	agendaStop: agendaStop
 };

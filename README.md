@@ -19,7 +19,8 @@ To optimally divest your wallet of your membership fee, we aim to:
 #### How to run  
 ```
 clone  
-npm install  
+npm install
+touch api/creds.json - see api/creds.json.example for structure
 npm start
 cry when it doesn't run
 ```
