@@ -1,6 +1,17 @@
 var moment = require('moment');
 
-exports.agendaStart = function() {
+function agendaStop(agenda) {
+	function graceful() {
+	  agenda.stop(function() {
+	    process.exit(0);
+	  });
+	}
+
+	process.on('SIGTERM', graceful);
+	process.on('SIGINT' , graceful);
+}
+
+function agendaStart(){
 
 	var config = require('../config');
 	var Agenda = require('agenda');
@@ -32,8 +43,13 @@ exports.agendaStart = function() {
 	// desk.deskOverdue(agenda);
 	// agenda.every('one day', 'deskOverdue');
 
-
+	agendaStop(agenda);
 
 	agenda.start();
 	console.log('Agenda tasks running');
+}
+
+module.exports = {
+	agendaStart: agendaStart,
+	agendaStop: agendaStop
 };
