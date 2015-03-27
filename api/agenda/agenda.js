@@ -12,8 +12,8 @@ exports.agendaStart = function() {
 
 	var annual = require('./annual');
 
-	annual.testReminder(agenda);
-	agenda.now('testReminder');
+	// annual.testReminder(agenda);
+	// agenda.now('testReminder');
 
 	// annual.annualReminder(agenda);
 	// agenda.every('one day', 'annualReminder');

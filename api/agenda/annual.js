@@ -22,7 +22,7 @@ function annualReminder(agenda) {
 								}
 							}
 							else {
-								db.updateAccount(user.username, {'automated_emails.membership_reminder_sent': true}, function(err2, result){
+								db.updateAccount(user.username, {'automated_emails.membership_reminder_sent': true}, function(err2, result2){
 									if (err) console.log('Error registering annual reminder email sent status ', err2);
 									if (index === result.length - 1) {
 										done();
@@ -57,7 +57,7 @@ function annualDemand(agenda) {
 								}
 							}
 							else {
-								db.updateAccount(user.username, {'automated_emails.membership_demand_sent': true}, function(err2, result){
+								db.updateAccount(user.username, {'automated_emails.membership_demand_sent': true}, function(err2, result2){
 									if (err) console.log('Error registering annual demand email sent status ', err2);
 									if (index === result.length - 1) {
 										done();
@@ -87,12 +87,12 @@ function annualOverdue(agenda) {
 						messages.sendEmail(user, "AnnualSubscriptionOverdue", function( error, data ) {
 							if( err ) {
 								console.log( "Annual sub demand email error: " + error );
-								if (index === result.length - 1) {
+								if (result.length - 1) {
 									done();
 								}
 							}
 							else {
-								db.updateAccount(user.username, {'automated_emails.membership_overdue_sent': true}, function(err2, result){
+								db.updateAccount(user.username, {'automated_emails.membership_overdue_sent': true}, function(err2, result2){
 									if (err) console.log('Error registering annual demand email sent status ', err2);
 									if (index === result.length - 1) {
 										done();
@@ -126,7 +126,7 @@ function testReminder(agenda){
 								}
 							}
 							else {
-								db.updateAccount(user.username, { 'automated_emails.test_sent': true}, function(err2, result){
+								db.updateAccount(user.username, { 'automated_emails.test_sent': true}, function(err2, result2){
 									if (err) console.log('Error registering annual reminder email sent status ', err2);
 									if (index === result.length - 1) {
 										done();

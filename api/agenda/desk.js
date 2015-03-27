@@ -37,7 +37,7 @@ function deskUnpaid(agenda) {
 									}
 								}
 								else {
-									db.updateAccount(user.username, {'automated_emails.desk_unpaid_sent': true}, function(err2, result){
+									db.updateAccount(user.username, {'automated_emails.desk_unpaid_sent': true}, function(err2, result2){
 										if (err) console.log('Error registering desk rental upaid sent status ', err2);
 										if (index === result.length - 1) {
 											done();
@@ -85,7 +85,7 @@ function deskOverdue(agenda) {
 									}
 								}
 								else {
-									db.updateAccount(user.username, {'automated_emails.desk_overdue_sent': true}, function(err2, result){
+									db.updateAccount(user.username, {'automated_emails.desk_overdue_sent': true}, function(err2, result2){
 										if (err) console.log('Error registering desk rental overdue sent status ', err2);
 										if (index === result.length - 1) {
 											done();
