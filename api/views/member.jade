@@ -22,7 +22,7 @@ html
 					li
 						a(href='#transactions', data-toggle='tab') Transactions
 					li
-						a(href='#membership', data-toggle='tab') Permissions
+						a(href='#permissions', data-toggle='tab') Permissions
 				.tab-content
 					#profile.tab-pane.active
 						div#profileheader
@@ -33,10 +33,6 @@ html
 								p You have been a member since: #{user.member_since}
 								p Your membership status is: #{user.membership_active_status ? "Active" : "Inactive"}
 								p You have paid for your membership until: #{user.membership_paid}
-								div.payment
-									form(action='/payment/membership', method='POST')
-										label.paymentlabel #{user.membership_active_status ? "Extend" : "Pay for"} your membership
-										script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
 							div.section#desk-wrapper
 								p You are currently #{user.desk_authorization ? "able" : "not yet able"} to rent desks!
 								if user.desk_authorization
@@ -89,15 +85,7 @@ html
 											| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "one month's desk rental" : "annual membership"}.
 											br
 											| Amount paid: £#{transaction.amount/100}
-					#membership.tab-pane
-						h2.tabheader  Edit Member Permissions and Desk Authorization
+					#permissions.tab-pane
+						h2.tabheader  Edit Member Permissions
 						div.col-xs-12.formwrapper
-							form#editform.form-horizontal
-								.form-group
-									label.control-label.col-xs-2(for='inputUserName') User
-									.col-xs-10
-							.panel.panel-default
-								.panel-heading(role='tab', id='del-heading')
-									h4.panel-title
-										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#del-collapse', aria-expanded='false', aria-controls='del-collapse')
 		+foot("account")
