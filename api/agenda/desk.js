@@ -2,18 +2,22 @@ var db = require('../models/accounts');
 var moment = require('moment');
 var messages = require('../messages/messages');
 
+// TODO:
+// run these functions on e.g.1st/2nd/3rd, in case of of error? bool should prevent resend
+
 function deskUnpaid(agenda) {
-	// checks for unpaid status on the 1st of the month (and 2nd in case of failure)
+	// checks for unpaid status on the first of the month
 	agenda.define('deskUnpaid', function(job, done){
-		console.log('Attempting deskUnpaid');
-		if (moment().date() === 1 || moment().date() === 2) {
-			console.log('date correct');
+		if (moment().date() === 1) {
 			var month = moment().month();
 			var year = moment().year();
-			var deskQueryYear = 'desk_rental_status[year]: {$exists: false}';
-			var deskQueryMonth = 'desk_rental_status.'+year+'.'+month+' = unpaid';
+			var deskQueryYear = {};
+			deskQueryYear[desk_rental_status][year] = {'$exits': false};
+			var deskQueryMonth = {};
+			deskQueryMonth[desk_rental_status][year][month] = 'unpaid';
 			// send reminder if desk_rental_status for year missing, or if this month = 'unpaid'
 			db.search({query: { $or: [
+				// QUERY ONE comma
 				{ $and: [ deskQueryYear, {desk_authorization: true} ]},
 				{ $and: [ deskQueryMonth, {desk_authorization: true} ]}
 			]}}, function(err, result){
@@ -22,28 +26,26 @@ function deskUnpaid(agenda) {
 					done();
 				}
 				else {
-					if (result) {
-						result.forEach(function(user, index){
-							if (!user.automated_emails.desk_unpaid_sent) {
-								messages.sendEmail(user, "DeskRentalUnpaid", function( error, data ) {
-									if( err ) {
-										console.log( "Desk rental unpaid email error: " + error );
+					result.forEach(function(user, index){
+						if (!user.automated_emails.desk_unpaid_sent) {
+							messages.sendEmail(user, "DeskRentalUnpaid", function( error, data ) {
+								if( err ) {
+									console.log( "Desk rental unpaid email error: " + error );
+									if (index === result.length - 1) {
+										done();
+									}
+								}
+								else {
+									db.updateAccount(user.username, {'automated_emails.desk_unpaid_sent': true}, function(err2, result2){
+										if (err) console.log('Error registering desk rental upaid sent status ', err2);
 										if (index === result.length - 1) {
 											done();
 										}
-									}
-									else {
-										db.updateAccount(user.username, {'automated_emails.desk_unpaid_sent': true}, function(err2, result2){
-											if (err) console.log('Error registering desk rental upaid sent status ', err2);
-											if (index === result.length - 1) {
-												done();
-											}
-										});
-									}
-								});
-							}
-						});
-					}
+									});
+								}
+							});
+						}
+					});
 				}
 			});
 		}
@@ -52,17 +54,18 @@ function deskUnpaid(agenda) {
 
 function deskOverdue(agenda) {
 
-	// checks for unpaid status on the 15th (and 16th in case of failure) of the month
+	// checks for unpaid status on the 15th of the month
 	agenda.define('deskOverdue', function(job, done){
-		console.log('Attempting deskUnpaid');
-		if (moment().date() === 15 || moment().date() === 16) {
-			console.log('date correct');
+		if (moment().date() === 15) {
 			var month = moment().month();
 			var year = moment().year();
-			var deskQueryYear = 'desk_rental_status[year]: {$exists: false}';
-			var deskQueryMonth = 'desk_rental_status.'+year+'.'+month+' = unpaid';
+			var deskQueryYear = {};
+			deskQueryYear[desk_rental_status][year] = {'$exits': false};
+			var deskQueryMonth = {};
+			deskQueryMonth[desk_rental_status][year][month] = 'unpaid';
 			// send reminder if desk_rental_status for year missing, or if this month = 'unpaid'
 			db.search({query: { $or: [
+				// QUERY ONE comma
 				{ $and: [ deskQueryYear, {desk_authorization: true} ]},
 				{ $and: [ deskQueryMonth, {desk_authorization: true} ]}
 			]}}, function(err, result){
@@ -71,28 +74,26 @@ function deskOverdue(agenda) {
 					done();
 				}
 				else {
-					if (result) {
-						result.forEach(function(user, index){
-							if (!user.automated_emails.desk_overdue_sent) {
-								messages.sendEmail(user, "DeskRentalOverdue", function( error, data ) {
-									if( err ) {
-										console.log( "Desk rental unpaid email error: " + error );
+					result.forEach(function(user, index){
+						if (!user.automated_emails.desk_overdue_sent) {
+							messages.sendEmail(user, "DeskRentalOverdue", function( error, data ) {
+								if( err ) {
+									console.log( "Desk rental unpaid email error: " + error );
+									if (index === result.length - 1) {
+										done();
+									}
+								}
+								else {
+									db.updateAccount(user.username, {'automated_emails.desk_overdue_sent': true}, function(err2, result2){
+										if (err) console.log('Error registering desk rental overdue sent status ', err2);
 										if (index === result.length - 1) {
 											done();
 										}
-									}
-									else {
-										db.updateAccount(user.username, {'automated_emails.desk_overdue_sent': true}, function(err2, result2){
-											if (err) console.log('Error registering desk rental overdue sent status ', err2);
-											if (index === result.length - 1) {
-												done();
-											}
-										});
-									}
-								});
-							}
-						});
-					}
+									});
+								}
+							});
+						}
+					});
 				}
 			});
 		}
@@ -101,28 +102,24 @@ function deskOverdue(agenda) {
 
 function deskClearBools(agenda) {
 	// clears the desk reminder bools in advance of next months email cycle
-	console.log('Attempting deskClearBools');
 	agenda.define('deskClearBools', function(job, done){
-		console.log('Clearing desk rental bools');
-		if (moment().date() === 25 || moment().date() === 26) {
+		if (moment().date() === 25) {
 			db.search({query: {} }, function(err, result){
 				if (err) {
 					console.log(err);
 					done();
 				}
 				else {
-					if (result) {
-						result.forEach(function(user, index){
-							user.automated_emails.desk_unpaid_sent = false;
-							user.automated_emails.desk_overdue_sent = false;
-							user.save(function(err2, success){
-								if(err2) console.log('Error resetting desk rental bools', err2);
-								if(index === result.length - 1) {
-									done();
-								}
-							});
+					result.forEach(function(user, index){
+						user.automated_emails.desk_unpaid_sent = false;
+						user.automated_emails.desk_overdue_sent = false;
+						user.save(function(err2, success){
+							if(err2) console.log('Error resetting desk rental bools', err2);
+							if(index === result.length - 1) {
+								done();
+							}
 						});
-					}
+					});
 				}
 			});
 		}

@@ -5,16 +5,9 @@ html
 	include ./includes/head.jade
 	body
 		include ./includes/navbar.jade
-		.jumbotron
-			.container
-				.row
-					.col-xs-12
-						include ./includes/alert_head.jade
-			.container
-				.row
-					div.admintitle.col-xs-12
-						h2 Member Administration Pages
-						for member in members
-							li
-								a(href='/admin/member/'+member.username) #{member.first_name} #{member.last_name}
+		div
+			h2 Member Administration Pages
+			for member in members
+				li
+					a(href='/admin/member/'+member.username) #{member.first_name} #{member.last_name}
 	+foot()

@@ -12,10 +12,8 @@ mixin message(deets)
 		h4 From: #{deets.from}
 		p #{deets.contents}
 
-mixin foot(fileArray)
+mixin foot(filename)
 	script(src='/lib/jquery-2.1.3.min.js')
 	script(src='/lib/bootstrap.min.js')
-	if fileArray
-		each file in fileArray
-			script(src='/scripts/' + file + '.js')
-
+	if filename
+		script(src='/scripts/' + filename + '.js')
