@@ -194,3 +194,37 @@ ul>li>a#profile {
 .sendicon{
 	margin-left: 10px;
 }
+
+.status {
+	float: right;
+	width: 100px;
+}
+
+.monthlist {
+	border-bottom: 1px dashed black;
+	margin-bottom: 5px;
+}
+
+.deskRentalPanel {
+	display: block;
+	height: 89px;
+	width: 70%;
+	margin: auto;
+	margin-bottom: 15px;
+}
+
+p.info {
+	text-align: center;
+}
+
+.membershippanel {
+	display: block;
+	width: 45%;
+	margin: auto;
+	padding-bottom: 15px;
+}
+
+.unauth {
+	margin-top: 100px;
+	position: absolute;
+}

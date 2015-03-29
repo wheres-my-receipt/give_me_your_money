@@ -51,6 +51,7 @@ exports.getAccount = function(username, onComplete) {
 
 exports.updateAccount = function(username, updateObject, onComplete) {
 
+// Need to set it so that on desk authorization, all months prior to 'now' are set as away.
 	Account.findOneAndUpdate({username : username}, updateObject, function(err, result) {
 		if (err) {
 			return onComplete(err);
@@ -100,6 +101,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 		var now 		 = new Date(+transaction.date);
 		var currentYear  = now.getFullYear();
 		var oldPaidUntil = result.membership_paid;
+		var currentMonth = now.getMonth();
 
 		if (transaction.type === "membership") {
 			result.membership_active_status = true;
@@ -115,32 +117,52 @@ exports.newTransaction = function(username, transaction, onComplete) {
 				// set the new 'paid until' to the old
 				var oldYear = oldPaidUntil.getFullYear();
 				result.membership_paid = oldPaidUntil.setFullYear(oldYear + 1);
+				result.markModified('membership_paid');
 			}
 
 		} else if (transaction.type === "desk") {
 
 			var deskHistory = result.desk_rental_status;
-			var currentMonth = now.getMonth();
+			var deskRentalChanger = function (status, year, month) {
+				if (!deskHistory[year]) {
+					result.desk_rental_status[year] = new DeskRental();
+				} else if (deskHistory[year][month] === "paid") {
+					return onComplete("already paid m8");
+				}
+				result.desk_rental_status[year][month] = status;
+				result.markModified('desk_rental_status');
+			};
 
-			if (!deskHistory[currentYear]) {
-				deskHistory[currentYear] = new DeskRental();
-			} else if (deskHistory[currentYear][currentMonth] === "paid") {
-				return onComplete("already paid m8");
-			}
-			deskHistory[currentYear][currentMonth] = "paid";
+			deskRentalChanger("paid", currentYear, currentMonth);
 		}
 
 		result.transaction_history.push(transaction);
-		result.save(function(err) {if (err) console.log(err); });
-		Account.findOneAndUpdate({username : username}, {membership_active_status: true, membership_paid: result.membership_paid}, function(err, success) {
-			console.log("success membership paid", success.membership_paid);
+		result.save(function(err, success) {
 			if(err) {
 				return onComplete(err);
 			}
 			return onComplete(null, success);
 		});
 	});
+};
 
+exports.changeDeskStatus = function(username, status, month, year, onComplete) {
+	
+	Account.findOne({username: username}, function(err, result) {
+		if(err) return onComplete(err);
+
+		if (!result.desk_rental_status[year]) {
+				result.desk_rental_status[year] = new DeskRental();
+		} else if (result.desk_rental_status[year][month] === "paid") {
+			return onComplete("You have already paid for this month");
+		}
+		result.desk_rental_status[year][month] = status;
+		result.markModified('desk_rental_status');
+		result.save(function(err, success) {
+			if (err) return onComplete(err);
+			else return onComplete(null, success);
+		});
+	});
 };
 
 // Message operations

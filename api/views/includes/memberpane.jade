@@ -31,15 +31,16 @@
 								div.deskRental
 									p Your current desk rental rate is £#{user.desk_rental_rate/100}
 								- if(user.desk_rental_status[thisMonth] !== "paid")
-									span.payment.col-xs-6
-										form(action='/payment/desk', method='POST')
-											label.paymentlabel Pay for this month's desk rent
-											script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
-									span.payment.col-xs-6
-										form()
-											label.paymentlabel Mark yourself as away
-											button.btn.btn-success.away
-												span#away I'm away!
+									div.deskRentalPanel.panel.panel-default
+										span.payment.col-xs-6
+											form(action='/payment/desk', method='POST')
+												label.paymentlabel Pay for this month's desk rent
+												script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
+										span.payment.col-xs-6
+											form#awayform()
+												label.paymentlabel Mark yourself as away
+												button.btn.btn-warning.away
+													span#away I'm away!
 								div
 									each year, index in user.desk_rental_status
 										.panel.panel-default
