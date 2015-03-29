@@ -2,8 +2,8 @@ module.exports = {
 	vanillaUser: {
 		email:        'timothyandthecrew@testing.com',
 		username:     'Timmy_Tester',
-		first_name:   'MIJ',
-		last_name:    'JIM',
+		first_name:   'Timbo',
+		last_name:    'Testacular',
 		member_since: "Thu Mar 26 2015 12:16:26 GMT+0000 (GMT)",
 		phone_number: '07958424331',
 

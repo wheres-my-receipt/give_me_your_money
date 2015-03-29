@@ -85,7 +85,7 @@
 												| #{moment(transaction.date).format("DD-MM-YY")}
 									.panel-collapse.collapse(role='tabpanel', aria-labelledby='t-heading' + index, id="m-collapse" + index)
 										.panel-body
-											| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "one month's desk rental" : "annual membership"}.
+											| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "desk rental for the month of " + months[transaction.date.getMonth()] : "annual membership"}.
 											br
 											| Amount paid: £#{transaction.amount/100}
 				#membership.tab-pane

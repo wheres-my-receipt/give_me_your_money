@@ -90,12 +90,12 @@ module.exports = {
 				return reply.redirect("/signup");
 			}
 
-			console.log(request.auth.credentials);
 			var userToFind = request.auth.credentials.username;
 			var alerts = request.auth.credentials.alerts;
 			var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 			var today = new Date();
 			var thisMonth = today.getMonth();
+			console.log(request.auth);
 
 			accounts.getAccount(userToFind, function(err, result) {
 				request.auth.session.set("alerts", []);
