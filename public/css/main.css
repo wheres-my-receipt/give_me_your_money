@@ -63,7 +63,7 @@ ul.nav-tabs>li.active>a, {
 .profilePic {
 	max-height: 200px;
 	max-width: 200px;
-	box-shadow: 0px 0px 16px 10px gold;
+	box-shadow: 0px 0px 8px 1px #78B7BA;
 }
 
 .contentwrapper {
@@ -118,6 +118,10 @@ ul>li>a#profile {
 	margin-top: 100px;
 }
 
+#editwrapper {
+	margin-top: 40px;
+}
+
 .tabs-left>ul.nav-tabs.nav>li.active>a,
 .tabs-left>ul.nav-tabs.nav>li.active>a:hover,
 .tabs-left>ul.nav-tabs.nav>li.active>a:focus {
@@ -156,6 +160,7 @@ ul>li>a#profile {
 
 .tabheader {
 	text-align: center;
+	color: #78B7BA;;
 }
 
 #profileheader {

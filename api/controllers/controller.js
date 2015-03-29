@@ -29,7 +29,9 @@ var updateDeskValidation = Joi.object({
 module.exports = {
 
 	homeView: {
-		auth: false,
+		auth: {
+			mode: 'try'
+		},
 		handler: function (request, reply ) {
 			if(request.auth.isAuthenticated) {
 				return request.auth.credentials.account ? reply.redirect("/account") : reply.redirect("/signup");
@@ -87,6 +89,7 @@ module.exports = {
 			if (!request.auth.credentials.account) {
 				return reply.redirect("/signup");
 			}
+
 			console.log(request.auth.credentials);
 			var userToFind = request.auth.credentials.username;
 			var alerts = request.auth.credentials.alerts;
@@ -458,7 +461,6 @@ module.exports = {
 					// return reply.redirect("/admin");
 				}
 			});
-
 		}
 	}
 };

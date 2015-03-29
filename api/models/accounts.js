@@ -77,6 +77,7 @@ exports.createAccount = function(accountToCreate, onComplete) {
 		if (err) {
 			return onComplete(err);
 		}
+		console.log(result);
 		return onComplete(null, result);
 	});
 };
@@ -206,10 +207,7 @@ exports.deleteMessage = function(username, messageId, onComplete ) {
 		var count_before_delete = result.message_history.length;
 		var foundMessage=false;
 		var messages_minus_deleted = result.message_history.filter( function( elem, index ) {
-			// console.log( "element id: " + elem.id );
-			// console.log( "messageId: " + messageId);
-			// console.log( "type of element id: " + typeof(elem.id) );
-			// console.log( "type of messageId: " + typeof( messageId));
+
 			if( elem.id===messageId ) {
 				console.log( 'Message found to delete!');
 				foundMessage = true;

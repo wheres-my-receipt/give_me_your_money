@@ -1,5 +1,3 @@
-var moment = require('moment');
-
 function agendaStop(agenda) {
 	function graceful() {
 	  agenda.stop(function() {
@@ -12,11 +10,10 @@ function agendaStop(agenda) {
 	process.on('SIGINT' , graceful);
 }
 
-function agendaStart(){
+function agendaStart(mongodbUri){
 
-	var config = require('../config');
 	var Agenda = require('agenda');
-	var agenda = new Agenda({db: { address: 'mongodb://' +config.mongo.dbuser + ':' + config.mongo.dbpwd + "@" + config.mongo.dburl}});
+	var agenda = new Agenda({db: { address: mongodbUri}});
 
 	// Schedule subscription tasks
 	var annual = require('./annual');

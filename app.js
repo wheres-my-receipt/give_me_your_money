@@ -16,7 +16,7 @@ server.start(function () {
 		});
 	});
 
-	agenda.agendaStart();
+	agenda.agendaStart(mongodbUri);
 
 	console.log('Server running at:', server.info.uri);
 });

@@ -30,4 +30,8 @@ npm-debug.log
 
 .DS_Store
 
+# Credentials
 creds.json
+
+# Local database folder for testing
+data/

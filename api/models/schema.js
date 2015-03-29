@@ -75,33 +75,3 @@ module.exports = {
 	Message 		: Message,
 	DeskRental  	: DeskRental,
 };
-
-// NB minimum billing period will be 1 month
-/* NOTE - After speaking to dan, he mentioned it might be easier and wiser to adopt a system along the lines
-of the following:
-Each member has 3 possible payment statuses for any given desk rental month - "Away", "Unpaid", or "Paid"
-So each member would 'mark' their status for the month (away or not), and could be chased up accordingly.
-
-userMonths = {
-	2015: {
-		jan: "paid",
-		feb: "away"
-		mar: "unpaid"
-		...
-	},
-	2016, {
-		jan: "paid"
-		...
-	}
-
-deskHistory = result.deskHistory
-currentYear = Date.now().getYear();
-currentMonth = Date.now().getMonth();
-
-if (!deskHistory.[currentYear]) {
-	deskHistory.[currentYear] = currentYear;
-}
-deskHistory.[currentYear][currentMonth] = "paid";
-
-}
-*/
