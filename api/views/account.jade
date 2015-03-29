@@ -29,29 +29,30 @@ html
 							img.profilePic.img-rounded(src=user.github_avatar href=user.github_link)
 						div#profilebody
 							div.section#member-wrapper
-								p You have been a member since #{moment(user.member_since).format("Do MMMM, YYYY")}
-								p You are a currently #{user.membership_active_status ? "active" : "inactive"} member of Founders & Coders
+								p.info You have been a member since #{moment(user.member_since).format("Do MMMM, YYYY")}
+								p.info You are a currently #{user.membership_active_status ? "active" : "inactive"} member of Founders & Coders
 								if (user.membership_paid)
-									p You have paid for your membership until #{moment(user.membership_paid).format("Do MMMM, YYYY")}.
-								div.payment
+									p.info You have paid for your membership until #{moment(user.membership_paid).format("Do MMMM, YYYY")}.
+								div.payment.panel.panel-default.membershippanel
 									form(action='/payment/membership', method='POST')
 										label.paymentlabel #{user.membership_active_status ? "Extend" : "Pay for"} your membership for #{user.membership_active_status ? "another" : "one"} year
 										script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=5000, data-name='Membership 1Y', currency="gbp", data-description="Membership for 1 year", data-image='/128x128.png')
 							div.section#desk-wrapper
-								p You are currently #{user.desk_authorization ? "able" : "not yet able"} to rent desks.
+								p.info You are currently #{user.desk_authorization ? "able" : "not yet able"} to rent desks.
 								if user.desk_authorization
 									div.deskRental
-										p Your current desk rental rate is £#{user.desk_rental_rate/100}
+										p.info Your current desk rental rate is £#{user.desk_rental_rate/100}
 									- if(user.desk_rental_status[thisMonth] !== "paid")
-										span.payment.col-xs-6
-											form(action='/payment/desk', method='POST')
-												label.paymentlabel Pay for this month's desk rent
-												script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
-										span.payment.col-xs-6
-											form()
-												label.paymentlabel Mark yourself as away
-												button.btn.btn-success.away
-													span#away I'm away!
+										div.deskRentalPanel.panel.panel-default
+											span.payment.col-xs-6
+												form(action='/payment/desk', method='POST')
+													label.paymentlabel Pay for this month's desk rent
+													script.stripe-button(src='https://checkout.stripe.com/checkout.js', data-key='pk_test_PAiIYQoiJwUEIs35XP50WNi8', data-amount=user.desk_rental_rate, data-name='Desk Rental', currency="gbp", data-description="Desk rental 1 month - tier 1", data-image='/128x128.png')
+											span.payment.col-xs-6
+												form#awayform()
+													label.paymentlabel Mark yourself as away
+													button.btn.btn-warning.away
+														span#away I'm away!
 									div
 										each year, index in user.desk_rental_status
 											.panel.panel-default
