@@ -115,6 +115,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 				// set the new 'paid until' to the old
 				var oldYear = oldPaidUntil.getFullYear();
 				result.membership_paid = oldPaidUntil.setFullYear(oldYear + 1);
+				result.markModified('membership_paid');
 			}
 
 		} else if (transaction.type === "desk") {
@@ -123,17 +124,16 @@ exports.newTransaction = function(username, transaction, onComplete) {
 			var currentMonth = now.getMonth();
 
 			if (!deskHistory[currentYear]) {
-				deskHistory[currentYear] = new DeskRental();
+				result.desk_rental_status[currentYear] = new DeskRental();
 			} else if (deskHistory[currentYear][currentMonth] === "paid") {
 				return onComplete("already paid m8");
 			}
-			deskHistory[currentYear][currentMonth] = "paid";
+			result.desk_rental_status[currentYear][currentMonth] = "paid";
+			result.markModified('desk_rental_status');
 		}
 
 		result.transaction_history.push(transaction);
-		result.save(function(err) {if (err) console.log(err); });
-		Account.findOneAndUpdate({username : username}, {membership_active_status: true, membership_paid: result.membership_paid}, function(err, success) {
-			console.log("success membership paid", success.membership_paid);
+		result.save({username : username}, function(err, success) {
 			if(err) {
 				return onComplete(err);
 			}
