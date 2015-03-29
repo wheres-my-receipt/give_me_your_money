@@ -6,6 +6,7 @@ var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var config 	 = require('../config.js');
 var accounts = require("../models/accounts.js");
 var messages = require("../messages/messages.js");
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 var creationValidation = Joi.object({
 		email: Joi.string().email().required(),
@@ -96,6 +97,7 @@ module.exports = {
 			accounts.getAccount(userToFind, function(err, result) {
 				request.auth.session.set("alerts", []);
 				if (err) {
+					console.log(err);
 					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }], moment: moment});
 				}
 				return reply.view('account.jade', {user: result, alerts: alerts, months: months, thisMonth: thisMonth, moment: moment});
@@ -241,7 +243,9 @@ module.exports = {
 				if (err) {
 					return reply(err);
 				}
-				return reply.view( 'member', {user :result });
+				var today = new Date();
+				var thisMonth = today.getMonth();
+				return reply.view( 'member', {user :result, months: months, thisMonth: thisMonth, moment: moment });
 			});
 		}
 	},
@@ -431,6 +435,8 @@ module.exports = {
 	createMessage : {
 		handler : function (request, reply) {
 			var member = request.params.member;
+			var today = new Date();
+			var thisMonth = today.getMonth();
 
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
@@ -443,14 +449,13 @@ module.exports = {
 				contents: request.payload.contents
 			};
 
-			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, body ) {
+			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, memberDocument, body ) {
 				if( error ){
-					return reply.view( 'member', {user:emailDetails, alerts: [{ isError : true, alert: error }] });
+					return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{ isError : true, alert: error }] });
 				}
 				else {
-					return reply.view( 'member', {user: emailDetails, alerts: [{isSuccess: true, alert: body.message}]});
-					//return reply.redirect("/admin/member/"+emailDetails.member);
-					//, messages: data.message_history
+					return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{isSuccess: true, alert: body.message}]});
+					// return reply.redirect("/admin");
 				}
 			});
 
