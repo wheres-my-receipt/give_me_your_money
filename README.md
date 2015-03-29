@@ -26,7 +26,13 @@ cry when it doesn't run
 ```
 
 #### How to test
+You'll need mongod installed.
 ```
+//Terminal 1
+mkdir data
+mongod --dbpath ./data --port 9000
+
+/Terminal 2
 gulp
 cry
 ```
