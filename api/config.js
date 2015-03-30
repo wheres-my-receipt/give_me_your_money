@@ -1,3 +1,7 @@
+// TODO - put require("./creds.json") back in each || statment
+// the purpose of this file is to avoid requiring creds. json when it's not present,e.g. on heroku, and crashing the process.
+// requiring normally at the top of the file will cause such a crash if creds.json is not htere
+
 /* $lab:coverage:off$ */
 var creds = require("./creds.json");
 
