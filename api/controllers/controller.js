@@ -6,6 +6,7 @@ var stripe 	 = require("stripe")(require("../config.js").stripe.sk);
 var config 	 = require('../config.js');
 var accounts = require("../models/accounts.js");
 var messages = require("../messages/messages.js");
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 var creationValidation = Joi.object({
 		email: Joi.string().email().required(),
@@ -20,6 +21,10 @@ var updateValidation = Joi.object({
 		last_name: Joi.string(),
 		phone_number: Joi.string().min(11).max(13)
 	}).or("email", "first_name", "last_name", "phone_number");
+
+var updateDeskValidation = Joi.object({
+	status: Joi.string().valid("unpaid", "paid", "away").required()
+});
 
 module.exports = {
 
@@ -46,6 +51,7 @@ module.exports = {
 					email 		: g.profile.email,
 					avatar 		: g.profile.raw.avatar_url,
 					url 		: g.profile.raw.url,
+					alerts 		: [],
 					account 	: false
 				};
 
@@ -81,15 +87,20 @@ module.exports = {
 			if (!request.auth.credentials.account) {
 				return reply.redirect("/signup");
 			}
+			console.log(request.auth.credentials);
 			var userToFind = request.auth.credentials.username;
+			var alerts = request.auth.credentials.alerts;
 			var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 			var today = new Date();
 			var thisMonth = today.getMonth();
+
 			accounts.getAccount(userToFind, function(err, result) {
+				request.auth.session.set("alerts", []);
 				if (err) {
+					console.log(err);
 					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }], moment: moment});
 				}
-				return reply.view('account.jade', {user: result, months: months, thisMonth: thisMonth, moment: moment});
+				return reply.view('account.jade', {user: result, alerts: alerts, months: months, thisMonth: thisMonth, moment: moment});
 			});
 		}
 	},
@@ -159,24 +170,13 @@ module.exports = {
 	// Payment Operations
 	payment: {
 		handler: function (request, reply) {
-			// First, check the type of payment
-			// If the type of payment is 'desk', check whether they are authorized
-			// And if they have already paid for this month's desk space, deny the request?
-			// If not, grab the rate from the DB and charge them for it
-			// And add the 'paid' status to the current month of the year in the db
-
-			// If the type of payment is 'membership', check their active status
-			// If active, deny the request?
-			// If not, charge them for 50 squid and set active_status to true
-			// If they paid for their membership less than a year from today,
-			// then extend membership_paid by 1 year.
-			// else set membership_paid to now.
 
 			var paymentFor 		= request.params.type;
 			var stripeToken		= request.payload.stripeToken;
 			var accountToUpdate = request.auth.credentials.username;
+			var alerts 			= request.auth.credentials.alerts;
 			var newCharge;
-			var alerts = [];
+
 			accounts.getAccount(accountToUpdate, function(err, result) {
 				var paymentSchemes = {
 					membership: {
@@ -227,7 +227,8 @@ module.exports = {
 					return accounts.newTransaction(accountToUpdate, transactionObject, function(err, success) {
 						if (err) {return reply(err);}
 						alerts.push( {isSuccess: true, alert: "Successfully Added To Transaction History" });
-						return reply.view('account', {user: success, alerts: alerts, moment: moment });
+						request.auth.session.set("alerts", alerts);
+						return reply.redirect("/account");
 					});
 				});
 			});
@@ -242,7 +243,9 @@ module.exports = {
 				if (err) {
 					return reply(err);
 				}
-				return reply.view( 'member', {user :result });
+				var today = new Date();
+				var thisMonth = today.getMonth();
+				return reply.view( 'member', {user :result, months: months, thisMonth: thisMonth, moment: moment });
 			});
 		}
 	},
@@ -309,7 +312,7 @@ module.exports = {
 				messages.addToMembersList(accountToCreate);
 				messages.sendEmail(accountToCreate, "Acknowledge", function( error, data ) {
 					if( err ) {
-						return reply.view( 'account', {user: result, alerts: [{isError:true, alert: "Error sending sign up confirmation"}]});
+						request.auth.session.set("alerts", [{isError:true, alert: "Error sending sign up confirmation"}]);
 					}
 					return reply.redirect("/account");
 				});
@@ -337,24 +340,71 @@ module.exports = {
 
 			var userToUpdate = request.params.member;
 			var updateTheseFields = request.payload;
+			var alerts = request.auth.credentials.alerts;
+
+			if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
+				alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+				request.auth.session.set("alerts", alerts);
+				return reply.redirect("/account");
+			}
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
-				if (err) {return reply(err);}
+				if (err) {
+					// need to stick the alert+redirect setting block in a function
+					alerts.push({isError: true, alert: "Error updating your account: " + err});
+					request.auth.session.set("alerts", alerts);
+					return reply.redirect("/account");
+				}
 				if (updateTheseFields.desk_authorization) {
 					messages.sendEmail(result, 'VerifyAccount', function(err){
-						if (err) console.log(err);
-						return reply.redirect("/account");
+						if (err) {
+							alerts.push({isError: true, alert: "Error updating your account: " + err});
+							request.auth.session.set("alerts", alerts);
+							return reply.redirect("/account");
+						}
 					});
 				}
 				if (updateTheseFields.admin_rights) {
 					messages.sendEmail(result, 'AdminRights', function(err){
-						if (err) console.log(err);
-						return reply.redirect("/account");
+						if (err) {
+							alerts.push({isError: true, alert: "Error updating your account: " + err});
+							request.auth.session.set("alerts", alerts);
+							return reply.redirect("/account");
+						}
 					});
 				}
-				else {
-					return reply.redirect("/account");
+				alerts.push({isSuccess: true, alert: "Account successfully updated"});
+				request.auth.session.set("alerts", alerts);
+				return reply.redirect("/account");
+			});
+		}
+	},
+
+	updateAccountDesk: {
+		validate:{
+                payload: updateDeskValidation,
+        },
+		handler: function (request, reply) {
+
+			var userToUpdate = request.params.member;
+			var year = request.params.year;
+			var month = request.params.month;
+			var status = request.payload.status;
+			var alerts = request.auth.credentials.alerts;
+
+			if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
+				alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+				request.auth.session.set("alerts", alerts);
+				return reply.redirect("/account");
+			}
+
+			accounts.changeDeskStatus(userToUpdate, status, month, year, function(err, result) {
+				if (err) {
+					alerts.push({isError: true, alert: "Error: " + err});
+					console.log(err);
+					request.auth.session.set("alerts", alerts);
 				}
+				return reply.redirect("/account");
 			});
 		}
 	},
@@ -362,8 +412,20 @@ module.exports = {
 	deleteAccount: {
 		handler: function (request, reply) {
 			var userToDelete = request.params.member;
+			var alerts = request.auth.credentials.alerts;
+
+			if(userToDelete !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
+				alerts.push({isError: true, alert: "You're not authorized to delete that user's account"});
+				request.auth.session.set("alerts", alerts);
+				return reply.redirect("/account");
+			}
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
+				if (err) {
+					alerts.push({isError: true, alert: "Error deleting your account: " + err});
+					request.auth.session.set("alerts", alerts);
+					return reply.redirect("/account");
+				}
 				request.auth.session.set("account", false);
 				return reply.redirect("/logout");
 			});
@@ -373,6 +435,8 @@ module.exports = {
 	createMessage : {
 		handler : function (request, reply) {
 			var member = request.params.member;
+			var today = new Date();
+			var thisMonth = today.getMonth();
 
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
@@ -385,14 +449,13 @@ module.exports = {
 				contents: request.payload.contents
 			};
 
-			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, body ) {
+			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, memberDocument, body ) {
 				if( error ){
-					return reply.view( 'member', {user:emailDetails, alerts: [{ isError : true, alert: error }] });
+					return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{ isError : true, alert: error }] });
 				}
 				else {
-					// return reply.view( 'member', {user: emailDetails, alerts: [{isSuccess: true, alert: body.message}]});
-					return reply.redirect("/admin");
-
+					return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{isSuccess: true, alert: body.message}]});
+					// return reply.redirect("/admin");
 				}
 			});
 
