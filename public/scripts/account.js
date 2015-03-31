@@ -3,6 +3,7 @@ $(document).ready(function() {
 	var myUser = $("#username")[0].innerHTML;
 
 	$("#editform").on("submit", function(e) {
+		console.log( 'IN ACCOUNT.JS');
 		var updateData = {};
 		if ($("#first_name").val()) { updateData.first_name = $("#first_name").val();}
 		if ($("#last_name").val()) { updateData.last_name = $("#last_name").val();}
@@ -41,7 +42,7 @@ $(document).ready(function() {
 			method: "DELETE",
 			success: function() {
     			window.location.reload(true);
-			}	
+			}
 		});
 	});
 });
