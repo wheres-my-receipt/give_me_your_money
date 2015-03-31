@@ -58,7 +58,7 @@ server.register([Bell, Cookie], function (err) {
 		isCached: false
 	});
 
-	server.method( 'updateAccount', controller.updateAccount.handler, {});
+	server.method( 'updateAccountHelper', controller.updateAccountHelper, {});
 	server.auth.default('session');
 	server.route( routes );
 });

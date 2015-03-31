@@ -253,45 +253,37 @@ module.exports = {
 	updateMemberView: {
 		handler: function (request, reply) {
 			var userToUpdate = request.params.member;
-			var updateTheseFields = request.payload;
-			var alerts = request.auth.credentials.alerts;
+			// var updateTheseFields = request.payload;
+			// var alerts = request.auth.credentials.alerts;
 
-			if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
-				alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
-				request.auth.session.set("alerts", alerts);
-				return reply.redirect("/account");
-			}
-			console.log( 'User to update: ' + userToUpdate );
-			console.log( 'Request update fields: ' + JSON.stringify( updateTheseFields));
-			var result = request.server.methods.updateAccount(request, reply);
-			console.log( 'Result: ' + JSON.stringify(result));
-			alerts = request.auth.credentials.alerts;
-			var today = new Date();
-			var thisMonth = today.getMonth();
-			return reply.view( 'member', {user :result, months: months, thisMonth: thisMonth, moment: moment });
-
+			// if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
+			// 	alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+			// 	request.auth.session.set("alerts", alerts);
+			// 	return reply.redirect("/admin");
+			// }
+			return request.server.methods.updateAccountHelper(request, reply, function( err, result) {
+				console.log( 'Result: ' + JSON.stringify(result));
+				var today = new Date();
+				var thisMonth = today.getMonth();
+				console.log( "Redirect to /admin/member/{user}");
+				return reply.redirect( '/admin/members' + userToUpdate);
+			});
+			// console.log( 'Request.server: ' + request.server );
 			// request.server.inject({
 			// 	method  : 'PUT',
-			// 	url     : 'http://localhost:3000/api/accounts/' + userToUpdate,
+			// 	url     : '/api/accounts/' + userToUpdate,
 			// 	// headers : request.headers,
 			// 	payload : updateTheseFields
 			// }, function (result) {
 			// 	console.log('Request: ' + JSON.stringify( result.raw.req));
-			// 	console.log( 'Server inject: ' + result.result);
+			// 	console.log( 'Server inject: ' + result.statusCode);
+			// 	console.log( 'Server inject: ' + result.payload);
 
 			// 	var today = new Date();
 			// 	var thisMonth = today.getMonth();
-				// return reply.view( 'member', {user :result, months: months, thisMonth: thisMonth, moment: moment });
+			// 	// return reply.view( 'member', {user :result, months: months, thisMonth: thisMonth, moment: moment });
+			// 	return reply.redirect( '/admin/members' + userToUpdate);
 
-			// });
-
-			// accounts.getAccount( userToFind, function( err, result ){
-			// 	if (err) {
-			// 		return reply(err);
-			// 	}
-			// 	var today = new Date();
-			// 	var thisMonth = today.getMonth();
-			// 	return reply.view( 'member', {user :result, months: months, thisMonth: thisMonth, moment: moment });
 			// });
 		}
 	},
@@ -379,11 +371,30 @@ module.exports = {
 
 
 	updateAccount: {
-		// validate:{
-		// 		payload: updateValidation,
-		// },
+		validate:{
+				payload: updateValidation,
+		},
 		handler: function (request, reply) {
 
+			// return request.server.methods.updateAccountHelper(request, reply, function( err, result) {
+			// 	console.log( 'Result: ' + JSON.stringify(result));
+			// 	var today = new Date();
+			// 	var thisMonth = today.getMonth();
+			// 	if (err) {
+			// 		console.log( 'Error in updateAccountHelper: ' + err );
+			// 	}
+			// 	console.log( 'alerts: ' + request.auth.session.alerts);
+			// 	console.log( "Redirect to /account");
+
+			// 	return reply.redirect("/account");
+			// });
+			// updateAccountHelper( request, reply, function( err, result ) {
+			// 	if (err) {
+			// 		console.log( 'Error in updateAccountHelper: ' + err );
+			// 	}
+			// 	console.log( 'alerts: ' + request.auth.session.alerts);
+			// 	return reply.redirect("/account");
+			// });
 			var userToUpdate = request.params.member;
 			var updateTheseFields = request.payload;
 			var alerts = request.auth.credentials.alerts;
@@ -396,17 +407,16 @@ module.exports = {
 			}
 
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
-				console.log( 'After updateAccount:' + err + ' : ' + result );
 				if (err) {
 					// need to stick the alert+redirect setting block in a function
 					alerts.push({isError: true, alert: "Error updating your account: " + err});
 					request.auth.session.set("alerts", alerts);
-					//return reply.redirect("/account");
-					return result;
+					return reply.redirect("/account");
 				}
 				if (updateTheseFields.desk_authorization) {
 					messages.sendEmail(result, 'VerifyAccount', function(err){
 						if (err) {
+							console.log( 'Error sending email: ' + err );
 							alerts.push({isError: true, alert: "Error updating your account: " + err});
 							request.auth.session.set("alerts", alerts);
 							return reply.redirect("/account");
@@ -422,10 +432,12 @@ module.exports = {
 						}
 					});
 				}
+				console.log( 'After updateAccount:' + err + ' : ' + result );
+
 				alerts.push({isSuccess: true, alert: "Account successfully updated"});
 				request.auth.session.set("alerts", alerts);
-				// return reply.redirect("/account");
-				return result;
+				console.log( 'Alerts: ' + request.auth.session.alerts );
+				return reply.redirect("/account");
 			});
 		}
 	},
@@ -510,5 +522,59 @@ module.exports = {
 			});
 
 		}
+	},
+
+	// update helper functions
+	updateAccountHelper: function (request, reply, onComplete) {
+
+		var userToUpdate = request.params.member;
+		var updateTheseFields = request.payload;
+		var alerts = request.auth.credentials.alerts;
+		console.log( 'User: ' + userToUpdate );
+		console.log( 'Fields to update: ' + JSON.stringify( updateTheseFields ));
+		if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
+			alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+			request.auth.session.set("alerts", alerts);
+			// return reply.redirect("/account");
+			return onComplete( "Error: You're not authorized to update user accounts");
+		}
+
+		accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
+			if (err) {
+				// need to stick the alert+redirect setting block in a function
+				alerts.push({isError: true, alert: "Error updating your account: " + err});
+				request.auth.session.set("alerts", alerts);
+				//return reply.redirect("/account");
+				return onComplete( err );
+			}
+			if (updateTheseFields.desk_authorization) {
+				messages.sendEmail(result, 'VerifyAccount', function(err){
+					if (err) {
+						console.log( 'Error sending email: ' + err );
+						alerts.push({isError: true, alert: "Error updating your account: " + err});
+						request.auth.session.set("alerts", alerts);
+						// return reply.redirect("/account");
+						return onComplete( err );
+
+					}
+				});
+			}
+			if (updateTheseFields.admin_rights) {
+				messages.sendEmail(result, 'AdminRights', function(err){
+					if (err) {
+						alerts.push({isError: true, alert: "Error updating your account: " + err});
+						request.auth.session.set("alerts", alerts);
+						// return reply.redirect("/account");
+						return onComplete( err );
+					}
+				});
+			}
+			console.log( 'After updateAccount:' + err + ' : ' + result );
+
+			alerts.push({isSuccess: true, alert: "Account successfully updated"});
+			request.auth.session.set("alerts", alerts);
+			// return reply.redirect("/account");
+			return onComplete( err, result );
+		});
 	}
 };
