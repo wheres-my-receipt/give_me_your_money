@@ -147,7 +147,7 @@ exports.newTransaction = function(username, transaction, onComplete) {
 };
 
 exports.changeDeskStatus = function(username, status, month, year, onComplete) {
-	
+
 	Account.findOne({username: username}, function(err, result) {
 		if(err) return onComplete(err);
 
@@ -175,7 +175,7 @@ exports.newMessage = function(username, emailDetails, onComplete) {
 		}
 		var messageObject = {
 			to: emailDetails.to,
-			from: 'facmembershipadmin@gmail.com',
+			from: emailDetails.from,
 			date: new Date(),
 			subject: emailDetails.subject ,
 			text: emailDetails.text

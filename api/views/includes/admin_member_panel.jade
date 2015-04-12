@@ -1,66 +1,51 @@
-extends ../layouts/member_layout
-block append listItems
-	li
-		a(href='#mailform', data-toggle='tab')
-			span.glyphicon.glyphicon-envelope
-block listItemPane
-	#mailform.tab-pane
-		include ./message_form.jade
-block profile
-	p You have been a member since #{moment(user.member_since).format("Do MMMM, YYYY")}
-	form#adminedit.form-horizontal
-		.form-group
-			label.control-label.col-xs-2(for='inputUserName') User
-			.col-xs-10
-				p.form-control-static#username #{user.username}
-		.form-group
-			.col-xs-10
-				p You are a currently #{user.membership_active_status ? "active" : "inactive"} member of Founders & Coders
-					span
-						if user.membership_active_status
-							select#memberStatus(name='membership_active_status')
-								option(value='active' selected="selected") Active
-								option(value='inactive') Inactive
-						else
-							select#memberStatus(name='membership_active_status')
-								option(value='active') Active
-								option(value='inactive' selected="selected") Inactive
-		.form-group
-			.col-xs-10
-				p You are currently #{user.desk_authorization ? "able" : "not yet able"} to rent desks.
-					span
-						if user.desk_authorization
-							select#deskStatus(name='desk_authorization')
-								option(value="active" selected="selected") Active
-								option(value="inactive") Inactive
-						else
-							select#deskStatus(name='desk_authorization')
-								option(value="active" ) Active
-								option(value="inactive" selected="selected") Inactive
-		.form-group
-			.col-xs-10
-				if (user.membership_paid)
-					p You have paid for your membership until #{moment(user.membership_paid).format("Do MMMM, YYYY")}.
-				else
-					p You have not paid for your membership. Membership Fee £#{user.membership_fee/100}
-				//- div.section#desk-wrapper
-				each year, index in user.desk_rental_status
-					.panel.panel-default
-						a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#d-collapse', aria-expanded='false', aria-controls='d-collapse')
-							.panel-heading(role='tab', id='d-heading')
-								h4.panel-title
-									| Desk Activity #{index}:
-						.panel-collapse.collapse(role='tabpanel', aria-labelledby='d-heading', id="d-collapse")
-							.list-group
-							- for(var i=0; i<thisMonth+1; i++)
-								div.monthlist
-									span.month #{months[i]}:
-									if (year[i] === "unpaid")
-										span.status.label.label-danger #{year[i]}
-									if (year[i] === "paid")
-										span.status.label.label.label-success #{year[i]}
-									if (year[i] === "away")
-										span.status.label.label-warning #{year[i]}
-		.form-group
-			.col-xs-6.col-xs-offset-5
-				button.btn.btn-primary(type='submit') Save
+.container
+	.row
+		.tabbable.tabs-left.col-md-8.col-md-offset-2.contentwrapper
+			ul.nav.nav-tabs
+				li.active
+					a(href='#profile', data-toggle='tab') Profile
+				li
+					a(href='#messages', data-toggle='tab') Messages
+				li
+						a(href='#transactions', data-toggle='tab') Transactions
+				li
+					a(href='#mailform', data-toggle='tab')
+						span.glyphicon.glyphicon-envelope
+			.tab-content
+				#profile.tab-pane.active
+					#profileheader
+						h2.tabheader#name  Hello #{user.first_name} #{user.last_name}
+						img.profilePic.img-rounded(src=user.github_avatar href=user.github_link)
+					#profilebody
+						.section#member-wrapper
+							include ./admin_member_profile.jade
+				#messages.tab-pane
+					h2.tabheader  Your Messages
+					#accordion.panel-group(role='tablist', aria-multiselectable='true')
+					if user.message_history
+						each message, index in user.message_history
+							.panel.panel-default
+								.panel-heading(role='tab', id='m-heading' + index)
+									h4.panel-title
+										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#t-collapse' + index, aria-expanded='false', aria-controls='t-collapse' + index)
+											| #{moment(message.date).format("Do, DD-MM-YY, h:mm") + ": " + message.subject}
+								.panel-collapse.collapse(role='tabpanel', aria-labelledby='m-heading' + index, id="t-collapse" + index)
+									.panel-body
+										| #{message.text}
+				#transactions.tab-pane
+					h2.tabheader  Your transaction history
+					#accordion.panel-group(role='tablist', aria-multiselectable='true')
+						if user.transaction_history
+							each transaction, index in user.transaction_history
+								.panel.panel-default
+									.panel-heading(role='tab', id='t-heading' + index)
+										h4.panel-title
+											a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#m-collapse' + index, aria-expanded='false', aria-controls='m-collapse' + index)
+												| #{moment(transaction.date).format("DD-MM-YY")}
+									.panel-collapse.collapse(role='tabpanel', aria-labelledby='t-heading' + index, id="m-collapse" + index)
+										.panel-body
+											| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "one month's desk rental" : "annual membership"}.
+											br
+											| Amount paid: £#{transaction.amount/100}
+				#mailform.tab-pane
+					include ./message_form.jade

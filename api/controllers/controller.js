@@ -93,9 +93,13 @@ module.exports = {
 			var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 			var today = new Date();
 			var thisMonth = today.getMonth();
-
+			console.log( 'Account view, alerts: ' + JSON.stringify( alerts ));
 			accounts.getAccount(userToFind, function(err, result) {
+				// request.auth.session.alerts = [];
 				request.auth.session.set("alerts", []);
+
+				console.log( 'Account view, alerts cleared: ' + JSON.stringify( request.auth.credentials.alerts ));
+
 				if (err) {
 					console.log(err);
 					return reply.view("account", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }], moment: moment});
@@ -107,52 +111,52 @@ module.exports = {
 
 	messagesView: {
 		handler: function (request, reply) {
-			if(request.auth.isAuthenticated) {
-				if (!request.auth.credentials.account) {
-					return reply.redirect("/signup");
+			if (!request.auth.credentials.account) {
+				return reply.redirect("/signup");
+			}
+			var userToFind = request.auth.credentials.username;
+			accounts.getAccount( userToFind, function (err, data ) {
+				if(err) {
+					return reply.view("messages", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
 				}
-				var userToFind = request.auth.credentials.username;
-				accounts.getAccount( userToFind, function (err, data ) {
-					if(err) {
-						return reply.view("messages", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
-					}
-					if( !data ){
-						return reply.view("messages", { user: undefined });
-					}
-					return reply.view("messages", { user: userToFind, messages: data.message_history });
-				});
-			}
-			else{
-				return reply.redirect( "/");
-			}
+				if( !data ){
+					return reply.view("messages", { user: undefined });
+				}
+				return reply.view("messages", { user: userToFind, messages: data.message_history });
+			});
 		}
 	},
 
 	adminView: {
 		handler: function (request, reply) {
-			if(request.auth.isAuthenticated) {
-				var userToFind = request.auth.credentials.username;
-				accounts.getAccount( userToFind, function (err, data ) {
-					if(err) {
-						return reply.view("admin_fail", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
-					}
-					if( !data ){
-						return reply.view("admin_fail", { user: undefined });
-					}
-					if( data.admin_rights){
-						// get all members for display on admin 'landing page'
-						accounts.getAccounts( function (err, members ) {
-							return reply.view("admin", { user: data, members: members });
-						});
-					}
-					else {
-						return reply.view("admin_fail", { user: data });
-					}
-				});
+			if (!request.auth.credentials.account) {
+				return reply.redirect("/signup");
 			}
-			else{
-				return reply.redirect("/account");
-			}
+			var userToFind = request.auth.credentials.username;
+			var alerts = request.auth.credentials.alerts;
+			console.log( 'Admin view, alerts: ' + JSON.stringify( alerts ));
+			accounts.getAccount( userToFind, function (err, data ) {
+				request.auth.session.set("alerts", []);
+				console.log( 'Admin view, alerts: ' + request.auth.credentials.alerts);
+
+				if(err) {
+					return reply.view("admin_fail", { user: undefined, alerts: [{isError: true, alert: "Error: " + err }]});
+				}
+				if( !data ){
+					return reply.view("admin_fail", { user: undefined, alerts: [{isError: true, alert: "No Account Data"}]});
+				}
+				// if user found has admin rights then allow them to view admin pages
+				if( data.admin_rights){
+					// get all members for display on admin 'landing page'
+					accounts.getAccounts( function (err, members ) {
+						return reply.view("admin", { user: data, members: members, mailLists: messages.getAllMailLists(), alerts: alerts });
+					});
+				}
+				else {
+					alerts.unshift( {isError: true, alert: "You do not have Administration Rights!"});
+					return reply.view("admin_fail", { user: data, alerts: alerts });
+				}
+			});
 		}
 	},
 
@@ -211,10 +215,10 @@ module.exports = {
 				}
 				var charge = stripe.charges.create(newCharge, function(err, charge) {
 					if (err) {return reply(err);}
-					alerts.push( {isSuccess: true, alert: "Thank you, your payment has been taken."});
+					alerts.unshift( {isSuccess: true, alert: "Thank you, your payment has been taken."});
 					messages.sendEmail(result, "PaymentReceipt", function( error, data ) {
 						if( error ) {
-							alerts.push({isError:true, alert: "Error sending payment receipt."});
+							alerts.unshift({isError:true, alert: "Error sending payment receipt."});
 						}
 					});
 					var transactionObject = {
@@ -226,7 +230,7 @@ module.exports = {
 
 					return accounts.newTransaction(accountToUpdate, transactionObject, function(err, success) {
 						if (err) {return reply(err);}
-						alerts.push( {isSuccess: true, alert: "Successfully Added To Transaction History" });
+						alerts.unshift( {isSuccess: true, alert: "Successfully Added To Transaction History" });
 						request.auth.session.set("alerts", alerts);
 						return reply.redirect("/account");
 					});
@@ -257,7 +261,7 @@ module.exports = {
 			// var alerts = request.auth.credentials.alerts;
 
 			// if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
-			// 	alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+			// 	alerts.unshift({isError: true, alert: "You're not authorized to update that user's account"});
 			// 	request.auth.session.set("alerts", alerts);
 			// 	return reply.redirect("/admin");
 			// }
@@ -266,7 +270,7 @@ module.exports = {
 				var today = new Date();
 				var thisMonth = today.getMonth();
 				console.log( "Redirect to /admin/member/{user}");
-				return reply.redirect( '/admin/members' + userToUpdate);
+				return reply.redirect( '/admin');///members' + userToUpdate);
 			});
 			// console.log( 'Request.server: ' + request.server );
 			// request.server.inject({
@@ -401,7 +405,7 @@ module.exports = {
 			console.log( 'User: ' + userToUpdate );
 			console.log( 'Fields to update: ' + JSON.stringify( updateTheseFields ));
 			if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
-				alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+				alerts.unshift({isError: true, alert: "You're not authorized to update that user's account"});
 				request.auth.session.set("alerts", alerts);
 				return reply.redirect("/account");
 			}
@@ -409,15 +413,21 @@ module.exports = {
 			accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
 				if (err) {
 					// need to stick the alert+redirect setting block in a function
-					alerts.push({isError: true, alert: "Error updating your account: " + err});
+					alerts.unshift({isError: true, alert: "Error updating your account: " + err});
 					request.auth.session.set("alerts", alerts);
 					return reply.redirect("/account");
 				}
 				if (updateTheseFields.desk_authorization) {
+					var forMailList = {
+						email: result.email,
+						first_name : result.first_name,
+						last_name : result.last_name
+					};
+					messages.addToDeskOccupantsList( forMailList);
 					messages.sendEmail(result, 'VerifyAccount', function(err){
 						if (err) {
 							console.log( 'Error sending email: ' + err );
-							alerts.push({isError: true, alert: "Error updating your account: " + err});
+							alerts.unshift({isError: true, alert: "Error updating your account: " + err});
 							request.auth.session.set("alerts", alerts);
 							return reply.redirect("/account");
 						}
@@ -426,7 +436,7 @@ module.exports = {
 				if (updateTheseFields.admin_rights) {
 					messages.sendEmail(result, 'AdminRights', function(err){
 						if (err) {
-							alerts.push({isError: true, alert: "Error updating your account: " + err});
+							alerts.unshift({isError: true, alert: "Error updating your account: " + err});
 							request.auth.session.set("alerts", alerts);
 							return reply.redirect("/account");
 						}
@@ -434,7 +444,7 @@ module.exports = {
 				}
 				console.log( 'After updateAccount:' + err + ' : ' + result );
 
-				alerts.push({isSuccess: true, alert: "Account successfully updated"});
+				alerts.unshift({isSuccess: true, alert: "Account successfully updated"});
 				request.auth.session.set("alerts", alerts);
 				console.log( 'Alerts: ' + request.auth.session.alerts );
 				return reply.redirect("/account");
@@ -455,14 +465,14 @@ module.exports = {
 			var alerts = request.auth.credentials.alerts;
 
 			if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
-				alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+				alerts.unshift({isError: true, alert: "You're not authorized to update that user's account"});
 				request.auth.session.set("alerts", alerts);
 				return reply.redirect("/account");
 			}
 
 			accounts.changeDeskStatus(userToUpdate, status, month, year, function(err, result) {
 				if (err) {
-					alerts.push({isError: true, alert: "Error: " + err});
+					alerts.unshift({isError: true, alert: "Error: " + err});
 					console.log(err);
 					request.auth.session.set("alerts", alerts);
 				}
@@ -477,14 +487,14 @@ module.exports = {
 			var alerts = request.auth.credentials.alerts;
 
 			if(userToDelete !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
-				alerts.push({isError: true, alert: "You're not authorized to delete that user's account"});
+				alerts.unshift({isError: true, alert: "You're not authorized to delete that user's account"});
 				request.auth.session.set("alerts", alerts);
 				return reply.redirect("/account");
 			}
 
 			accounts.deleteAccount(userToDelete, function(err, result) {
 				if (err) {
-					alerts.push({isError: true, alert: "Error deleting your account: " + err});
+					alerts.unshift({isError: true, alert: "Error deleting your account: " + err});
 					request.auth.session.set("alerts", alerts);
 					return reply.redirect("/account");
 				}
@@ -499,10 +509,10 @@ module.exports = {
 			var member = request.params.member;
 			var today = new Date();
 			var thisMonth = today.getMonth();
-
+			var alerts = request.auth.credentials.alerts;
 			//var recipient_user	= request.payload.recipient;
 			var emailDetails = {
-				emailtype: request.payload.emailtype2,
+				emailtype: request.payload.emailtype,
 				email: request.payload.email,
 				username: request.params.member,
 				first_name: request.payload.firstname,
@@ -513,11 +523,17 @@ module.exports = {
 
 			messages.sendEmail( emailDetails, emailDetails.emailtype, function ( error, message, memberDocument, body ) {
 				if( error ){
-					return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{ isError : true, alert: error }] });
+					console.log( "Error sending email: " + error);
+					alerts.unshift({ isError : true, alert: error });
+					request.auth.session.set("alerts", alerts);
+					return reply.redirect("/admin");
+					// return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [] });
 				}
 				else {
-					return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{isSuccess: true, alert: body.message}]});
-					// return reply.redirect("/admin");
+					alerts.unshift({isSuccess: true, alert: body.message});
+					request.auth.session.set("alerts", alerts );
+					// return reply.view( 'member', {user: memberDocument, months: months, thisMonth: thisMonth, moment: moment, alerts: [{isSuccess: true, alert: body.message}]});
+					return reply.redirect("/admin");
 				}
 			});
 
@@ -533,7 +549,7 @@ module.exports = {
 		console.log( 'User: ' + userToUpdate );
 		console.log( 'Fields to update: ' + JSON.stringify( updateTheseFields ));
 		if(userToUpdate !== request.auth.credentials.username && !request.auth.credentials.admin_rights) {
-			alerts.push({isError: true, alert: "You're not authorized to update that user's account"});
+			alerts.unshift({isError: true, alert: "You're not authorized to update that user's account"});
 			request.auth.session.set("alerts", alerts);
 			// return reply.redirect("/account");
 			return onComplete( "Error: You're not authorized to update user accounts");
@@ -542,7 +558,7 @@ module.exports = {
 		accounts.updateAccount(userToUpdate, updateTheseFields, function(err, result) {
 			if (err) {
 				// need to stick the alert+redirect setting block in a function
-				alerts.push({isError: true, alert: "Error updating your account: " + err});
+				alerts.unshift({isError: true, alert: "Error updating your account: " + err});
 				request.auth.session.set("alerts", alerts);
 				//return reply.redirect("/account");
 				return onComplete( err );
@@ -551,7 +567,7 @@ module.exports = {
 				messages.sendEmail(result, 'VerifyAccount', function(err){
 					if (err) {
 						console.log( 'Error sending email: ' + err );
-						alerts.push({isError: true, alert: "Error updating your account: " + err});
+						alerts.unshift({isError: true, alert: "Error updating your account: " + err});
 						request.auth.session.set("alerts", alerts);
 						// return reply.redirect("/account");
 						return onComplete( err );
@@ -562,7 +578,7 @@ module.exports = {
 			if (updateTheseFields.admin_rights) {
 				messages.sendEmail(result, 'AdminRights', function(err){
 					if (err) {
-						alerts.push({isError: true, alert: "Error updating your account: " + err});
+						alerts.unshift({isError: true, alert: "Error updating your account: " + err});
 						request.auth.session.set("alerts", alerts);
 						// return reply.redirect("/account");
 						return onComplete( err );
@@ -571,7 +587,7 @@ module.exports = {
 			}
 			console.log( 'After updateAccount:' + err + ' : ' + result );
 
-			alerts.push({isSuccess: true, alert: "Account successfully updated"});
+			alerts.unshift({isSuccess: true, alert: "Account successfully updated"});
 			request.auth.session.set("alerts", alerts);
 			// return reply.redirect("/account");
 			return onComplete( err, result );

@@ -1,0 +1,27 @@
+.container
+	.row
+		.tabbable.tabs-left.col-md-8.col-md-offset-2.contentwrapper
+			ul.nav.nav-tabs
+				li.active
+					a(href='#members', data-toggle='tab') Members
+				li
+						a(href='#alerts', data-toggle='tab') Alerts
+				li
+					a(href='#maillists', data-toggle='tab') Maillists
+						span.glyphicon.glyphicon-envelope
+			.tab-content
+				#members.tab-pane.active
+					h2.tabheader Founders And Coders Members
+						div
+							for member in members
+								.panel.panel-default
+									.panel-heading(role="tab")
+										h3.panel-title
+											a(href='/admin/member/'+member.username) #{member.first_name} #{member.last_name}
+												span.sendicon
+													a(href='/admin/message/'+member.username)
+														span.glyphicon.glyphicon-envelope
+				#alerts.tab-pane
+				#maillists.tab-pane
+					include ./message_form.jade
+

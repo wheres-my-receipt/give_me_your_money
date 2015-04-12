@@ -15,7 +15,12 @@ $(document).ready(function() {
 			method: "PUT",
 			data: updateData,
 			success: function() {
+				console.log( 'In AJAX success cb');
     			window.location.reload(true);
+			},
+			complete: function(){
+				console.log( 'In AJAX complete cb');
+				window.location.reload(true);
 			}
 		});
 	});

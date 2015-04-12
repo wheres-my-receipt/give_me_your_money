@@ -10,18 +10,5 @@ html
 				.row
 					.col-xs-6.col-xs-offset-3
 						include ./includes/alert_head.jade
-			.container
-				.row
-					.admintitle.col-xs-12
-						h2 Member Administration Pages
-				.row
-					.memberspanel.col-xs-6.col-xs-offset-3
-						for member in members
-							.panel.panel-default
-								.panel-heading(role="tab")
-									h3.panel-title
-										a(href='/admin/member/'+member.username) #{member.first_name} #{member.last_name}
-											span.sendicon
-												a(href='/admin/message/'+member.username)
-													span.glyphicon.glyphicon-envelope
+			include ./includes/admin_main.jade
 	+foot()
