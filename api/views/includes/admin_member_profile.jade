@@ -1,0 +1,57 @@
+p You have been a member since #{moment(user.member_since).format("Do MMMM, YYYY")}
+	form#adminedit.form-horizontal
+		.form-group
+			label.control-label.col-xs-2(for='inputUserName') User
+			.col-xs-10
+				p.form-control-static#username #{user.username}
+		.form-group
+			.col-xs-10
+				p You are a currently #{user.membership_active_status ? "active" : "inactive"} member of Founders & Coders
+					span
+						if user.membership_active_status
+							select#memberStatus(name='membership_active_status')
+								option(value='active' selected="selected") Active
+								option(value='inactive') Inactive
+						else
+							select#memberStatus(name='membership_active_status')
+								option(value='active') Active
+								option(value='inactive' selected="selected") Inactive
+		.form-group
+			.col-xs-10
+				p You are currently #{user.desk_authorization ? "able" : "not yet able"} to rent desks.
+					span
+						if user.desk_authorization
+							select#deskStatus(name='desk_authorization')
+								option(value="active" selected="selected") Active
+								option(value="inactive") Inactive
+						else
+							select#deskStatus(name='desk_authorization')
+								option(value="active" ) Active
+								option(value="inactive" selected="selected") Inactive
+		.form-group
+			.col-xs-10
+				if (user.membership_paid)
+					p You have paid for your membership until #{moment(user.membership_paid).format("Do MMMM, YYYY")}.
+				else
+					p You have not paid for your membership. Membership Fee £#{user.membership_fee/100}
+				//- div.section#desk-wrapper
+				each year, index in user.desk_rental_status
+					.panel.panel-default
+						a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#d-collapse', aria-expanded='false', aria-controls='d-collapse')
+							.panel-heading(role='tab', id='d-heading')
+								h4.panel-title
+									| Desk Activity #{index}:
+						.panel-collapse.collapse(role='tabpanel', aria-labelledby='d-heading', id="d-collapse")
+							.list-group
+							- for(var i=0; i<thisMonth+1; i++)
+								div.monthlist
+									span.month #{months[i]}:
+									if (year[i] === "unpaid")
+										span.status.label.label-danger #{year[i]}
+									if (year[i] === "paid")
+										span.status.label.label.label-success #{year[i]}
+									if (year[i] === "away")
+										span.status.label.label-warning #{year[i]}
+		.form-group
+			.col-xs-6.col-xs-offset-5
+				button.btn.btn-primary(type='submit') Save

@@ -175,9 +175,9 @@ ul>li>a#profile {
 }
 
 .alert-wrapper {
-	position: fixed;
+	/*position: fixed;
 	right: 0;
-	top: 60px;
+	top: 60px;*/
 }
 
 #d-collapse{
@@ -187,10 +187,44 @@ ul>li>a#profile {
 	border-top-color: black;
 }
 
-.admintitle {
+.admintitle, .memberspanel {
 	text-align:center
 }
 
 .sendicon{
 	margin-left: 10px;
+}
+
+.status {
+	float: right;
+	width: 100px;
+}
+
+.monthlist {
+	border-bottom: 1px dashed black;
+	margin-bottom: 5px;
+}
+
+.deskRentalPanel {
+	display: block;
+	height: 89px;
+	width: 70%;
+	margin: auto;
+	margin-bottom: 15px;
+}
+
+p.info {
+	text-align: center;
+}
+
+.membershippanel {
+	display: block;
+	width: 45%;
+	margin: auto;
+	padding-bottom: 15px;
+}
+
+.unauth {
+	margin-top: 100px;
+	position: absolute;
 }
