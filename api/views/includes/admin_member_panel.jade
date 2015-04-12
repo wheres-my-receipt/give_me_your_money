@@ -1,0 +1,51 @@
+.container
+	.row
+		.tabbable.tabs-left.col-md-8.col-md-offset-2.contentwrapper
+			ul.nav.nav-tabs
+				li.active
+					a(href='#profile', data-toggle='tab') Profile
+				li
+					a(href='#messages', data-toggle='tab') Messages
+				li
+						a(href='#transactions', data-toggle='tab') Transactions
+				li
+					a(href='#mailform', data-toggle='tab')
+						span.glyphicon.glyphicon-envelope
+			.tab-content
+				#profile.tab-pane.active
+					#profileheader
+						h2.tabheader#name  Hello #{user.first_name} #{user.last_name}
+						img.profilePic.img-rounded(src=user.github_avatar href=user.github_link)
+					#profilebody
+						.section#member-wrapper
+							include ./admin_member_profile.jade
+				#messages.tab-pane
+					h2.tabheader  Your Messages
+					#accordion.panel-group(role='tablist', aria-multiselectable='true')
+					if user.message_history
+						each message, index in user.message_history
+							.panel.panel-default
+								.panel-heading(role='tab', id='m-heading' + index)
+									h4.panel-title
+										a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#t-collapse' + index, aria-expanded='false', aria-controls='t-collapse' + index)
+											| #{moment(message.date).format("Do, DD-MM-YY, h:mm") + ": " + message.subject}
+								.panel-collapse.collapse(role='tabpanel', aria-labelledby='m-heading' + index, id="t-collapse" + index)
+									.panel-body
+										| #{message.text}
+				#transactions.tab-pane
+					h2.tabheader  Your transaction history
+					#accordion.panel-group(role='tablist', aria-multiselectable='true')
+						if user.transaction_history
+							each transaction, index in user.transaction_history
+								.panel.panel-default
+									.panel-heading(role='tab', id='t-heading' + index)
+										h4.panel-title
+											a.collapsed(data-toggle='collapse', data-parent='#accordion', href='#m-collapse' + index, aria-expanded='false', aria-controls='m-collapse' + index)
+												| #{moment(transaction.date).format("DD-MM-YY")}
+									.panel-collapse.collapse(role='tabpanel', aria-labelledby='t-heading' + index, id="m-collapse" + index)
+										.panel-body
+											| Transaction made by #{transaction.name} for #{ transaction.type === "desk" ? "one month's desk rental" : "annual membership"}.
+											br
+											| Amount paid: £#{transaction.amount/100}
+				#mailform.tab-pane
+					include ./message_form.jade

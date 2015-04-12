@@ -3,6 +3,7 @@ $(document).ready(function() {
 	var myUser = $("#username")[0].innerHTML;
 
 	$("#editform").on("submit", function(e) {
+		console.log( 'IN ACCOUNT.JS');
 		var updateData = {};
 		if ($("#first_name").val()) { updateData.first_name = $("#first_name").val();}
 		if ($("#last_name").val()) { updateData.last_name = $("#last_name").val();}
@@ -14,7 +15,12 @@ $(document).ready(function() {
 			method: "PUT",
 			data: updateData,
 			success: function() {
+				console.log( 'In AJAX success cb');
     			window.location.reload(true);
+			},
+			complete: function(){
+				console.log( 'In AJAX complete cb');
+				window.location.reload(true);
 			}
 		});
 	});
@@ -41,7 +47,7 @@ $(document).ready(function() {
 			method: "DELETE",
 			success: function() {
     			window.location.reload(true);
-			}	
+			}
 		});
 	});
 });

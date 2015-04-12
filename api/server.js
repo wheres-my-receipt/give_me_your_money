@@ -5,7 +5,7 @@ var path 	= require('path');
 var routes 	= require('./routes/routes.js');
 var config 	= require('./config.js');
 var port 	= {port: (process.env.port || 3000 ) };
-
+var controller 	= require("./controllers/controller.js");
 var server = new Hapi.Server({
 	connections: {
 		routes: {
@@ -58,6 +58,7 @@ server.register([Bell, Cookie], function (err) {
 		isCached: false
 	});
 
+	server.method( 'updateAccountHelper', controller.updateAccountHelper, {});
 	server.auth.default('session');
 	server.route( routes );
 });

@@ -46,6 +46,7 @@ var accountSchema = new Schema({
 
 	membership_active_status: {type: Boolean, required: true, default: false}, //currently paid up or not
 	membership_paid: {type: Date}, // date membership paid until
+	membership_fee: {type: Number, required: true, default: 5000},
 
 	desk_authorization: {type: Boolean, required: true, default: false},
 

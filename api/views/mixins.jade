@@ -19,3 +19,19 @@ mixin foot(fileArray)
 		each file in fileArray
 			script(src='/scripts/' + file + '.js')
 
+mixin recipient(user, listArray)
+	if listArray
+		h3 Send a Mail List Email
+			.control-group
+				.controls
+					label.label(for="email") Email Address
+					br
+					select.form-control(name="email")
+						each val, index in listArray
+							option(value=val.name) #{val.name}
+	else
+		h3 Send #{user.first_name} #{user.last_name} a message
+		.control-group
+			.controls
+				label.label(for="email") Email Address
+					input.form-control(type="text" name="email" value=user.email)

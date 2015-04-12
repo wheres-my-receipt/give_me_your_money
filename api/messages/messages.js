@@ -5,8 +5,9 @@ var domain 	= config.mailgunTest.domain;
 var port = {port: (process.env.port || 3000 ) };
 //var proxy 	= config.mailgunTest.proxy + port;
 var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
-var allMembersList = config.mailgunTest.mailLists.allMembersList;
-var deskOccupantsList = config.mailgunTest.mailLists.deskOccupantsList;
+var allMembersList = config.mailgunTest.mailLists[0];
+var deskOccupantsList = config.mailgunTest.mailLists[1];
+var mailLists = config.mailgunTest.mailLists;
 
 var messageTemplates = {
 	acknowledge : function (message, data) {
@@ -43,7 +44,7 @@ var messageTemplates = {
 	},
 	customMessage : function (message, data) {
 		message.subject = data.subject;
-		message.text = data.subject;
+		message.text = data.contents;
 		return message;
 	},
 
@@ -74,13 +75,30 @@ var messageTemplates = {
 		return message;
 	}
 };
+getRecipient = function( data ) {
+	//  return data.email as if if data.email is already an email address
+	console.log( 'Recipient: ' + data.email);
+	if( data.email.indexOf( "@") !== -1) return data.email;
+
+	// if no @ then need to look up mail list
+	var found = mailLists.filter( function( val, index ) {
+		return( val.name === data.email );
+	});
+	if( found.length === 1 ) {
+		console.log( "Found: "+ found[0].email);
+		return found[0].email;
+	}
+	if( found.length === 0 ) console.log( "Didn't find any maillists matching: " + data.email );
+	else console.log( "Found too many matching mail lists : " + found);
+
+};
 
 createMessage = function( emailType, data ){
 	var message = {
 					// from: 'facmembershipadmin@gmail.com',
 					from: 'mail@sandbox987b404359ae4e0ab6199bd4e6ad6d2f.mailgun.org',
-					to: data.email
 				};
+	message.to = getRecipient( data );
 	switch( emailType ){
 		case "Acknowledge" :
 			return messageTemplates.acknowledge( message, data );
@@ -112,10 +130,8 @@ createMessage = function( emailType, data ){
 };
 
 module.exports = {
-
-	addToMembersList : function( data ){
-		// == ADD NEW ACCOUNT MEMBER TO "all_members" EMAIL LIST
-		var list = mailgun.lists(allMembersList);
+	addToMailList : function ( data, mailListName ) {
+		var list = mailgun.lists(mailListName.email );
 
 		var newMember = {
 				subscribed: true,
@@ -123,39 +139,37 @@ module.exports = {
 				name: data.first_name + ' ' + data.last_name
 		};
 
-		list.members().create( newMember, function (err, data) {
+		if( list ){
+			list.members().create( newMember, function (err, data) {
 
-			if( err )
-				console.log("Created Error: " + err);
-			else
-				console.log("Created: " + data);
-
-			list.members().list(function (err, members) {
 				if( err )
 					console.log("Created Error: " + err);
-				else// `members` is the list of members
-					console.log("addToMembersList (" + members.length + ')');
+				else
+					console.log("Created: " + data);
+
+				list.members().list(function (err, members) {
+					if( err )
+						console.log("Created Error: " + err);
+					else// `members` is the list of members
+						console.log("addToMembersList (" + members.length + ')');
+				});
 			});
-		});
+		}
+		else {
+			console.log( "Error, cannot find list: " + mailListName.email);
+		}
+	},
+	addToMembersList : function( data ){
+		// == ADD NEW ACCOUNT MEMBER TO "all_members" EMAIL LIST
+		addToMailList( data, allMembersList );
 	},
 	addToDeskOccupantsList : function ( data ) {
 		// == ADD NEW ACCOUNT MEMBER TO "all_members" EMAIL LIST
-		var list = mailgun.lists( deskOccupantsList );
-		var newMember = {
-				subscribed: true,
-				address: data.email,
-				name: data.first_name + ' ' + data.last_name
-		};
-
-		list.members().create( newMember, function (err, data) {
-			// `data` is the member details
-			if( err )
-				console.log("Created Error: " + err);
-			else
-				console.log("Created: " + data);
-		});
+		addToMailList(data, deskOccupantsList );
 	},
-
+	getAllMailLists : function() {
+		return mailLists;
+	},
 	sendEmail: function(data, emailtype, onComplete){
 		// ==== SEND AN EMAIL (e.g. ACKNOWLEDGEMENT TO NEW MEMBER) == //
 		var message = createMessage(emailtype, data );

@@ -1,0 +1,34 @@
+include ../mixins.jade
+
+if user
+	form.contact.well(name="contact" action='/api/messages/'+ user.username , method='POST')
+		+recipient(user, mailLists)
+		.control-group
+			.controls
+				label.label(for="emailtype") Type Of Message
+					br
+					select.form-control(name="emailtype")
+						//- label.label(for="custom") Custom
+						option(value="Custom") Custom
+						//- label.label(for="verify") Verify
+						option(value="VerifyAccount") Verify
+						//- label.label(for="annfeerem") Annual Fees Reminder
+						option(value="AnnualFeeReminder") Annual Fees Reminder
+						//- label.label(for="deskfeerem") Desk Rent Fee Reminder
+						option(value="DeskRentFeeReminder") Desk Rent Fee Reminder
+						//- label.label(for="annsubsdemand") Annual Subscription Demand
+						option(value="annualSubscriptionDemand") Annual Subscription Demand
+						//- label.label(for="annsubsoverdue") Annual Subscription Overdue
+						option(value="annualSubscriptionOverdue") Annual Subscription Overdue
+		.control-group
+			.controls
+				label.label(for="subject") Subject
+				br
+				input.form-control(type="text" name="subject" placeholder="subject")
+		.control-group
+			.controls
+				label.label(for="message") Message
+				br
+				textarea.form-control(name="contents" placeholder="type your message here")
+		.control-group
+			button.btn.btn-primary(type='submit') Submit
